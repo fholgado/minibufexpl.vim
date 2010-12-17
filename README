@@ -7,7 +7,12 @@ This is an updated and modified version of the script available here: http://www
 	MBEVisibleActive       
 	MBEVisibleChangedActive
 
+You can see a screenshot of what this looks like here: http://fhl.gd/qnNQ
+
 [6.3.4] - Added to the original script were the following keybindings: (By Oliver Uvman)
+
+Added to the original script were the following keybindings: (By Oliver Uvman)
+
 h and l to move left and right when selecting buffers in addition to the original Tab and Shift-Tab
 o and e to show a buffer in addition to the original <CR>
 s to open the selected buffer in a split window
