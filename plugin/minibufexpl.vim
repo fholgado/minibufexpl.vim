@@ -21,8 +21,8 @@
 " Last Updated: Federico Holgad <fholgado@gmail.com>
 "          URL: http://vim.sourceforge.net/scripts/script.php?script_id=159
 "   GitHub URL: https://github.com/fholgado/minibufexpl.vim
-"  Last Change: Friday, December 11, 2010
-"      Version: 6.3.5
+"  Last Change: Friday, December 16, 2010
+"      Version: 6.3.6
 "               Derived from Jeff Lanzarotta's bufexplorer.vim version 6.0.7
 "               Jeff can be reached at (jefflanzarotta@yahoo.com) and the
 "               original plugin can be found at:
@@ -274,8 +274,6 @@
 "         Todo: - Add the ability to specify a regexp for eligible buffers
 "                 allowing the ability to filter out certain buffers that 
 "                 you don't want to control from MBE.
-"               - To update the MBE immediately after changes have been made
-"                 to a buffer to reflect the proper state of Normal or Changed.
 "
 "=============================================================================
 " }}}
@@ -1696,7 +1694,10 @@ endfunc " }}}
 " MBE Script History {{{
 "=============================================================================
 "
-"      History: 6.3.5 o Added highlighting for currently active buffer.
+"      History: 6.3.6 o MBE now updates current buffer's status on buffer save
+"                       and when a buffer is modified. Patched by Federico
+"                       Holgado (fholgado at gmail dot com).
+"               6.3.5 o Added highlighting for currently active buffer.
 "                       Patched by Federico Holgado (fholgado at gmail dot
 "                       com).
 "               6.3.4 o Now returns to augroup NONE after setting augroup
