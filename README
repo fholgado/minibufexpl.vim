@@ -1,11 +1,13 @@
 This is an updated and modified version of the script available here: http://www.vim.org/scripts/script.php?script_id=159
 
-Added two more states for buffer names to the included possible states to reflect the current buffer that is active. These states can be targeted by the following syntax: (By Federico Holgado)
+[6.3.6] 12/16/2010 - Added behavior to reflect buffer highlighting states automatically on buffer change and buffer save. This corrects previous behavior where MBE was only updated after entering another buffer and it would be marked as modified even though the buffer was just saved. (By Federico Holgado)
+
+[6.3.5] 12/12/2010 - Added two more states for buffer names to the included possible states to reflect the current buffer that is active. These states can be targeted by the following syntax: (By Federico Holgado)
 
 	MBEVisibleActive       
 	MBEVisibleChangedActive
 
-Added to the original script were the following keybindings: (By Oliver Uvman)
+[6.3.4] - Added to the original script were the following keybindings: (By Oliver Uvman)
 h and l to move left and right when selecting buffers in addition to the original Tab and Shift-Tab
 o and e to show a buffer in addition to the original <CR>
 s to open the selected buffer in a split window

@@ -350,7 +350,7 @@ endif " }}}
 " 5-9 = info ; 5 is the most important
 " 10 = Entry/Exit
 if !exists('g:miniBufExplorerDebugLevel')
-  let g:miniBufExplorerDebugLevel = 0 
+  let g:miniBufExplorerDebugLevel = 0
 endif
 
 " }}}
@@ -612,9 +612,12 @@ let s:debugIndex = 0
 " that keep our explorer updated automatically.
 "
 augroup MiniBufExplorer
-autocmd MiniBufExplorer BufDelete   * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufname("%"))
-autocmd MiniBufExplorer BufEnter    * call <SID>DEBUG('-=> BufEnter  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
-autocmd MiniBufExplorer VimEnter    * call <SID>DEBUG('-=> VimEnter  AutoCmd', 10) |let g:miniBufExplorerAutoUpdate = 1 |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufname("%"))
+autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer CursorMoved    * call <SID>DEBUG('-=> InsertChange  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer CursorMovedI   * call <SID>DEBUG('-=> InsertChange  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter  AutoCmd', 10) |let g:miniBufExplorerAutoUpdate = 1 |call <SID>AutoUpdate(-1,bufname("%"))
 augroup NONE
 " }}}
 
