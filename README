@@ -1,5 +1,7 @@
 This is an updated and modified version of the script available here: http://www.vim.org/scripts/script.php?script_id=159
 
+[6.3.7] 12/19/2010 - MBE now uses it's own custom statusline format to reduce visual clutter. (By Federico Holgado)
+
 [6.3.6] 12/16/2010 - Added behavior to reflect buffer highlighting states automatically on buffer change and buffer save. This corrects previous behavior where MBE was only updated after entering another buffer and it would be marked as modified even though the buffer was just saved. (By Federico Holgado)
 
 [6.3.5] 12/12/2010 - Added two more states for buffer names to the included possible states to reflect the current buffer that is active. These states can be targeted by the following syntax: (By Federico Holgado)
