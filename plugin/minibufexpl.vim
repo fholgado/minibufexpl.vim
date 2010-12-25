@@ -352,7 +352,7 @@ endif " }}}
 " 5-9 = info ; 5 is the most important
 " 10 = Entry/Exit
 if !exists('g:miniBufExplorerDebugLevel')
-  let g:miniBufExplorerDebugLevel = 0
+  let g:miniBufExplorerDebugLevel = 1
 endif
 
 " }}}
@@ -366,7 +366,7 @@ endif
 " 3 = Write into g:miniBufExplorerDebugOutput
 "     global variable [This is the default]
 if !exists('g:miniBufExplorerDebugMode')
-  let g:miniBufExplorerDebugMode = 3 
+  let g:miniBufExplorerDebugMode = 3
 endif 
 
 " }}}
@@ -1126,11 +1126,69 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
           " Only show modifiable buffers (The idea is that we don't 
           " want to show Explorers)
           if (getbufvar(l:i, '&modifiable') == 1 && BufName != '-MiniBufExplorer-')
+              
+            "See if buffer names are duplicate
+            let l:dupeBufName = 0
+            let l:dupeBufDir1 = 0
+            let l:i2 = 0
+
+            while(l:i2 <= l:NBuffers)
+                call <SID>DEBUG('Entering Dupe Checking Loop',10)
+                let l:i2 = l:i2 + 1
+                let l:BufName2 = bufname(l:i2)
+
+                "Get the full path of the current buffer in the loop and the
+                "new bufferin the loop
+                let l:bufPath = expand(l:BufName)
+                let l:bufPath2 = expand(l:BufName2)
+                let l:bufFileName = fnamemodify(l:BufName, ':t')
+                let l:bufFileName2 = fnamemodify(l:BufName2, ':t')
+
+                "Split the path string by delimiters
+                let l:bufSplitPath = split(l:bufPath, '/')
+                let l:bufSplitPath2 = split(l:bufPath2, '/')
+
+                "Get the filename from each buffer to compare them
+                let l:bufFileNameFromPath = l:bufSplitPath[-1]
+
+                "Make sure to take into account empty buffers
+                let l:bufFileNameFromPath2 = ''
+                if(strlen(l:BufName2))
+                    let l:bufFileNameFromPath2 = l:bufSplitPath2[-1]
+                endif
+
+                call <SID>DEBUG(l:bufFileNameFromPath.' vs '.l:bufFileNameFromPath2,10)
+                call <SID>DEBUG('BufName2 is '.l:BufName2.' and bufName is '.l:BufName,10)
+
+                if (l:bufFileName == l:bufFileName2)
+                    let l:dupeBufName = l:dupeBufName + 1
+                    call <SID>DEBUG('dupeBufName equals '.l:dupeBufName,10)
+                    call <SID>DEBUG(l:bufSplitPath[-2].' vs '.l:bufSplitPath2[-2],10)
+                    if(l:bufSplitPath[-2] == l:bufSplitPath2[-2])
+                        let l:dupeBufDir1 = l:dupeBufDir1 + 1
+                        call <SID>DEBUG('Match in first level directory name and dupeBufDir1 is '.l:dupeBufDir1,10)
+                    endif
+                endif
+            endwhile   
             
-            " Get filename & Remove []'s & ()'s
-            let l:shortBufName = fnamemodify(l:BufName, ":t")                  
-            let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g') 
-            let l:tab = '['.l:i.':'.l:shortBufName.']'
+            if (l:dupeBufName == 1)
+                " Get filename & Remove []'s & ()'s
+                let l:shortBufName = fnamemodify(l:BufName, ":t")
+                " let l:shortBufName = l:shortBufName.'/'.fnamemodify(l:BufName, ':t')
+
+                let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g') 
+                let l:tab = '['.l:i.':'.l:shortBufName.']'
+            endif
+
+            if (l:dupeBufName >= 2)
+                let l:bufPathSplit = split(l:BufName, '/')
+                let l:tab = '['.l:i.':'.l:bufPathSplit[-2].'/'.l:bufPathSplit[-1].']'
+            endif
+
+            if (l:dupeBufDir1 >= 2)
+                let l:bufPathSplit = split(l:BufName, '/')
+                let l:tab = '['.l:i.':'.l:bufPathSplit[-3].'/'.l:bufPathSplit[-2].'/'.l:bufPathSplit[-1].']'
+            endif
 
             " If the buffer is open in a window mark it
             if bufwinnr(l:i) != -1
