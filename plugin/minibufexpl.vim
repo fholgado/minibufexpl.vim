@@ -613,12 +613,17 @@ let s:debugIndex = 0
 " Setup an autocommand group and some autocommands {{{
 " that keep our explorer updated automatically.
 "
+
+"set update time for the CursorHold function so that it is called 100ms after
+"a key is pressed
+setlocal updatetime=100
+
 augroup MiniBufExplorer
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufname("%"))
 autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
 autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
-autocmd MiniBufExplorer CursorMoved    * call <SID>DEBUG('-=> InsertChange  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
-autocmd MiniBufExplorer CursorMovedI   * call <SID>DEBUG('-=> InsertChange  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer CursorHold    * call <SID>DEBUG('-=> CursroHold  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer CursorHoldI   * call <SID>DEBUG('-=> CursorHoldI  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter  AutoCmd', 10) |let g:miniBufExplorerAutoUpdate = 1 |call <SID>AutoUpdate(-1,bufname("%"))
 augroup NONE
 " }}}
