@@ -1139,7 +1139,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
   " Loop through every buffer less than the total number of buffers.
   while(l:i <= l:NBuffers)
     let l:i = l:i + 1
-   
+
     " If we have a delBufNum and it is the current
     " buffer then ignore the current buffer. 
     " Otherwise, continue.
@@ -1150,6 +1150,21 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
         let l:BufName = bufname(l:i)
         " Check to see if the buffer is a blank or not. If the buffer does have
         " a name, process it.
+
+        " default separator for *nix file systems
+        let s:PathSeparator = '/'
+
+        " check to see what platform we are in
+        " if (match(bufname(l:i), '/'))
+        "     call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
+        "     let s:PathSeparator = '/'
+        " endif
+
+        " if (match(bufname(l:i), '\'))
+        "     call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
+        "     let s:PathSeparator = '\'
+        " endif
+
         if(strlen(l:BufName))
           " Only show modifiable buffers (The idea is that we don't 
           " want to show Explorers)
@@ -1178,8 +1193,8 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
                 call <SID>DEBUG('BufName is '.l:BufName.' and bufName2 is '.l:BufName2,10)
 
                 " Split the path string by delimiters
-                let l:bufSplitPath = split(l:bufPath, '/')
-                let l:bufSplitPath2 = split(l:bufPath2, '/')
+                let l:bufSplitPath = split(l:bufPath,s:PathSeparator,0)
+                let l:bufSplitPath2 = split(l:bufPath2,s:PathSeparator,0)
 
                 " Get the filename from each buffer to compare them
                 let l:bufFileNameFromPath = 'No Name'
@@ -1219,7 +1234,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
                     call <SID>DEBUG('Item in pathList loop is '.item,10)
                     if ((!empty(item)) && (item != l:bufPath))
                         call <SID>DEBUG('2 or more duplicate buffer names, calling dir check function with '.l:bufPath.' vs '.item,10)
-                        call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,'/'),split(item,'/'))
+                        call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,s:PathSeparator,0),split(item,s:PathSeparator,0))
                     endif
                 endfor
             endif
