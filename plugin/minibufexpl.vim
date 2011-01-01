@@ -1135,6 +1135,11 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
 
   let l:fileNames = ''
   let l:maxTabWidth = 0
+  " default separator for *nix file systems
+  let s:PathSeparator = '/'
+  " counter to see what platform we may be in
+  let l:nixPlatform = 0
+  let l:winPlatform = 0
 
   " Loop through every buffer less than the total number of buffers.
   while(l:i <= l:NBuffers)
@@ -1151,19 +1156,16 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
         " Check to see if the buffer is a blank or not. If the buffer does have
         " a name, process it.
 
-        " default separator for *nix file systems
-        let s:PathSeparator = '/'
-
         " check to see what platform we are in
-        " if (match(bufname(l:i), '/'))
-        "     call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
-        "     let s:PathSeparator = '/'
-        " endif
+        if (has('unix'))
+            let s:PathSeparator = '/'
+            call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
+        else
+            let s:PathSeparator = '\'
+            call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
+        endif
 
-        " if (match(bufname(l:i), '\'))
-        "     call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
-        "     let s:PathSeparator = '\'
-        " endif
+        call <SID>DEBUG('Separator is '.s:PathSeparator,10)
 
         if(strlen(l:BufName))
           " Only show modifiable buffers (The idea is that we don't 
@@ -1229,6 +1231,8 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
 
             endwhile   
             
+            " If there are 2 or more buffers with the same name, let's call a
+            " function that show a differentiating parent directory so that the name is unique.
             if l:dupeBufName >= 2
                 for item in l:pathList
                     call <SID>DEBUG('Item in pathList loop is '.item,10)
