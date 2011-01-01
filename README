@@ -1,5 +1,18 @@
 This is an updated and modified version of the script available here: http://www.vim.org/scripts/script.php?script_id=159
 
+[6.4.0] 1/1/2011 - Added Emacs-like 'uniquify' feature where MBE will show a parent directory when there are 2 buffers with the same filename.
+
+i.e. There are 2 buffers with the same filename:
+/ProjectA/Application/CSS/style.css
+/ProjectB/Applications/CSS/style.css
+
+Originally, MBE would just display 'style.css' for both buffers. Now, MBE crawls up the directory tree to find the first differentiating parent directory for both buffers, s MBE will show:
+
+ProjectA/style.css
+ProjectB/style.css
+
+- Now sets winfixheight and winfixwidth for the MBE buffer so that it does not get resized automatically by window resizing commands such as 'CTRL W='.
+
 [6.3.7] 12/19/2010 - MBE now uses it's own custom statusline format to reduce visual clutter. (By Federico Holgado)
 
 [6.3.6] 12/16/2010 - Added behavior to reflect buffer highlighting states automatically on buffer change and buffer save. This corrects previous behavior where MBE was only updated after entering another buffer and it would be marked as modified even though the buffer was just saved. (By Federico Holgado)

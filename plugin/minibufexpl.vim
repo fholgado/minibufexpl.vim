@@ -6,7 +6,7 @@
 "=============================================================================
 "    Copyright: Copyright (C) 2002 & 2003 Bindu Wavell 
 "    		    Copyright (C) 2010 Oliver Uvman
-"    		    Copyright (C) 2010 Federico Holgado
+"    		    Copyright (C) 2010 & 2011 Federico Holgado
 "               Permission is hereby granted to use and distribute this code,
 "               with or without modifications, provided that this copyright
 "               notice is copied with it. Like anything else that's free,
@@ -17,12 +17,12 @@
 "
 " Name Of File: minibufexpl.vim
 "  Description: Mini Buffer Explorer Vim Plugin
-"   Maintainer: Bindu Wavell <bindu@wavell.net>
+"   Maintainer: Federico Holgado <fholgado@gmail.com>
 " Last Updated: Federico Holgado <fholgado@gmail.com>
 "          URL: http://vim.sourceforge.net/scripts/script.php?script_id=159
 "   GitHub URL: https://github.com/fholgado/minibufexpl.vim
-"  Last Change: Saturday, December 19, 2010
-"      Version: 6.3.7
+"  Last Change: Saturday, January 1, 2011
+"      Version: 6.4.0
 "               Derived from Jeff Lanzarotta's bufexplorer.vim version 6.0.7
 "               Jeff can be reached at (jefflanzarotta@yahoo.com) and the
 "               original plugin can be found at:
@@ -672,6 +672,12 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   " them off for the MBE window
   setlocal foldcolumn=0
   setlocal nonumber
+  "
+  "Depending on what type of split, make sure the MBE buffer is not
+  "automatically rezised by CTRL + W =, etc...
+  setlocal winfixheight
+  setlocal winfixwidth
+
   " Set the text of the statusline for the MBE buffer. See help:stl for
   " many options
   setlocal stl=-MiniBufExplorer-
@@ -1817,7 +1823,20 @@ endfunc " }}}
 " MBE Script History {{{
 "=============================================================================
 "
-"      History: 6.3.7 o MBE now uses it's own status line format to reduce the
+"      History: 6.4.0 o Added Emacs-like 'uniquify' feature where MBE will
+"                       show a parent directory when there are 2 buffers with
+"                       the same filename. Example: There are 2 buffers, one
+"                       is /ProjectA/Application/CSS/style.css and
+"                       /ProjectB/Applications/CSS/style.css. Originally, MBE
+"                       would just display 'style.css' for both buffers. Now,
+"                       MBE crawls up the directory tree to find the first
+"                       differentiating parent directory for both buffers, so
+"                       MBE will show 'ProjectA/style.css' and
+"                       'ProjectB/style.css' for each buffer name.
+"                     o Now setting winfixheight and winfixwidth for the MBE
+"                       buffer so that it does not get resized automatically
+"                       by window resizing commands such as 'CTRL W='.
+"               6.3.7 o MBE now uses it's own status line format to reduce the
 "                       amount of visual clutter. This can be customized.
 "               6.3.6 o MBE now updates current buffer's status on buffer save
 "                       and when a buffer is modified. Patched by Federico
