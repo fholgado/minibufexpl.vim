@@ -227,6 +227,12 @@
 "
 "                 let g:miniBufExplModSelTarget = 1
 " 
+"               If you would like MBE to close when you select a buffer, put:
+"
+"                 let g:miniBufExplCloseOnSelect = 1
+"
+"               into your .vimrc.
+"
 "               into your .vimrc in order to force MBE to try to place selected 
 "               buffers into a window that does not have a nonmodifiable buffer.
 "               The upshot of this should be that if you go into MBE and select
@@ -578,6 +584,14 @@ if g:miniBufExplUseSingleClick == 1
   endif
 endif " }}}
 
+" Close on Select? {{{
+" Flag that can be set to 1 in a users .vimrc to hide
+" the explorer when a user selects a buffer.
+"
+if !exists('g:miniBufExplCloseOnSelect')
+  let g:miniBufExplCloseOnSelect = 0
+endif "}}}
+
 " Variables used internally
 "
 " Script/Global variables {{{
@@ -603,12 +617,19 @@ if !exists('g:miniBufExplForceDisplay')
   let g:miniBufExplForceDisplay = 0
 endif
 
+if !exists('g:miniBufExplSortBy')
+  let g:miniBufExplSortBy = "number"
+endif
+
 " Variable used to pass maxTabWidth info between functions
 let s:maxTabWidth = 0 
 
 " Variable used to count debug output lines
 let s:debugIndex = 0 
 
+" Build initial MRUList. This makes sure all the files specified on the
+" command line are picked up correctly.
+let s:MRUList = range(1, bufnr('$'))
   
 " }}}
 " Setup an autocommand group and some autocommands {{{
@@ -617,7 +638,7 @@ let s:debugIndex = 0
 
 "set update time for the CursorHold function so that it is called 100ms after
 "a key is pressed
-setlocal updatetime=100
+setlocal updatetime=300
 
 augroup MiniBufExplorer
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufname("%"))
@@ -1126,6 +1147,37 @@ function! CheckRootDirForDupes(level,path1,path2)
 endfunction
 
 " }}}
+" IgnoreBuffer - check to see if buffer should be ignored {{{
+"
+" Returns 0 if this buffer should be displayed in the list, 1 otherwise.
+"
+function! <SID>IgnoreBuffer(buf)
+  " Skip temporary buffers with buftype set.
+  if empty(getbufvar(a:buf, "&buftype") == 0)
+    return 1
+  endif
+
+  " Skip unlisted buffers.
+  if buflisted(a:buf) == 0
+    return 1
+  endif
+
+  " Skip buffers with no name.
+  let l:BufName = bufname(a:buf)
+  if empty(l:BufName) == 1
+    return 1
+  endif
+
+  " Only show modifiable buffers (The idea is that we don't 
+  " want to show Explorers)
+  if (getbufvar(a:buf, '&modifiable') != 1 || l:BufName == '-MiniBufExplorer-')
+    return 1
+  endif
+
+  return 0 
+endfunction
+
+" }}}
 " BuildBufferList - Build the text for the MBE window {{{
 " 
 " Creates the buffer list string and returns 1 if it is different than
@@ -1140,6 +1192,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
   let l:i = 0                     " Set the buffer index to zero.
 
   let l:fileNames = ''
+  let l:tabList = []
   let l:maxTabWidth = 0
   " default separator for *nix file systems
   let s:PathSeparator = '/'
@@ -1154,14 +1207,8 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
     " If we have a delBufNum and it is the current
     " buffer then ignore the current buffer. 
     " Otherwise, continue.
-    if (a:delBufNum == -1 || l:i != a:delBufNum)
-      " Make sure the buffer in question is listed.
-      if(getbufvar(l:i, '&buflisted') == 1)
-        " Get the name of the buffer.
-        let l:BufName = bufname(l:i)
-        " Check to see if the buffer is a blank or not. If the buffer does have
-        " a name, process it.
-
+              
+    if (a:delBufNum == l:i)
         " check to see what platform we are in
         if (has('unix'))
             let s:PathSeparator = '/'
@@ -1173,11 +1220,22 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
 
         call <SID>DEBUG('Separator is '.s:PathSeparator,10)
 
-        if(strlen(l:BufName))
-          " Only show modifiable buffers (The idea is that we don't 
-          " want to show Explorers)
-          if (getbufvar(l:i, '&modifiable') == 1 && BufName != '-MiniBufExplorer-')
-              
+        continue
+    endif
+
+    if (<SID>IgnoreBuffer(l:i))
+        continue
+    endif
+
+    if g:miniBufExplSortBy == "mru"
+        let l:mruIdx = index(s:MRUList, l:i)
+        if l:mruIdx == -1
+            call add(s:MRUList, l:i)
+        endif
+    endif
+
+    let l:BufName = bufname(l:i)
+
             " See if buffer names are duplicate
             let l:dupeBufName = 0
             let l:i2 = 0
@@ -1269,22 +1327,30 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
             endif
 
             let l:maxTabWidth = <SID>Max(strlen(l:tab), l:maxTabWidth)
+            call add(l:tabList, l:tab)
+
+        if g:miniBufExplSortBy == "name"
+            call sort(l:tabList, "<SID>NameCmp")
+        elseif g:miniBufExplSortBy == "mru"
+            call sort(l:tabList, "<SID>MRUCmp")
+        endif
+
+        let l:fileNames = ''
+        for l:tab in l:tabList
             let l:fileNames = l:fileNames.l:tab
 
             " If horizontal and tab wrap is turned on we need to add spaces
             if g:miniBufExplVSplit == 0
-              if g:miniBufExplTabWrap != 0
-                let l:fileNames = l:fileNames.' '
-              endif
-            " If not horizontal we need a newline
+                if g:miniBufExplTabWrap != 0
+                    let l:fileNames = l:fileNames.' '
+                endif
+                " If not horizontal we need a newline
             else
-              let l:fileNames = l:fileNames . "\n"
+                let l:fileNames = l:fileNames . "\n"
             endif
-          endif
-        endif
-      endif
-    endif
-  endwhile
+    	endfor
+	endwhile
+
 
   if (g:miniBufExplBufList != l:fileNames)
     if (a:updateBufList)
@@ -1296,6 +1362,30 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
     return 0
   endif
 
+endfunction
+
+" }}}
+" NameCmp - compares tabs based on filename {{{
+"
+function! <SID>NameCmp(tab1, tab2)
+  let l:name1 = matchstr(a:tab1, ":.*")
+  let l:name2 = matchstr(a:tab2, ":.*")
+  if l:name1 < l:name2
+    return -1
+  elseif l:name1 > l:name2
+    return 1
+  else
+    return 0
+  endif
+endfunction
+
+" }}}
+" MRUCmp - compares tabs based on MRU order {{{
+"
+function! <SID>MRUCmp(tab1, tab2)
+  let l:buf1 = str2nr(matchstr(a:tab1, '[0-9]\+'))
+  let l:buf2 = str2nr(matchstr(a:tab2, '[0-9]\+'))
+  return index(s:MRUList, l:buf1) - index(s:MRUList, l:buf2)
 endfunction
 
 " }}}
@@ -1408,8 +1498,11 @@ function! <SID>AutoUpdate(delBufNum,currBufName)
 
   endif
 
+  call <SID>MRUPush(bufnr("%"))
+  
   if (a:delBufNum != -1)
     call <SID>DEBUG('AutoUpdate will make sure that buffer '.a:delBufNum.' is not included in the buffer list.', 5)
+    call <SID>MRUPop(a:delBufNum)
   endif
   
   " Only allow updates when the AutoUpdate flag is set
@@ -1566,10 +1659,13 @@ function! <SID>MBESelectBuffer(split)
   let &report  = l:save_rep
   let &showcmd = l:save_sc
 
+  if g:miniBufExplCloseOnSelect == 1
+    call <SID>StopExplorer(1)
+  endif
+
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Completed MBESelectBuffer()',10)
   call <SID>DEBUG('===========================',10)
-
 endfunction
 
 " }}}
@@ -1746,6 +1842,29 @@ function! <SID>CycleBuffer(forward)
   endif
 
 endfunction
+
+" }}}
+" MRUPop - remove buffer from MRU list {{{
+"
+function! <SID>MRUPop(buf)
+  call filter(s:MRUList, 'v:val != '.a:buf)
+endfunction
+
+" }}}
+" MRUPush - add buffer to MRU list {{{
+"
+function! <SID>MRUPush(buf)
+  if <SID>IgnoreBuffer(a:buf) == 1
+    return
+  endif
+
+  " Remove the buffer number from the list if it already exists.
+  call <SID>MRUPop(a:buf)
+
+  " Add the buffer number to the head of the list.
+  call insert(s:MRUList,a:buf)
+endfunction
+
 
 " }}}
 " DEBUG - Display debug output when debugging is turned on {{{

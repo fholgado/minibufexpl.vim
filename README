@@ -1,5 +1,7 @@
 This is an updated and modified version of the script available here: http://www.vim.org/scripts/script.php?script_id=159
 
+[6.4.1] 1/6/2011 - Added patches by Danielle Church to sort the MBE window by most recently used buffers. Added patches by Stephan Sokolow to close MBE on buffer select.
+
 [6.4.0] 1/1/2011 - Added Emacs-like 'uniquify' feature where MBE will show a parent directory when there are 2 buffers with the same filename.
 
 i.e. There are 2 buffers with the same filename:
