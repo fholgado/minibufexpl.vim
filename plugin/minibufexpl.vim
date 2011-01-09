@@ -6,6 +6,8 @@
 "=============================================================================
 "    Copyright: Copyright (C) 2002 & 2003 Bindu Wavell 
 "    		    Copyright (C) 2010 Oliver Uvman
+"    		    Copyright (C) 2010 Danielle Church
+"    		    Copyright (C) 2010 Stephan Sokolow
 "    		    Copyright (C) 2010 & 2011 Federico Holgado
 "               Permission is hereby granted to use and distribute this code,
 "               with or without modifications, provided that this copyright
@@ -642,10 +644,11 @@ setlocal updatetime=300
 
 augroup MiniBufExplorer
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufname("%"))
+autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete ModTrackingListClean AutoCmd for buffer '.bufnr("%"), 10) |call <SID>CleanModTrackingList(bufnr("%"))
 autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
 autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
-autocmd MiniBufExplorer CursorHold    * call <SID>DEBUG('-=> CursroHold  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
-autocmd MiniBufExplorer CursorHoldI   * call <SID>DEBUG('-=> CursorHoldI  AutoCmd', 10) |call <SID>AutoUpdate(-1,bufname("%"))
+autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold  AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
+autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI  AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter  AutoCmd', 10) |let g:miniBufExplorerAutoUpdate = 1 |call <SID>AutoUpdate(-1,bufname("%"))
 augroup NONE
 " }}}
@@ -1447,6 +1450,52 @@ function! <SID>HasEligibleBuffers(delBufNum)
 
   return (l:found >= l:needed)
   
+endfunction
+
+" }}}
+" Auto Update Check - Function called by auto commands to see if MBE needs to
+" be updated {{{
+" If current buffer's modified flag has changed THEN
+" call the auto update function. ELSE
+" Don't do anything
+" This is implemented to save resources so that MBE does not have to update
+" on every keypress to check if the buffer has been modified
+let g:modTrackingList = []
+function! <SID>AutoUpdateCheck(currBuf)
+    let l:bufAlreadyExists = 0
+    for item in g:modTrackingList
+        if (item[0] == a:currBuf)
+            let l:bufAlreadyExists = 1
+            if(getbufvar(a:currBuf, '&modified') != item[1])
+                call <SID>AutoUpdate(-1,bufname(a:currBuf))
+                "update g:modTrackingList with new &mod flag state
+                "call <SID>DEBUG(getbufvar(a:currBuf, '&modified'),1)
+                let item[1] = getbufvar(a:currBuf, '&modified')
+            elseif(getbufvar(a:currBuf, '&modified') == item[1])
+                "do nothing
+            endif
+        endif
+    endfor
+    if (l:bufAlreadyExists == 0)
+        call add(g:modTrackingList, [a:currBuf,0])
+    endif
+    call <SID>DEBUG('Buffer List is '.join(g:modTrackingList),10)
+endfunction
+
+" }}}
+" Clean Mod Tracking List - Function called when a buffer is deleted to keep the
+" list used to track modified buffers nice and small {{{
+" On buffer delete, loop through g:modTrackingList and delete the item that
+" matches this buffer's number
+function! <SID>CleanModTrackingList(currBuf)
+    let l:trackingListPos = 0
+    for item in g:modTrackingList
+        if (item[0] == a:currBuf)
+            call <SID>DEBUG('Buffer index to be deleted is '.l:trackingListPos,10)
+            call remove(g:modTrackingList, l:trackingListPos)
+        endif
+        let l:trackingListPos = l:trackingListPos + 1
+    endfor
 endfunction
 
 " }}}
