@@ -23,8 +23,8 @@
 " Last Updated: Federico Holgado <fholgado@gmail.com>
 "          URL: http://vim.sourceforge.net/scripts/script.php?script_id=159
 "   GitHub URL: https://github.com/fholgado/minibufexpl.vim
-"  Last Change: Saturday, January 1, 2011
-"      Version: 6.4.0
+"  Last Change: Saturday, January 8, 2011
+"      Version: 6.4.1b1
 "               Derived from Jeff Lanzarotta's bufexplorer.vim version 6.0.7
 "               Jeff can be reached at (jefflanzarotta@yahoo.com) and the
 "               original plugin can be found at:
