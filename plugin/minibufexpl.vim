@@ -809,6 +809,11 @@ function! <SID>StopExplorer(sticky)
     exec l:winNum.' wincmd w'
     silent! close
     wincmd p
+
+    " Work around a redraw bug in gVim (Confirmed present in 7.3.50)
+    if has('gui_gtk') && has('gui_running')
+        redraw!
+    endif
   endif
 
   call <SID>DEBUG('===========================',10)
@@ -833,7 +838,7 @@ function! <SID>ToggleExplorer()
     call <SID>StopExplorer(1)
   else
     call <SID>StartExplorer(1, -1, bufnr("%"))
-    wincmd p
+    " wincmd p
   endif
 
   call <SID>DEBUG('===========================',10)
