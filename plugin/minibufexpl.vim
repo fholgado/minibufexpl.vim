@@ -1544,8 +1544,9 @@ function! <SID>AutoUpdate(delBufNum,currBufName)
     let g:miniBufExplInAutoUpdate = 1
   endif
 
-  " Don't bother autoupdating the MBE window
-  if (bufname('%') == '-MiniBufExplorer-')
+  " Don't bother autoupdating the MBE window, and skip the FuzzyFinder window
+  " (Thanks toupeira!)
+  if (bufname('%') == '-MiniBufExplorer-' || bufname('%') == '[fuf]')
     " If this is the only buffer left then toggle the buffer
     if (winbufnr(2) == -1)
         call <SID>CycleBuffer(1)
