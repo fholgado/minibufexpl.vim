@@ -837,7 +837,7 @@ function! <SID>ToggleExplorer()
     call <SID>StopExplorer(1)
   else
     call <SID>StartExplorer(1, -1, bufnr("%"))
-    " wincmd p
+    wincmd p
   endif
 
   call <SID>DEBUG('===========================',10)
