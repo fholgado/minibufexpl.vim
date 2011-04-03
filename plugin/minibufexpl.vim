@@ -701,8 +701,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   setlocal foldcolumn=0
   setlocal nonumber
   "don't highlight matching parentheses, etc.
-  setlocal nosm
-  "
+  setlocal matchpairs=
   "Depending on what type of split, make sure the MBE buffer is not
   "automatically rezised by CTRL + W =, etc...
   setlocal winfixheight
