@@ -2009,7 +2009,13 @@ endfunc " }}}
 " MBE Script History {{{
 "=============================================================================
 "
-"    History: 6.4.1b2 o Fixed Dupe File Name checking function to prevent some
+"    History: 6.4.1b4 o Finally figured out how to turn off parentheses
+"                       matching for the MBE buffer, which solves a couple of
+"                       annoying graphical glitches. Thanks to Thomas Egreger
+"                       for the patch!
+"                     o Added a temporary fix for the issues with MBE and
+"                       FuzzyFinder thanks to toupeira.
+"             6.4.1b2 o Fixed Dupe File Name checking function to prevent some
 "                       errors and actually work properly!
 "             6.4.1b1 o Added handler function to only update MBE on changes.
 "               6.4.0 o Added Emacs-like 'uniquify' feature where MBE will
