@@ -1394,6 +1394,7 @@ function! <SID>AutoUpdate(delBufNum,currBufName)
     " If this is the only buffer left then toggle the buffer
     if (winbufnr(2) == -1)
         call <SID>CycleBuffer(1)
+        exec 'syntax enable'
         call <SID>DEBUG('AutoUpdate does not run for cycled windows', 9)
     else
       call <SID>DEBUG('AutoUpdate does not run for the MBE window', 9)
