@@ -600,6 +600,16 @@ endif " }}}
 "
 if !exists('g:miniBufExplCloseOnSelect')
   let g:miniBufExplCloseOnSelect = 0
+endif " }}}
+" Check for duplicate buffer names? {{{
+" Flag that can be set to 0 in a users .vimrc to turn off
+" the explorer's feature that differentiates similar buffer names by
+" displaying the parent directory names. This feature should be turned off
+" if you work with a large number of buffers (>15) simultaneously.
+"
+if !exists('g:miniBufExplCheckDupeBufs')
+  let g:miniBufExplCheckDupeBufs = 1
+endif " }}}
 
 " Variables used internally
 "
@@ -1269,67 +1279,69 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
 
         " While in current buffer from first loop, loop through all buffers
         " again!
-        while(l:i2 <= l:NBuffers)
-            " Get the full path of the current buffer in the loop and the
-            " current buffer in the new loop
-            let l:i2 = l:i2 + 1
-            let l:bufPath = expand( "#" . l:i . ":p")
-            let l:bufPath2 = expand( "#" . l:i2 . ":p")
-            let l:BufName2 = expand( "#" . l:i2 . ":p:t")      
+        if (g:miniBufExplCheckDupeBufs == 1)
+            while(l:i2 <= l:NBuffers)
+                " Get the full path of the current buffer in the loop and the
+                " current buffer in the new loop
+                let l:i2 = l:i2 + 1
+                let l:bufPath = expand( "#" . l:i . ":p")
+                let l:bufPath2 = expand( "#" . l:i2 . ":p")
+                let l:BufName2 = expand( "#" . l:i2 . ":p:t")      
 
-            call <SID>DEBUG('BUFFER PATHS ---> bufPath is '.l:bufPath.' and bufPath2 is '.l:bufPath2,10)
-            call <SID>DEBUG('BUFFER NAMES ---> bufName is '.l:BufName.' and BufName2 is '.l:BufName2,10)
+                call <SID>DEBUG('BUFFER PATHS ---> bufPath is '.l:bufPath.' and bufPath2 is '.l:bufPath2,10)
+                call <SID>DEBUG('BUFFER NAMES ---> bufName is '.l:BufName.' and BufName2 is '.l:BufName2,10)
 
-            " Split the path string by delimiters
-            let l:bufSplitPath = split(l:bufPath,s:PathSeparator,0)
-            let l:bufSplitPath2 = split(l:bufPath2,s:PathSeparator,0)
+                " Split the path string by delimiters
+                let l:bufSplitPath = split(l:bufPath,s:PathSeparator,0)
+                let l:bufSplitPath2 = split(l:bufPath2,s:PathSeparator,0)
 
-            if((l:BufName2 != '') && (l:bufPath != l:bufPath2))
-                call <SID>DEBUG('bufPath2 is not empty and not comparing the same file, going to check for dupes!',10)
+                if((l:BufName2 != '') && (l:bufPath != l:bufPath2))
+                    call <SID>DEBUG('bufPath2 is not empty and not comparing the same file, going to check for dupes!',10)
 
-                " Get the filename from each buffer to compare them
-                let l:bufFileNameFromPath = 'No Name'
-                if(strlen(l:BufName))
-                    let l:bufFileNameFromPath = l:bufSplitPath[-1]
-                    call <SID>DEBUG('Setting bufFileNameFromPath as '.l:bufSplitPath[-1],10)
-                endif
+                    " Get the filename from each buffer to compare them
+                    let l:bufFileNameFromPath = 'No Name'
+                    if(strlen(l:BufName))
+                        let l:bufFileNameFromPath = l:bufSplitPath[-1]
+                        call <SID>DEBUG('Setting bufFileNameFromPath as '.l:bufSplitPath[-1],10)
+                    endif
 
-                " Make sure to take into account empty buffers
-                let l:bufFileNameFromPath2 = 'No Name'
-                if(strlen(l:BufName2))
-                    let l:bufFileNameFromPath2 = l:bufSplitPath2[-1]
-                    call <SID>DEBUG('Setting bufFileNameFromPath2 as '.l:bufSplitPath2[-1],10)
-                endif
+                    " Make sure to take into account empty buffers
+                    let l:bufFileNameFromPath2 = 'No Name'
+                    if(strlen(l:BufName2))
+                        let l:bufFileNameFromPath2 = l:bufSplitPath2[-1]
+                        call <SID>DEBUG('Setting bufFileNameFromPath2 as '.l:bufSplitPath2[-1],10)
+                    endif
 
-                call <SID>DEBUG('Comparing '.l:bufPath.' vs '.l:bufPath2,10)
+                    call <SID>DEBUG('Comparing '.l:bufPath.' vs '.l:bufPath2,10)
 
-                " If there is a match for buffer names, increase a variable
-                " that we'll check later
+                    " If there is a match for buffer names, increase a variable
+                    " that we'll check later
 
-                if (l:bufFileNameFromPath == l:bufFileNameFromPath2)
-                    let l:dupeBufName = l:dupeBufName + 1
-                    call <SID>DEBUG('dupeBufName equals '.l:dupeBufName,10)
-                    " Now check to see if the parent directory matches if there
-                    " are 2 or more buffers with the same name
-                    if (l:bufPath2 != 'No Name')
-                        let l:bufPathToCompare2 = l:bufPath2
-                        let l:pathList = add(l:pathList,l:bufPath2)
-                        call <SID>DEBUG('Adding '.l:bufPath2.' to pathList',10)
+                    if (l:bufFileNameFromPath == l:bufFileNameFromPath2)
+                        let l:dupeBufName = l:dupeBufName + 1
+                        call <SID>DEBUG('dupeBufName equals '.l:dupeBufName,10)
+                        " Now check to see if the parent directory matches if there
+                        " are 2 or more buffers with the same name
+                        if (l:bufPath2 != 'No Name')
+                            let l:bufPathToCompare2 = l:bufPath2
+                            let l:pathList = add(l:pathList,l:bufPath2)
+                            call <SID>DEBUG('Adding '.l:bufPath2.' to pathList',10)
+                        endif
                     endif
                 endif
-            endif
-        endwhile   
+            endwhile   
 
-        " If there are 2 or more buffers with the same name, let's call a
-        " function that show a differentiating parent directory so that the name is unique.
-        if l:dupeBufName >= 1
-            for item in l:pathList
-                call <SID>DEBUG('Item in pathList loop is '.item,10)
-                if ((!empty(item)) && (item != l:bufPath))
-                    call <SID>DEBUG('2 or more duplicate buffer names, calling dir check function with '.l:bufPath.' vs '.item,10)
-                    call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,s:PathSeparator,0),split(item,s:PathSeparator,0))
-                endif
-            endfor
+            " If there are 2 or more buffers with the same name, let's call a
+            " function that show a differentiating parent directory so that the name is unique.
+            if l:dupeBufName >= 1
+                for item in l:pathList
+                    call <SID>DEBUG('Item in pathList loop is '.item,10)
+                    if ((!empty(item)) && (item != l:bufPath))
+                        call <SID>DEBUG('2 or more duplicate buffer names, calling dir check function with '.l:bufPath.' vs '.item,10)
+                        call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,s:PathSeparator,0),split(item,s:PathSeparator,0))
+                    endif
+                endfor
+            endif
         endif
 
         " Establish the tab's content, including the differentiating root
