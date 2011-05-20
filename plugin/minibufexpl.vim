@@ -1112,7 +1112,7 @@ endfunction
 "
 function! CheckRootDirForDupes(level,path1,path2)
     call <SID>DEBUG('Entering Dupe Dir Checking Function for '.join(a:path1),1)
-    if(len(a:path1) >= abs(a:level))
+    if(len(a:path1) >= abs(a:level) && len(a:path2) >= abs(a:level))
         if(a:path1[a:level] == a:path2[a:level])
             let s:bufPathPosition = a:level - 1
             call CheckRootDirForDupes(s:bufPathPosition,a:path1,a:path2)
