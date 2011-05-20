@@ -23,8 +23,8 @@
 " Last Updated: Federico Holgado <fholgado@gmail.com>
 "          URL: http://vim.sourceforge.net/scripts/script.php?script_id=159
 "   GitHub URL: https://github.com/fholgado/minibufexpl.vim
-"  Last Change: Saturday, January 30, 2011
-"      Version: 6.4.1b2
+"  Last Change: Friday, May 20, 2011
+"      Version: 6.4.1b5
 "               Derived from Jeff Lanzarotta's bufexplorer.vim version 6.0.7
 "               Jeff can be reached at (jefflanzarotta@yahoo.com) and the
 "               original plugin can be found at:
@@ -233,13 +233,26 @@
 "
 "                 let g:miniBufExplCloseOnSelect = 1
 "
-"               into your .vimrc.
-"
 "               into your .vimrc in order to force MBE to try to place selected 
 "               buffers into a window that does not have a nonmodifiable buffer.
 "               The upshot of this should be that if you go into MBE and select
 "               a buffer, the buffer should not show up in a window that is 
 "               hosting an explorer.
+"
+"               If you use Vim with many open buffers simultaneously (>15) and
+"               you notice that switching buffers takes longer than usual, it
+"               is because of MBE's duplicate buffer name checking feature. To
+"               turn it off, you can add the following to your .vimrc:
+"
+"                   let g:miniBufExplCheckDupeBufs = 0
+"               
+"               We are working on a fix so that we can all enjoy the feature
+"               if you want!
+"
+"               If you would like to omit the buffer number from MBE's buffer
+"               display, put the following in your .vimrc:
+"
+"                   let g:miniBufExplShowBufNumbers = 0
 "
 "               There is a VIM bug that can cause buffers to show up without 
 "               their highlighting. The following setting will cause MBE to
@@ -2058,7 +2071,19 @@ endfunction " }}}
 " MBE Script History {{{
 "=============================================================================
 "
-"    History: 6.4.1b4 o Finally figured out how to turn off parentheses
+"    History: 6.4.1b5 o Allow users to turn off Buffer number display on exporer
+"                       tabs courtesy of jmatraszek.
+"                     o Allow users to turn off duplicate buffer name checking
+"                       to speed up MBE buffer switching. We are working on
+"                       optimizing this feature so that it is usable even with
+"                       many buffers open.
+"                     o Set Shellslash fix for Windows users so that duplicate
+"                       buffer name checking works properly.
+"                     o Re-enable synatx highlighitng after cycling the buffer
+"                       courtesy of Sontek.
+"                     o Fix erratic :q behavior when MBE is the last buffer
+"                       courtesy of Moopet.
+"             6.4.1b4 o Finally figured out how to turn off parentheses
 "                       matching for the MBE buffer, which solves a couple of
 "                       annoying graphical glitches. Thanks to Thomas Egreger
 "                       for the patch!
