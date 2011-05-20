@@ -1112,7 +1112,7 @@ endfunction
 "
 function! CheckRootDirForDupes(level,path1,path2)
     call <SID>DEBUG('Entering Dupe Dir Checking Function for '.join(a:path1),1)
-    if(len(a:path1) >= abs(a:level))
+    if(len(a:path1) >= abs(a:level) && len(a:path2) >= abs(a:level))
         if(a:path1[a:level] == a:path2[a:level])
             let s:bufPathPosition = a:level - 1
             call CheckRootDirForDupes(s:bufPathPosition,a:path1,a:path2)
@@ -1394,6 +1394,7 @@ function! <SID>AutoUpdate(delBufNum,currBufName)
     " If this is the only buffer left then toggle the buffer
     if (winbufnr(2) == -1)
         call <SID>CycleBuffer(1)
+        exec 'syntax enable'
         call <SID>DEBUG('AutoUpdate does not run for cycled windows', 9)
     else
       call <SID>DEBUG('AutoUpdate does not run for the MBE window', 9)
