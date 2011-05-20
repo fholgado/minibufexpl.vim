@@ -1,4 +1,4 @@
-" Mini Buffer Explorer++ <minibufexpl.vim>
+" Mini Buffer Explorer <minibufexpl.vim>
 "
 " HINT: Type zR if you don't know how to use folds
 "
@@ -569,7 +569,7 @@ endif
 " flag that can be set to 1 in a users .vimrc to allow 
 " single click switching of tabs. By default we use
 " double click for tab selection.
-"
+
 if !exists('g:miniBufExplUseSingleClick')
   let g:miniBufExplUseSingleClick = 0
 endif 
@@ -594,14 +594,12 @@ if g:miniBufExplUseSingleClick == 1
     exec s:m
   endif
 endif " }}}
-
 " Close on Select? {{{
 " Flag that can be set to 1 in a users .vimrc to hide
 " the explorer when a user selects a buffer.
 "
 if !exists('g:miniBufExplCloseOnSelect')
   let g:miniBufExplCloseOnSelect = 0
-endif "}}}
 
 " Variables used internally
 "
