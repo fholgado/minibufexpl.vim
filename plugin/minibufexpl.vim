@@ -724,6 +724,11 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   "automatically rezised by CTRL + W =, etc...
   setlocal winfixheight
   setlocal winfixwidth
+  
+  " Set shellslash for Windows/DOS Vim for dupeBufName checking to Work
+  if (has("win32") || has("win64"))
+      set shellslash
+  endif
 
   " Set the text of the statusline for the MBE buffer. See help:stl for
   " many options
