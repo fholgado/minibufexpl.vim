@@ -474,6 +474,15 @@ if !exists('g:miniBufExplTabWrap')
 endif
 
 " }}}
+" ShowBufNumber? {{{
+" By default buffers' numbers are shown in MiniBufExplorer. You can turn it off
+" by setting this option to 0.
+"
+if !exists('g:miniBufExplShowBufNumbers')
+  let g:miniBufExplShowBufNumbers = 1
+endif
+
+" }}}
 " Extended window navigation commands? {{{
 " Global flag to turn extended window navigation commands on or off
 " enabled = 1, dissabled = 0
@@ -1327,7 +1336,11 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
 
         " Establish the tab's content, including the differentiating root
         " dir if neccessary
-        let l:tab = '['.l:i.':'.s:bufPathPrefix.l:bufSplitPath[-1].']'
+        let l:tab = '['
+        if g:miniBufExplShowBufNumbers == 1
+            let l:tab = l:tab .l:i.':'
+        endif
+        let l:tab = l:tab .s:bufPathPrefix.l:bufSplitPath[-1].']'
 
         " If the buffer is open in a window mark it
         if bufwinnr(l:i) != -1
@@ -2211,7 +2224,7 @@ endfunc " }}}
 "                       opened again unless you do a \mbe (or restart VIM).
 "                     o Removed spaces between "tabs" (even more mini :)
 "                     o Simplified MBE tab processing 
-"               6.0.6 o Fixed register overwrite bug found by Sébastien Pierre
+"               6.0.6 o Fixed register overwrite bug found by S?bastien Pierre
 "               6.0.5 o Fixed an issue with window sizing when we run out of 
 "                       buffers.  
 "                     o Fixed some weird commenting bugs.  
