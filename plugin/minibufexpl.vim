@@ -1354,24 +1354,33 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
         " dir if neccessary
         let l:tab = '['
         if g:miniBufExplShowBufNumbers == 1
-            let l:tab = l:tab .l:i.':'
+            let l:tab .= l:i.':'
         endif
-        let l:tab = l:tab .s:bufPathPrefix.l:bufSplitPath[-1].']'
+
+        if (g:miniBufExplCheckDupeBufs == 0)
+            " Get filename & Remove []'s & ()'s
+            let l:shortBufName = fnamemodify(l:BufName, ":t")                  
+            let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g') 
+            let l:tab .= l:shortBufName.']'
+        else
+
+            let l:tab .= s:bufPathPrefix.l:bufSplitPath[-1].']'
+        endif
 
         " If the buffer is open in a window mark it
         if bufwinnr(l:i) != -1
-            let l:tab = l:tab . '*'
+            let l:tab .= '*'
         endif
 
         " If the buffer is modified then mark it
         if(getbufvar(l:i, '&modified') == 1)
-            let l:tab = l:tab . '+'
+            let l:tab .= '+'
         endif
 
         " If the buffer matches the)current buffer name, then  mark it
         call <SID>DEBUG('l:i is '.l:i.' and l:CurrBufName is '.l:CurrBufName,10)
         if(l:i == l:CurrBufName)
-            let l:tab = l:tab . '!'
+            let l:tab .= '!'
         endif
 
         let l:maxTabWidth = <SID>Max(strlen(l:tab), l:maxTabWidth)
