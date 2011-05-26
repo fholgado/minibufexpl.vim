@@ -623,6 +623,11 @@ endif " }}}
 if !exists('g:miniBufExplCheckDupeBufs')
   let g:miniBufExplCheckDupeBufs = 1
 endif " }}}
+" dictionary used to map buffer numbers to names when the buffer names
+" are not unique.
+let s:nameDict = {}
+" dictionary used to keep track of the names we have seen.
+let s:bufNameDict = {}
 
 " Variables used internally
 "
@@ -681,6 +686,8 @@ autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd'
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete ModTrackingListClean AutoCmd for buffer '.bufnr("%"), 10) |call <SID>CleanModTrackingList(bufnr("%"))
 autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
 autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter Checking for Last window', 10) |call <SID>CheckForLastWindow()
+autocmd MiniBufExplorer BufNew         * call <SID>DEBUG('-=> BufNew Building NameDict', 5) |call <SID>BuildNameDict(expand("<abuf>"))
+autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Building NameDict', 5) |call <SID>BuildAllNameDicts()
 autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
 autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
@@ -1295,74 +1302,6 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
         let s:bufPathPosition = -2
         let s:bufPathPrefix = ""
         let l:pathList = []
-
-        " While in current buffer from first loop, loop through all buffers
-        " again!
-        if (g:miniBufExplCheckDupeBufs == 1)
-            while(l:i2 <= l:NBuffers)
-                " Get the full path of the current buffer in the loop and the
-                " current buffer in the new loop
-                let l:i2 = l:i2 + 1
-                let l:bufPath = expand( "#" . l:i . ":p")
-                let l:bufPath2 = expand( "#" . l:i2 . ":p")
-                let l:BufName2 = expand( "#" . l:i2 . ":p:t")      
-
-                call <SID>DEBUG('BUFFER PATHS ---> bufPath is '.l:bufPath.' and bufPath2 is '.l:bufPath2,10)
-                call <SID>DEBUG('BUFFER NAMES ---> bufName is '.l:BufName.' and BufName2 is '.l:BufName2,10)
-
-                " Split the path string by delimiters
-                let l:bufSplitPath = split(l:bufPath,s:PathSeparator,0)
-                let l:bufSplitPath2 = split(l:bufPath2,s:PathSeparator,0)
-
-                if((l:BufName2 != '') && (l:bufPath != l:bufPath2))
-                    call <SID>DEBUG('bufPath2 is not empty and not comparing the same file, going to check for dupes!',10)
-
-                    " Get the filename from each buffer to compare them
-                    let l:bufFileNameFromPath = 'No Name'
-                    if(strlen(l:BufName))
-                        let l:bufFileNameFromPath = l:bufSplitPath[-1]
-                        call <SID>DEBUG('Setting bufFileNameFromPath as '.l:bufSplitPath[-1],10)
-                    endif
-
-                    " Make sure to take into account empty buffers
-                    let l:bufFileNameFromPath2 = 'No Name'
-                    if(strlen(l:BufName2))
-                        let l:bufFileNameFromPath2 = l:bufSplitPath2[-1]
-                        call <SID>DEBUG('Setting bufFileNameFromPath2 as '.l:bufSplitPath2[-1],10)
-                    endif
-
-                    call <SID>DEBUG('Comparing '.l:bufPath.' vs '.l:bufPath2,10)
-
-                    " If there is a match for buffer names, increase a variable
-                    " that we'll check later
-
-                    if (l:bufFileNameFromPath == l:bufFileNameFromPath2)
-                        let l:dupeBufName = l:dupeBufName + 1
-                        call <SID>DEBUG('dupeBufName equals '.l:dupeBufName,10)
-                        " Now check to see if the parent directory matches if there
-                        " are 2 or more buffers with the same name
-                        if (l:bufPath2 != 'No Name')
-                            let l:bufPathToCompare2 = l:bufPath2
-                            let l:pathList = add(l:pathList,l:bufPath2)
-                            call <SID>DEBUG('Adding '.l:bufPath2.' to pathList',10)
-                        endif
-                    endif
-                endif
-            endwhile   
-
-            " If there are 2 or more buffers with the same name, let's call a
-            " function that show a differentiating parent directory so that the name is unique.
-            if l:dupeBufName >= 1
-                for item in l:pathList
-                    call <SID>DEBUG('Item in pathList loop is '.item,10)
-                    if ((!empty(item)) && (item != l:bufPath))
-                        call <SID>DEBUG('2 or more duplicate buffer names, calling dir check function with '.l:bufPath.' vs '.item,10)
-                        call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,s:PathSeparator,0),split(item,s:PathSeparator,0))
-                    endif
-                endfor
-            endif
-        endif
-
         " Establish the tab's content, including the differentiating root
         " dir if neccessary
         let l:tab = '['
@@ -1370,14 +1309,13 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
             let l:tab .= l:i.':'
         endif
 
-        if (g:miniBufExplCheckDupeBufs == 0)
+        if (empty(s:nameDict) || !get(s:nameDict, l:i) || g:miniBufExplCheckDupeBufs == 0)
             " Get filename & Remove []'s & ()'s
             let l:shortBufName = fnamemodify(l:BufName, ":t")                  
             let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g') 
             let l:tab .= l:shortBufName.']'
         else
-
-            let l:tab .= s:bufPathPrefix.l:bufSplitPath[-1].']'
+            let l:tab .= s:nameDict[l:i].']'
         endif
 
         " If the buffer is open in a window mark it
@@ -1433,6 +1371,68 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
     endif
 
 endfunction
+
+function! <SID>CreateBufferName(bufNum, Dupes)
+    let s:PathSeparator = '/'
+    let s:bufPathPosition = -2
+    let s:bufPathPrefix = ""
+
+    let l:bufPath = expand( "#" . a:bufNum . ":p")
+    let l:bufName = expand( "#" . a:bufNum . ":p:t")
+
+    for bufn in a:Dupes
+        if bufn == a:bufNum
+            continue
+        endif
+        let l:bufPath2 = expand( "#" . bufn . ":p")
+        call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
+    endfor
+    call <SID>DEBUG('Setting ' . a:bufNum . ' to ' .  s:bufPathPrefix.l:bufName,5)
+    let s:nameDict[a:bufNum] = s:bufPathPrefix.l:bufName
+endfunction
+
+function! <SID>BuildNameDict(bufNum)
+    call <SID>DEBUG('Entering BuildNameDict()',5)
+
+    let s:PathSeparator = '/'
+    let s:bufPathPosition = -2
+    let s:bufPathPrefix = ""
+
+    let l:bufNum = 0 + a:bufNum
+    let l:bufName = expand( "#" . l:bufNum . ":p:t")
+    if bufName == ''
+        return
+    endif
+    let l:bufPath = expand( "#" . l:bufNum . ":p")
+
+    if(!has_key(s:bufNameDict, l:bufName))
+        call <SID>DEBUG('Adding empty list for ' . l:bufName,5)
+        let s:bufNameDict[l:bufName] = []
+    endif
+    call add(s:bufNameDict[l:bufName], l:bufNum)
+
+    if(len(s:bufNameDict[l:bufName]) > 1)
+        for bufn in s:bufNameDict[l:bufName]
+            call <SID>DEBUG('creating buffer name for ' . bufn,5)
+            call <SID>CreateBufferName(bufn, s:bufNameDict[l:bufName])
+        endfor
+    endif
+
+endfunction
+
+function! <SID>BuildAllNameDicts()
+    let l:NBuffers = bufnr('$')     " Get the number of the last buffer.
+    let l:i = 0                     " Set the buffer index to zero.
+
+    " Loop through every buffer less than the total number of buffers.
+    while(l:i <= l:NBuffers)
+        if bufexists(l:i)
+            call <SID>BuildNameDict(l:i)
+        endif
+        let l:i = l:i + 1
+    endwhile
+endfunction
+
 
 " }}}
 " NameCmp - compares tabs based on filename {{{
