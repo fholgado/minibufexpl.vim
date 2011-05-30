@@ -1309,7 +1309,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
             let l:tab .= l:i.':'
         endif
 
-        if (empty(s:nameDict) || !get(s:nameDict, l:i) || g:miniBufExplCheckDupeBufs == 0)
+        if (empty(s:nameDict) || !has_key(s:nameDict, l:i) || g:miniBufExplCheckDupeBufs == 0)
             " Get filename & Remove []'s & ()'s
             let l:shortBufName = fnamemodify(l:BufName, ":t")                  
             let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g') 
