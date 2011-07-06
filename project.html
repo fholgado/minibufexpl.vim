@@ -1,0 +1,201 @@
+<html>
+
+	<head>
+
+		<title>MiniBufExplorer</title>
+
+		<link rel="stylesheet" href="http://dl.dropbox.com/u/118650/mbe/keys.css" type="text/css" media="screen" />
+		<script type="text/javascript" src="http://dl.dropbox.com/u/118650/mbe/scripts/shCore.js"></script>
+		<script type="text/javascript" src="http://dl.dropbox.com/u/118650/mbe/scripts/shBrushVimscript.js"></script>
+		<link type="text/css" rel="stylesheet" href="http://dl.dropbox.com/u/118650/mbe/styles/shCore.css"/>
+		<link type="text/css" rel="stylesheet" href="http://dl.dropbox.com/u/118650/mbe/styles/shThemeDefault.css"/>
+		<link type="text/css" rel="stylesheet" href="http://dl.dropbox.com/u/118650/mbe/styles/shThemeBlackboard.css"/>
+		<script type="text/javascript">
+			SyntaxHighlighter.config.clipboardSwf = 'http://dl.dropbox.com/u/118650/mbe/scripts/clipboard.swf';
+			SyntaxHighlighter.defaults['gutter'] = false;
+			SyntaxHighlighter.defaults['toolbar'] = false;
+			SyntaxHighlighter.all();
+		</script>
+
+		<style>
+
+		html {
+			background: gray;
+		}
+
+		body {
+			background: white;
+			width: 960px;
+			padding: 10px;
+			margin: 0 auto;
+			font-family: helvetica;
+		}
+
+		img {
+			display: block;
+			margin: 0 auto;
+		}
+
+		</style>
+
+	</head>
+
+	<body>
+
+		<h1>MiniBufExplorer</h1>
+
+		<p>I've been working on improving MiniBufExplorer, a plugin for <a href="http://vim.org">Vim</a>.</p>
+
+		<!-- <img src="http://dl.dropbox.com/u/118650/mbe/mbe.png" /> -->
+
+		<h2>The story: Why am I doing this?</h2>
+
+		<p>The reason why I took it upon myself to improve MiniBufExplorer is a matter of need. I am a User Interface designer who spends a lot of time writing front-end code. I recently found Vim and fell in love with it. During my search for the plugins that would help me the most, I came across MBE. I loved it initially, but quickly saw that it had some major flaws.</p>
+
+		<p>After using MBE for some time, I have been able to identify some areas that needed some dire attention from a usability standpoint. I am doing my best to fix those issues without adding "feature bloat" or other unnecessary things to MBE. I am always open to suggestions and discussion as to what we can do to improve this great plugin.</p>
+
+		<p>I would also like to thank <a href="http://www.wavell.net/">Bindu Wavell</a>, who is the plugin's original creator and <a href="https://github.com/OliverUv">Oliver Uvman</a>, who like myself has been hacking at MBE to make needed improvements. My goal is to consolidate the code and act as the maintainer so that any further changes from contributors can be found in a single location.</p>
+
+		<hr />
+
+		<h2>New and Improved Features</h2>
+
+		<ol>
+			<li>Highlight currently active buffer</li>
+			<li>Show differentiating parent directory with multiple buffers with the same filename</li>
+			<li>Custom non-intrusive status line</li>
+			<li>Update buffer name color according to buffer state (modified or unmodified) immediately after changes are made</li>
+			<li>Prevents resizing of MBE buffer by window resizing commands</li>
+		</ol>
+
+		<hr />
+
+		<h2>Download MiniBufExplorer 6.4.0 (1/1/2011)</h2>
+
+		<a style="font-size:larger;" href="https://github.com/fholgado/minibufexpl.vim">Download MiniBufExplorer from GitHub</a>
+
+		<p>If you want to report a bug, or suggest a feature just post it to the <a href="https://github.com/fholgado/minibufexpl.vim/issues">GitHub Issue Tracker for MiniBufExplorer</a>. If you don't have a GitHub account, just email me at fholgado at gmail.</p>
+
+		<hr />
+
+		<h2>Features Overview</h3>
+
+		<h3>Current Buffer Highlighting</h3>
+
+		<p>Previously, MBE would only tell you if a buffer was currently visible in the editor like such:</p>
+
+		<img src="http://dl.dropbox.com/u/118650/mbe/screenshots/current_buffer/old.png" />
+
+		<p>Now, MBE shows you the buffer that is currently visible <em>and</em> active in the editor. Here is an animated GIF that shows the current buffer highlighting in action:</p>
+
+		<!-- <img src="http://dl.dropbox.com/u/118650/mbe/screenshots/current_buffer/new1.png" /> -->
+		<!-- <img src="http://dl.dropbox.com/u/118650/mbe/screenshots/current_buffer/new2.png" /> -->
+		<!-- <img src="http://dl.dropbox.com/u/118650/mbe/screenshots/current_buffer/new3.png" /> -->
+		<img src="http://dl.dropbox.com/u/118650/mbe/screenshots/mbe1.gif" />
+
+		<hr />
+
+		<h3>Duplicate Buffer Names</h3>
+
+		<p>If you are an MBE user, I am sure you are familiar with the following scenario:</p>
+
+		<img src="http://dl.dropbox.com/u/118650/mbe/screenshots/dupe_buf_names/old_fade.png" />
+
+		<p>The problem is that buffers with the same filename do not get differentiated, and it makes it very hard to find the buffer you are trying to edit. The simple solution is to show a parent directory that is different between all buffers like such:</p>
+
+		<img src="http://dl.dropbox.com/u/118650/mbe/screenshots/dupe_buf_names/new_fade.png" />
+
+		<p>Let me explain how it works. Let's observe 2 files that have the same filename.</p>
+
+		<pre>
+		/Users/fholgado/Sites/website1/css/style.css
+		/Users/fholgado/Sites/website2/css/style.css
+		</pre>
+
+		<p>You'll notice both files have the same filename <em>and</em> are in a folder called 'css'. This happens all the time in web development projects.</p>
+
+		<p>In order to differentiate the two files, MBE now crawls up the directory tree and finds the first parent directory that differs from both files, which in this case is 'website1' and 'website2'. MBE will now show you these 2 files as such:</p>
+
+		<div class="mbe_dupe_buffers" style="padding:5px 0;background:#1B1D1E;display:block;font-family:Andale Mono;">
+		<span style="color:#5DC2D6">[1:website1/style.css][2:website2/style.css]</span>
+		</div>
+
+		<hr />
+
+		<h3>Buffer Save States</h3>
+
+		<p>It is always important to be able to see at a glance what buffers are modified and need to be saved. MBE now shows you respective colors whether the buffer is modified or not modified.</p>
+
+		<img src="http://dl.dropbox.com/u/118650/mbe/screenshots/save_states/new.png" />
+
+		<p><strong>Most importantly</strong>, MBE now updates the buffer states immediately after making changes, instead of the previous behaviour that only updated buffer states when switching buffers.</p>
+
+		<hr />
+
+		<h3>Status Line Clutter</h3>
+
+		<p>Previously, the MBE buffer would use the same statusline that is currently configured for Vim. This adds a lot of visual clutter to MBE and does not add any functionality, since the status line is showing information for a buffer that does not contain any real content.</p>
+
+		<img src="http://dl.dropbox.com/u/118650/mbe/screenshots/status_line/old.png" />
+
+		<p>MBE now uses it's own custom Status Line format to reduce the unwanted information. This line is customizable and can even be empty.</p>
+
+		<img src="http://dl.dropbox.com/u/118650/mbe/screenshots/status_line/new.png" />
+
+		<hr />
+
+		<h3>Window Resizing</h3>
+
+		<p>Previously, the MBE buffer made the automatic window resizing using the <span class="dark-keys"><kbd>ctrl</kbd> + <kbd>w</kbd> + <kbd>=</kbd></span> command in Vim. Many of you have seen the following picture:</p>
+
+		<img src="http://dl.dropbox.com/u/118650/mbe/screenshots/window_resizing/old.png" />
+
+		<p>MBE now maintains it's buffer size both in horizontal and vertical mode when using window resizing commands. Now you can take a Vim tab that looks like this:</p>
+
+		<img src="http://dl.dropbox.com/u/118650/mbe/screenshots/window_resizing/new1.png" />
+
+		<p>And turn it into something like this without worrying about the MBE window becoming large as well:</p>
+
+		<img src="http://dl.dropbox.com/u/118650/mbe/screenshots/window_resizing/new2.png" />
+
+		<hr />
+
+		<h3>Customizing Colors</h3>
+
+		<p>Here are all the color additions to customize MBE's new features. You can add the following to your Color file and customize the color accordingly:</p>
+
+		<pre class="brush: vimscript">
+			" MiniBufExpl Colors
+			hi MBEVisibleActive guifg=#A6DB29 guibg=fg
+			hi MBEVisibleChangedActive guifg=#F1266F guibg=fg
+			hi MBEVisibleChanged guifg=#F1266F guibg=fg
+			hi MBEVisibleNormal guifg=#5DC2D6 guibg=fg
+			hi MBEChanged guifg=#CD5907 guibg=fg
+			hi MBENormal guifg=#808080 guibg=fg
+			</pre>
+
+		<hr />
+
+		<h2>Download MiniBufExplorer 6.4.0 (1/1/2011)</h2>
+
+		<a style="font-size:larger;" href="https://github.com/fholgado/minibufexpl.vim">Download MiniBufExplorer from GitHub</a>
+
+		<p>If you want to report a bug, or suggest a feature just post it to the <a href="https://github.com/fholgado/minibufexpl.vim/issues">GitHub Issue Tracker for MiniBufExplorer</a>. If you don't have a GitHub account, just email me at fholgado at gmail.</p>
+
+	</body>
+
+<script type="text/javascript">
+// <![CDATA[
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-4063957-3']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+	})();
+// ]]>
+</script>
+
+</html>
