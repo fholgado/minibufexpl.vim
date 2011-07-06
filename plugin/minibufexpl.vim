@@ -23,8 +23,8 @@
 " Last Updated: Federico Holgado <fholgado@gmail.com>
 "          URL: http://vim.sourceforge.net/scripts/script.php?script_id=159
 "   GitHub URL: https://github.com/fholgado/minibufexpl.vim
-"  Last Change: Friday, May 20, 2011
-"      Version: 6.4.1b5
+"  Last Change: Tuesday, July 5, 2011
+"      Version: 6.4.2
 "               Derived from Jeff Lanzarotta's bufexplorer.vim version 6.0.7
 "               Jeff can be reached at (jefflanzarotta@yahoo.com) and the
 "               original plugin can be found at:
@@ -2071,7 +2071,9 @@ endfunction " }}}
 " MBE Script History {{{
 "=============================================================================
 "
-"    History: 6.4.1b5 o Allow users to turn off Buffer number display on exporer
+"    History: 6.4.2   o Moving current build out of beta. Getting ready for a
+"                       re-write!
+"             6.4.1b5 o Allow users to turn off Buffer number display on exporer
 "                       tabs courtesy of jmatraszek.
 "                     o Allow users to turn off duplicate buffer name checking
 "                       to speed up MBE buffer switching. We are working on
