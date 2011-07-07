@@ -689,6 +689,11 @@ augroup NONE
 " }}}
 
 " Functions
+" EscapeTilde - escapes "~" {{{
+function! <SID>EscapeTilde(str)
+   return substitute(a:str, "\\\~","\\\\\~","g")
+endfunction
+" }}}
 "
 " StartExplorer - Sets up our explorer and causes it to be displayed {{{
 "
@@ -812,7 +817,8 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   call <SID>DisplayBuffers(a:delBufNum,a:currBufName)
 
   if (l:curBuf != -1)
-    call search('\['.l:curBuf.':'.expand('#'.l:curBuf.':t').'\]')
+    let l:bname = <SID>EscapeTilde(expand('#'.l:curBuf.':t'))
+    call search('\['.l:curBuf.':'.l:bname.'\]')
   else
     call <SID>DEBUG('No current buffer to search for',9)
   endif
@@ -1175,6 +1181,17 @@ function! <SID>Max(argOne, argTwo)
 endfunction
 
 " }}}
+" MbeAbs - absolute value {{{
+function! <SID>MbeAbs(arg)
+  if (v:version >= 720)
+    return abs(a:arg)
+  endif
+  if (a:arg < 0)
+    return -a:arg
+  endif
+  return a:arg
+endfunction
+" }}}
 " CheckRootDirForDupes - Checks if the buffer parent dirs are the same {{{
 " 
 " Compares 2 buffers with the same filename and returns the directory of
@@ -1182,7 +1199,7 @@ endfunction
 "
 function! CheckRootDirForDupes(level,path1,path2)
     call <SID>DEBUG('Entering Dupe Dir Checking Function for at level '.a:level.' for '.join(a:path1).' vs '.join(a:path2),10)
-    if(len(a:path1) >= abs(a:level))
+    if(len(a:path1) >= <SID>MbeAbs(a:level))
         call <SID>DEBUG('Path level1 is '.get(a:path1,a:level),10)
         call <SID>DEBUG('Path level2 is '.get(a:path2,a:level),10)
         if(get(a:path1,a:level) == get(a:path2,a:level))
