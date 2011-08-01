@@ -682,27 +682,27 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
 
           if l:edge
               if g:miniBufExplVSplit == 0
-                  exec 'bo sp '.a:bufName
+                  silent exec 'bo sp '.a:bufName
               else
-                  exec 'bo vsp '.a:bufName
+                  silent exec 'bo vsp '.a:bufName
               endif
           else
               if g:miniBufExplVSplit == 0
-                  exec 'to sp '.a:bufName
+                  silent exec 'to sp '.a:bufName
               else
-                  exec 'to vsp '.a:bufName
+                  silent exec 'to vsp '.a:bufName
               endif
           endif
       else
           if g:miniBufExplVSplit == 0
-              exec 'sp '.a:bufName
+              silent exec 'sp '.a:bufName
           else
               " &splitbelow doesn't affect vertical splits
               " so we have to do this explicitly.. ugh.
               if &splitbelow
-                  exec 'rightb vsp '.a:bufName
+                  silent exec 'rightb vsp '.a:bufName
               else
-                  exec 'vsp '.a:bufName
+                  silent exec 'vsp '.a:bufName
               endif
           endif
       endif
@@ -883,7 +883,7 @@ function! <SID>ShowBuffers(delBufNum,currBufName)
     " and then delete the extra trailing blank line
     $
     put! =g:miniBufExplBufList
-    $ d _
+    silent $ d _
 
     let g:miniBufExplForceDisplay = 0
 
