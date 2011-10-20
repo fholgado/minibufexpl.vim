@@ -27,8 +27,6 @@ single location.
    [2]: http://www.wavell.net/
    [3]: https://github.com/OliverUv
 
-* * *
-
 ## New and Improved Features
 
   1. Highlight currently active buffer
@@ -36,8 +34,6 @@ single location.
   3. Custom non-intrusive status line
   4. Update buffer name color according to buffer state (modified or unmodified) immediately after changes are made
   5. Prevents resizing of MBE buffer by window resizing commands
-
-* * *
 
 ## Features Overview
 
@@ -57,8 +53,6 @@ action:
 ![][7]
 
    [7]: http://dl.dropbox.com/u/118650/mbe/screenshots/mbe1.gif
-
-* * *
 
 ### Duplicate Buffer Names
 
@@ -92,9 +86,7 @@ and finds the first parent directory that differs from both files, which in
 this case is 'website1' and 'website2'. MBE will now show you these 2 files as
 such:
 
-[1:website1/style.css][2:website2/style.css]
-
-* * *
+        [1:website1/style.css][2:website2/style.css]
 
 ### Buffer Save States
 
@@ -107,8 +99,6 @@ is modified or not modified.
    [10]: http://dl.dropbox.com/u/118650/mbe/screenshots/save_states/new.png
 
 **Most importantly**, MBE now updates the buffer states immediately after making changes, instead of the previous behavior that only updated buffer states when switching buffers.
-
-* * *
 
 ### Status Line Clutter
 
@@ -127,8 +117,6 @@ information. This line is customizable and can even be empty.
 ![][12]
 
    [12]: http://dl.dropbox.com/u/118650/mbe/screenshots/status_line/new.png
-
-* * *
 
 ### Window Resizing
 
@@ -154,8 +142,6 @@ becoming large as well:
 
    [15]: http://dl.dropbox.com/u/118650/mbe/screenshots/window_resizing/new2.png
 
-* * *
-
 ### Customizing Colors
 
 Here are all the color additions to customize MBE's new features. You can add
@@ -168,17 +154,3 @@ the following to your Color file and customize the color accordingly:
     			hi MBEVisibleNormal guifg=#5DC2D6 guibg=fg
     			hi MBEChanged guifg=#CD5907 guibg=fg
     			hi MBENormal guifg=#808080 guibg=fg
-    			
-* * *
-
-## Download MiniBufExplorer 6.4.0 (1/1/2011)
-
-[Download MiniBufExplorer from GitHub][16]
-
-   [16]: https://github.com/fholgado/minibufexpl.vim
-
-If you want to report a bug, or suggest a feature just post it to the [GitHub
-Issue Tracker for MiniBufExplorer][17]. If you don't have a GitHub account,
-just email me at fholgado at gmail.
-
-   [17]: https://github.com/fholgado/minibufexpl.vim/issues
