@@ -746,6 +746,11 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   " Set the text of the statusline for the MBE buffer. See help:stl for
   " many options
   setlocal stl=%!g:statusLineText
+
+  " No spell check
+  setlocal nospell
+  " Restore colorcolumn
+  setlocal colorcolumn&
  
   if has("syntax")
     syn clear
@@ -2209,7 +2214,7 @@ endfunction " }}}
 "                       NOTE: in 6.3.0 we started using MinSize instead of
 "                       Minheight. This will still work if MinSize is not
 "                       specified, but it is depreciated. Use MinSize instead.
-"                     o I now setlocal foldcomun=0 and nonumber in the MBE 
+"                     o I now setlocal foldcolumn=0 and nonumber in the MBE 
 "                       window. This is for those of you that like to have
 "                       these options turned on locally. I'm assuming noone
 "                       outthere wants foldcolumns and line numbers in the
