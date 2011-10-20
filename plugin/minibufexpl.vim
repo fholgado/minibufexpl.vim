@@ -2079,7 +2079,13 @@ endfunction " }}}
 " MBE Script History {{{
 "=============================================================================
 "
-"    History: 6.4.2   o Moving current build out of beta. Getting ready for a
+"    History:   6.4.3 o Fix MBE losing highlighting when a buffer is closed.
+"                       Thanks to Markus Koller for the pull request!
+"                     o Disable spellcheck on MBE buffer.
+"                     o Don't use colorcolumn setting on MBE buffer. Thanks to 
+"                       grassofhust for the pull requests for this and the
+"                       previous issue!
+"               6.4.2 o Moving current build out of beta. Getting ready for a
 "                       re-write!
 "             6.4.1b5 o Allow users to turn off Buffer number display on exporer
 "                       tabs courtesy of jmatraszek.
