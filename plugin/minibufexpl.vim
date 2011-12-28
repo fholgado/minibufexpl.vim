@@ -750,7 +750,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   " No spell check
   setlocal nospell
   " Restore colorcolumn for VIM >= 7.3
-  if has("colorcolumn")
+  if exists("+colorcolumn")
       setlocal colorcolumn&
   end
  
