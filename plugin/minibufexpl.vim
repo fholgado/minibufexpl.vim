@@ -4,7 +4,7 @@
 "
 " Script Info and Documentation  {{{
 "=============================================================================
-"    Copyright: Copyright (C) 2002 & 2003 Bindu Wavell 
+"    Copyright: Copyright (C) 2002 & 2003 Bindu Wavell
 "    		    Copyright (C) 2010 Oliver Uvman
 "    		    Copyright (C) 2010 Danielle Church
 "    		    Copyright (C) 2010 Stephan Sokolow
@@ -46,7 +46,7 @@
 "
 "               However, in most cases you won't need any key-bindings at all.
 "
-"               <Leader> is usually backslash so type "\mbe" (quickly) to open 
+"               <Leader> is usually backslash so type "\mbe" (quickly) to open
 "               the -MiniBufExplorer- window.
 "
 "               Other keymappings include: <Leader>mbc to close the Explorer
@@ -54,7 +54,7 @@
 "               <Leader>mbt to toggle the Explorer window; it will open if
 "               closed or close if open. Each of these key bindings can be
 "               overridden (see the notes on <Leader>mbe above.)
-" 
+"
 "               You can map these additional commands as follows:
 "
 "                 map <Leader>c :CMiniBufExplorer<cr>
@@ -70,10 +70,10 @@
 "                 :MiniBufExplorer    " Open and/or goto Explorer
 "                 :CMiniBufExplorer   " Close the Explorer if it's open
 "                 :UMiniBufExplorer   " Update Explorer without navigating
-"                 :TMiniBufExplorer   " Toggle the Explorer window open and 
+"                 :TMiniBufExplorer   " Toggle the Explorer window open and
 "                                       closed.
 "
-"               To control where the new split window goes relative to the 
+"               To control where the new split window goes relative to the
 "               current window, use the setting:
 "
 "                 let g:miniBufExplSplitBelow=0  " Put new window above
@@ -86,7 +86,7 @@
 "               The default for this is read from the &splitbelow VIM option.
 "
 "               By default we are now (as of 6.0.2) forcing the -MiniBufExplorer-
-"               window to open up at the edge of the screen. You can turn this 
+"               window to open up at the edge of the screen. You can turn this
 "               off by setting the following variable in your .vimrc:
 "
 "                 let g:miniBufExplSplitToEdge = 0
@@ -103,14 +103,14 @@
 "               letting the following variable in your .vimrc:
 "
 "                 let g:miniBufExplMaxSize = <max lines: defualt 0>
-"               
+"
 "               setting this to 0 will mean the window gets as big as
-"               needed to fit all your buffers. 
+"               needed to fit all your buffers.
 "
 "               NOTE: This was g:miniBufExplMaxHeight before 6.3.0; the old
 "               setting is backwards compatible if you don't use MaxSize.
 "
-"               As of 6.2.2 it is possible to set a minimum height for the 
+"               As of 6.2.2 it is possible to set a minimum height for the
 "               -MiniBufExplorer- window. You can set the min height by
 "               letting the following variable in your .vimrc:
 "
@@ -122,11 +122,11 @@
 "               IN VERTICAL MODE: (as of 6.3.0)
 "               By default the vertical explorer has a fixed width. If you put:
 "
-"                 let g:miniBufExplMaxSize = <max width: default 0> 
+"                 let g:miniBufExplMaxSize = <max width: default 0>
 "
 "               into your .vimrc then MBE will attempt to set the width of the
 "               MBE window to be as wide as your widest tab. The width will not
-"               exceed MaxSize even if you have wider tabs. 
+"               exceed MaxSize even if you have wider tabs.
 "
 "               Accepting the default value of 0 for this will give you a fixed
 "               width MBE window.
@@ -139,11 +139,11 @@
 "               This will have no effect unless you also specivy MaxSize.
 "
 "               By default we are now (as of 6.0.1) turning on the MoreThanOne
-"               option. This stops the -MiniBufExplorer- from opening 
+"               option. This stops the -MiniBufExplorer- from opening
 "               automatically until more than one eligible buffer is available.
 "               You can turn this feature off by setting the following variable
 "               in your .vimrc:
-"                 
+"
 "                 let g:miniBufExplorerMoreThanOne=1
 "
 "               (The following enhancement is as of 6.2.2)
@@ -152,22 +152,22 @@
 "               window to be loaded as soon as an eligible buffer is read. You
 "               can also set it to larger numbers. So if you set it to 4 for
 "               example the MBE window wouldn't auto-open until 4 eligibles
-"               buffers had been loaded. This is nice for folks that don't 
+"               buffers had been loaded. This is nice for folks that don't
 "               want an MBE window unless they are editing more than two or
 "               three buffers.
 "
-"               To enable the optional mapping of Control + Vim Direction Keys 
-"               [hjkl] to window movement commands, you can put the following into 
+"               To enable the optional mapping of Control + Vim Direction Keys
+"               [hjkl] to window movement commands, you can put the following into
 "               your .vimrc:
 "
 "                 let g:miniBufExplMapWindowNavVim = 1
 "
-"               To enable the optional mapping of Control + Arrow Keys to window 
+"               To enable the optional mapping of Control + Arrow Keys to window
 "               movement commands, you can put the following into your .vimrc:
 "
 "                 let g:miniBufExplMapWindowNavArrows = 1
 "
-"               To enable the optional mapping of <C-TAB> and <C-S-TAB> to a 
+"               To enable the optional mapping of <C-TAB> and <C-S-TAB> to a
 "               function that will bring up the next or previous buffer in the
 "               current window, you can put the following into your .vimrc:
 "
@@ -180,23 +180,23 @@
 "                 let g:miniBufExplMapCTabSwitchWindows = 1
 "
 "
-"               NOTE: If you set the ...TabSwitchBufs AND ...TabSwitchWindows, 
-"                     ...TabSwitchBufs will be enabled and ...TabSwitchWindows 
+"               NOTE: If you set the ...TabSwitchBufs AND ...TabSwitchWindows,
+"                     ...TabSwitchBufs will be enabled and ...TabSwitchWindows
 "                     will not.
-"               
+"
 "               As of MBE 6.3.0, you can put the following into your .vimrc:
-"               
+"
 "                 let g:miniBufExplUseSingleClick = 1
 "
 "               If you would like to single click on tabs rather than double
-"               clicking on them to goto the selected buffer. 
+"               clicking on them to goto the selected buffer.
 "
-"               NOTE: If you use the single click option in taglist.vim you may 
-"                     need to get an updated version that includes a patch I 
-"                     provided to allow both explorers to provide single click 
+"               NOTE: If you use the single click option in taglist.vim you may
+"                     need to get an updated version that includes a patch I
+"                     provided to allow both explorers to provide single click
 "                     buffer selection.
 "
-"               It is possible to customize the the highlighting for the tabs in 
+"               It is possible to customize the the highlighting for the tabs in
 "               the MBE by configuring the following highlighting groups:
 "
 "                 MBENormal               - for buffers that have NOT CHANGED and
@@ -207,7 +207,7 @@
 "                                           VISIBLE
 "                 MBEVisibleNormalActive  - buffers that have NOT CHANGED and are
 "                                           VISIBLE and is the active buffer
-"                 MBEVisibleChanged       - for buffers that have CHANGED and are 
+"                 MBEVisibleChanged       - for buffers that have CHANGED and are
 "                                           VISIBLE
 "                 MBEVisibleChangedActive - buffers that have CHANGED and are VISIBLE
 "                                           and is the active buffer
@@ -228,15 +228,15 @@
 "               If you use other explorers like TagList you can (As of 6.2.8) put:
 "
 "                 let g:miniBufExplModSelTarget = 1
-" 
+"
 "               If you would like MBE to close when you select a buffer, put:
 "
 "                 let g:miniBufExplCloseOnSelect = 1
 "
-"               into your .vimrc in order to force MBE to try to place selected 
+"               into your .vimrc in order to force MBE to try to place selected
 "               buffers into a window that does not have a nonmodifiable buffer.
 "               The upshot of this should be that if you go into MBE and select
-"               a buffer, the buffer should not show up in a window that is 
+"               a buffer, the buffer should not show up in a window that is
 "               hosting an explorer.
 "
 "               If you use Vim with many open buffers simultaneously (>15) and
@@ -245,7 +245,7 @@
 "               turn it off, you can add the following to your .vimrc:
 "
 "                   let g:miniBufExplCheckDupeBufs = 0
-"               
+"
 "               We are working on a fix so that we can all enjoy the feature
 "               if you want!
 "
@@ -254,14 +254,14 @@
 "
 "                   let g:miniBufExplShowBufNumbers = 0
 "
-"               There is a VIM bug that can cause buffers to show up without 
+"               There is a VIM bug that can cause buffers to show up without
 "               their highlighting. The following setting will cause MBE to
 "               try and turn highlighting back on (introduced in 6.3.1):
 "
 "                 let g:miniBufExplForceSyntaxEnable = 1
 "
 "               MBE has had a basic debugging capability for quite some time.
-"               However, it has not been very friendly in the past. As of 6.0.8, 
+"               However, it has not been very friendly in the past. As of 6.0.8,
 "               you can put one of each of the following into your .vimrc:
 "
 "                 let g:miniBufExplorerDebugLevel = 0  " MBE serious errors output
@@ -271,7 +271,7 @@
 "               You can also set a DebugMode to cause output to be target as
 "               follows (default is mode 3):
 "
-"                 let g:miniBufExplorerDebugMode  = 0  " Errors will show up in 
+"                 let g:miniBufExplorerDebugMode  = 0  " Errors will show up in
 "                                                      " a vim window
 "                 let g:miniBufExplorerDebugMode  = 1  " Uses VIM's echo function
 "                                                      " to display on the screen
@@ -285,11 +285,11 @@
 "               failing.
 "
 "      History: Moved to end of file
-"      
+"
 " Known Issues: When debugging is turned on and set to output to a window, there
 "               are some cases where the window is opened more than once, there
 "               are other cases where an old debug window can be lost.
-" 
+"
 "               Several MBE commands can break the window history so <C-W>[pnw]
 "               might not take you to the expected window.
 "
@@ -298,7 +298,7 @@
 "                 where multiple files have the same name but are in different
 "                 locations.
 "                 - Add the ability to specify a regexp for eligible buffers
-"                 allowing the ability to filter out certain buffers that 
+"                 allowing the ability to filter out certain buffers that
 "                 you don't want to control from MBE.
 "
 "=============================================================================
@@ -317,8 +317,8 @@ let loaded_minibufexplorer = 1
 " Mappings and Commands
 "
 " MBE Keyboard Mappings {{{
-" If we don't already have keyboard mappings for MBE then create them 
-" 
+" If we don't already have keyboard mappings for MBE then create them
+"
 if !hasmapto('<Plug>MiniBufExplorer')
   map <unique> <Leader>mbe <Plug>MiniBufExplorer
 endif
@@ -336,7 +336,7 @@ if !hasmapto('<Plug>MBEMarkCurrent')
 endif
 " }}}
 " MBE <Script> internal map {{{
-" 
+"
 noremap <unique> <script> <Plug>MiniBufExplorer  :call <SID>StartExplorer(1, -1, bufnr("%"))<CR>:<BS>
 noremap <unique> <script> <Plug>CMiniBufExplorer :call <SID>StopExplorer(1)<CR>:<BS>
 noremap <unique> <script> <Plug>UMiniBufExplorer :call <SID>AutoUpdate(-1,bufnr("%"))<CR>:<BS>
@@ -345,7 +345,7 @@ noremap <unique> <script> <Plug>MBEMarkCurrent :call <SID>MarkCurrentBuffer(bufn
 
 " }}}
 " MBE commands {{{
-" 
+"
 if !exists(':MiniBufExplorer')
   command! MiniBufExplorer  call <SID>StartExplorer(1, -1, bufnr("%"))
 endif
@@ -389,12 +389,12 @@ endif
 "     global variable [This is the default]
 if !exists('g:miniBufExplorerDebugMode')
   let g:miniBufExplorerDebugMode = 3
-endif 
+endif
 
 " }}}
 " Allow auto update? {{{
 "
-" We start out with this off for startup, but once vim is running we 
+" We start out with this off for startup, but once vim is running we
 " turn this on.
 if !exists('g:miniBufExplorerAutoUpdate')
   let g:miniBufExplorerAutoUpdate = 0
@@ -402,20 +402,20 @@ endif
 
 " }}}
 " MoreThanOne? {{{
-" Display Mini Buf Explorer when there are 'More Than One' eligible buffers 
+" Display Mini Buf Explorer when there are 'More Than One' eligible buffers
 "
 if !exists('g:miniBufExplorerMoreThanOne')
   let g:miniBufExplorerMoreThanOne = 2
-endif 
+endif
 
 " }}}
 " Split below/above/left/right? {{{
-" When opening a new -MiniBufExplorer- window, split the new windows below or 
+" When opening a new -MiniBufExplorer- window, split the new windows below or
 " above the current window?  1 = below, 0 = above.
 "
 if !exists('g:miniBufExplSplitBelow')
   let g:miniBufExplSplitBelow = &splitbelow
-endif 
+endif
 
 " }}}
 " Split to edge? {{{
@@ -424,7 +424,7 @@ endif
 "
 if !exists('g:miniBufExplSplitToEdge')
   let g:miniBufExplSplitToEdge = 1
-endif 
+endif
 
 " }}}
 " MaxHeight (depreciated) {{{
@@ -434,12 +434,12 @@ endif
 "
 if !exists('g:miniBufExplMaxHeight')
   let g:miniBufExplMaxHeight = 0
-endif 
+endif
 
 " }}}
 " MaxSize {{{
 " Same as MaxHeight but also works for vertical splits if specified with a
-" vertical split then vertical resizing will be performed. If left at 0 
+" vertical split then vertical resizing will be performed. If left at 0
 " then the number of columns in g:miniBufExplVSplit will be used as a
 " static window width.
 if !exists('g:miniBufExplMaxSize')
@@ -459,7 +459,7 @@ endif
 
 " }}}
 " MinSize {{{
-" Same as MinHeight but also works for vertical splits. For vertical splits, 
+" Same as MinHeight but also works for vertical splits. For vertical splits,
 " this is ignored unless g:miniBufExplMax(Size|Height) are specified.
 if !exists('g:miniBufExplMinSize')
   let g:miniBufExplMinSize = g:miniBufExplMinHeight
@@ -468,7 +468,7 @@ endif
 " }}}
 " Horizontal or Vertical explorer? {{{
 " For folks that like vertical explorers, I'm caving in and providing for
-" veritcal splits. If this is set to 0 then the current horizontal 
+" veritcal splits. If this is set to 0 then the current horizontal
 " splitting logic will be run. If however you want a vertical split,
 " assign the width (in characters) you wish to assign to the MBE window.
 "
@@ -502,7 +502,7 @@ endif
 "
 if !exists('g:miniBufExplMapWindowNav')
   " This is for backwards compatibility and may be removed in a
-  " later release, please use the ...NavVim and/or ...NavArrows 
+  " later release, please use the ...NavVim and/or ...NavArrows
   " settings.
   let g:miniBufExplMapWindowNav = 0
 endif
@@ -519,7 +519,7 @@ endif
 " we turn off CTabSwitchWindows.
 if g:miniBufExplMapCTabSwitchBufs == 1 || !exists('g:miniBufExplMapCTabSwitchWindows')
   let g:miniBufExplMapCTabSwitchWindows = 0
-endif 
+endif
 
 "
 " If we have enabled control + vim direction key remapping
@@ -579,13 +579,13 @@ endif
 
 " }}}
 " Single/Double Click? {{{
-" flag that can be set to 1 in a users .vimrc to allow 
+" flag that can be set to 1 in a users .vimrc to allow
 " single click switching of tabs. By default we use
 " double click for tab selection.
 
 if !exists('g:miniBufExplUseSingleClick')
   let g:miniBufExplUseSingleClick = 0
-endif 
+endif
 
 "
 " attempt to perform single click mapping, it would be much
@@ -595,7 +595,7 @@ endif
 "
 if g:miniBufExplUseSingleClick == 1
   let s:clickmap = ':if bufname("%") == "-MiniBufExplorer-" <bar> call <SID>MBEClick() <bar> endif <CR>'
-  if maparg('<LEFTMOUSE>', 'n') == '' 
+  if maparg('<LEFTMOUSE>', 'n') == ''
     " no mapping for leftmouse
     exec ':nnoremap <silent> <LEFTMOUSE> <LEFTMOUSE>' . s:clickmap
   else
@@ -658,15 +658,15 @@ if !exists('g:statusLineText')
 endif
 
 " Variable used to pass maxTabWidth info between functions
-let s:maxTabWidth = 0 
+let s:maxTabWidth = 0
 
 " Variable used to count debug output lines
-let s:debugIndex = 0 
+let s:debugIndex = 0
 
 " Build initial MRUList. This makes sure all the files specified on the
 " command line are picked up correctly.
 let s:MRUList = range(1, bufnr('$'))
-  
+
 " }}}
 " Setup an autocommand group and some autocommands {{{
 " that keep our explorer updated automatically.
@@ -708,7 +708,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   let l:save_rep = &report
   let l:save_sc  = &showcmd
   let &report    = 10000
-  set noshowcmd 
+  set noshowcmd
 
   call <SID>FindCreateWindow('-MiniBufExplorer-', -1, 1, 1)
 
@@ -727,7 +727,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   " We don't want the mouse to change focus without a click
   set nomousefocus
 
-  " If folks turn numbering and columns on by default we will turn 
+  " If folks turn numbering and columns on by default we will turn
   " them off for the MBE window
   setlocal foldcolumn=0
   setlocal nonumber
@@ -737,7 +737,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   "automatically rezised by CTRL + W =, etc...
   setlocal winfixheight
   setlocal winfixwidth
-  
+
   " Set shellslash for Windows/DOS Vim for dupeBufName checking to Work
   if (has("win32") || has("win64"))
       set shellslash
@@ -753,7 +753,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   if has("colorcolumn")
       setlocal colorcolumn&
   end
- 
+
   if has("syntax")
     syn clear
     syn match MBENormal                   '\[[^\]]*\]'
@@ -770,7 +770,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
     " hi MBEVisibleNormal guifg=#5DC2D6 guibg=fg
     " hi MBEChanged guifg=#CD5907 guibg=fg
     " hi MBENormal guifg=#808080 guibg=fg
-    
+
     if !exists("g:did_minibufexplorer_syntax_inits")
       let g:did_minibufexplorer_syntax_inits = 1
       hi def link MBENormal                Comment
@@ -802,7 +802,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   " If you press w in the -MiniBufExplorer- then switch back
   " to the previous window.
   nnoremap <buffer> p :wincmd p<CR>:<BS>
-  " The following allow us to use regular movement keys to 
+  " The following allow us to use regular movement keys to
   " scroll in a wrapped single line buffer
   nnoremap <buffer> j gj
   nnoremap <buffer> k gk
@@ -815,7 +815,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   nnoremap <buffer> <S-TAB> :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
   nnoremap <buffer> l   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
   nnoremap <buffer> h :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
- 
+
   call <SID>DisplayBuffers(a:delBufNum,a:currBufName)
 
   if (l:curBuf != -1)
@@ -831,7 +831,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   call <SID>DEBUG('Completed StartExplorer()'  ,10)
   call <SID>DEBUG('===========================',10)
 
-endfunction 
+endfunction
 
 " }}}
 " StopExplorer - Looks for our explorer and closes the window if it is open {{{
@@ -847,7 +847,7 @@ function! <SID>StopExplorer(sticky)
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-  if l:winNum != -1 
+  if l:winNum != -1
     exec l:winNum.' wincmd w'
     silent! close
     wincmd p
@@ -876,7 +876,7 @@ function! <SID>ToggleExplorer()
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-  if l:winNum != -1 
+  if l:winNum != -1
     call <SID>StopExplorer(1)
   else
     call <SID>StartExplorer(1, -1, bufnr("%"))
@@ -891,14 +891,14 @@ endfunction
 
 " }}}
 " FindWindow - Return the window number of a named buffer {{{
-" If none is found then returns -1. 
+" If none is found then returns -1.
 "
 function! <SID>FindWindow(bufName, doDebug)
   if a:doDebug
     call <SID>DEBUG('Entering FindWindow()',10)
   endif
 
-  " Try to find an existing window that contains 
+  " Try to find an existing window that contains
   " our buffer.
   let l:bufNum = bufnr(a:bufName)
   if l:bufNum != -1
@@ -917,11 +917,11 @@ endfunction
 " }}}
 " FindCreateWindow - Attempts to find a window for a named buffer. {{{
 "
-" If it is found then moves there. Otherwise creates a new window and 
+" If it is found then moves there. Otherwise creates a new window and
 " configures it and moves there.
 "
 " forceEdge, -1 use defaults, 0 below, 1 above
-" isExplorer, 0 no, 1 yes 
+" isExplorer, 0 no, 1 yes
 " doDebug, 0 no, 1 yes
 "
 function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
@@ -938,7 +938,7 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
   " Try to find an existing explorer window
   let l:winNum = <SID>FindWindow(a:bufName, a:doDebug)
 
-  " If found goto the existing window, otherwise 
+  " If found goto the existing window, otherwise
   " split open a new window.
   if l:winNum != -1
     if a:doDebug
@@ -1026,12 +1026,12 @@ endfunction
 " }}}
 " DisplayBuffers - Wrapper for getting MBE window shown {{{
 "
-" Makes sure we are in our explorer, then erases the current buffer and turns 
+" Makes sure we are in our explorer, then erases the current buffer and turns
 " it into a mini buffer explorer window.
 "
 function! <SID>DisplayBuffers(delBufNum,currBufName)
   call <SID>DEBUG('Entering DisplayBuffers()',10)
-  
+
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('DisplayBuffers called in invalid window',1)
@@ -1043,9 +1043,9 @@ function! <SID>DisplayBuffers(delBufNum,currBufName)
 
   call <SID>ShowBuffers(a:delBufNum,a:currBufName)
   call <SID>ResizeWindow()
-  
+
   normal! zz
-  
+
   " Prevent the buffer from being modified.
   setlocal nomodifiable
   set nobuflisted
@@ -1054,8 +1054,8 @@ endfunction
 
 " }}}
 " Resize Window - Set width/height of MBE window {{{
-" 
-" Makes sure we are in our explorer, then sets the height/width for our explorer 
+"
+" Makes sure we are in our explorer, then sets the height/width for our explorer
 " window so that we can fit all of our information without taking extra lines.
 "
 function! <SID>ResizeWindow()
@@ -1078,7 +1078,7 @@ function! <SID>ResizeWindow()
       if (l:width == 0)
         let l:height = winheight('.')
       else
-        let l:height = (l:length / l:width) 
+        let l:height = (l:length / l:width)
         " handle truncation from div
         if (l:length % l:width) != 0
           let l:height = l:height + 1
@@ -1092,29 +1092,29 @@ function! <SID>ResizeWindow()
       let l:height = line('.')
       normal gg
     endif
-  
+
     " enforce max window height
     if g:miniBufExplMaxSize != 0
       if g:miniBufExplMaxSize < l:height
         let l:height = g:miniBufExplMaxSize
       endif
     endif
-  
+
     " enfore min window height
     if l:height < g:miniBufExplMinSize || l:height == 0
       let l:height = g:miniBufExplMinSize
     endif
-  
+
     call <SID>DEBUG('ResizeWindow to '.l:height.' lines',9)
-  
+
     exec('resize '.l:height)
-  
+
   " Vertical Resize
-  else 
+  else
 
     if g:miniBufExplMaxSize != 0
       let l:newWidth = s:maxTabWidth
-      if l:newWidth > g:miniBufExplMaxSize 
+      if l:newWidth > g:miniBufExplMaxSize
           let l:newWidth = g:miniBufExplMaxSize
       endif
       if l:newWidth < g:miniBufExplMinSize
@@ -1130,14 +1130,14 @@ function! <SID>ResizeWindow()
     endif
 
   endif
-  
+
 endfunction
 
 " }}}
 " ShowBuffers - Clear current buffer and put the MBE text into it {{{
-" 
-" Makes sure we are in our explorer, then adds a list of all modifiable 
-" buffers to the current buffer. Special marks are added for buffers that 
+"
+" Makes sure we are in our explorer, then adds a list of all modifiable
+" buffers to the current buffer. Special marks are added for buffers that
 " are in one or more windows (*) and buffers that have been modified (+)
 "
 function! <SID>ShowBuffers(delBufNum,currBufName)
@@ -1149,12 +1149,12 @@ function! <SID>ShowBuffers(delBufNum,currBufName)
     let l:save_rep = &report
     let l:save_sc = &showcmd
     let &report = 10000
-    set noshowcmd 
+    set noshowcmd
 
     " Delete all lines in buffer.
     1,$d _
-  
-    " Goto the end of the buffer put the buffer list 
+
+    " Goto the end of the buffer put the buffer list
     " and then delete the extra trailing blank line
     $
     put! =g:miniBufExplBufList
@@ -1167,7 +1167,7 @@ function! <SID>ShowBuffers(delBufNum,currBufName)
   else
     call <SID>DEBUG('Buffer list not update since there was no change',9)
   endif
-  
+
 endfunction
 
 " }}}
@@ -1183,7 +1183,7 @@ endfunction
 
 " }}}
 " CheckRootDirForDupes - Checks if the buffer parent dirs are the same {{{
-" 
+"
 " Compares 2 buffers with the same filename and returns the directory of
 " buffer 1's path at the point where it is different from buffer 2's path
 "
@@ -1227,18 +1227,18 @@ function! <SID>IgnoreBuffer(buf)
     return 1
   endif
 
-  " Only show modifiable buffers (The idea is that we don't 
+  " Only show modifiable buffers (The idea is that we don't
   " want to show Explorers)
   if (getbufvar(a:buf, '&modifiable') != 1 || l:BufName == '-MiniBufExplorer-')
     return 1
   endif
 
-  return 0 
+  return 0
 endfunction
 
 " }}}
 " BuildBufferList - Build the text for the MBE window {{{
-" 
+"
 " Creates the buffer list string and returns 1 if it is different than
 " last time this was called and 0 otherwise.
 "
@@ -1264,7 +1264,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
         let l:i = l:i + 1
 
         " If we have a delBufNum and it is the current
-        " buffer then ignore the current buffer. 
+        " buffer then ignore the current buffer.
         " Otherwise, continue.
 
         if (a:delBufNum == l:i)
@@ -1312,7 +1312,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
                 let l:i2 = l:i2 + 1
                 let l:bufPath = expand( "#" . l:i . ":p")
                 let l:bufPath2 = expand( "#" . l:i2 . ":p")
-                let l:BufName2 = expand( "#" . l:i2 . ":p:t")      
+                let l:BufName2 = expand( "#" . l:i2 . ":p:t")
 
                 call <SID>DEBUG('BUFFER PATHS ---> bufPath is '.l:bufPath.' and bufPath2 is '.l:bufPath2,10)
                 call <SID>DEBUG('BUFFER NAMES ---> bufName is '.l:BufName.' and BufName2 is '.l:BufName2,10)
@@ -1355,7 +1355,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
                         endif
                     endif
                 endif
-            endwhile   
+            endwhile
 
             " If there are 2 or more buffers with the same name, let's call a
             " function that show a differentiating parent directory so that the name is unique.
@@ -1379,8 +1379,8 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
 
         if (g:miniBufExplCheckDupeBufs == 0)
             " Get filename & Remove []'s & ()'s
-            let l:shortBufName = fnamemodify(l:BufName, ":t")                  
-            let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g') 
+            let l:shortBufName = fnamemodify(l:BufName, ":t")
+            let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g')
             let l:tab .= l:shortBufName.']'
         else
 
@@ -1467,8 +1467,8 @@ endfunction
 
 " }}}
 " HasEligibleBuffers - Are there enough MBE eligible buffers to open the MBE window? {{{
-" 
-" Returns 1 if there are any buffers that can be displayed in a 
+"
+" Returns 1 if there are any buffers that can be displayed in a
 " mini buffer explorer. Otherwise returns 0. If delBufNum is
 " any non -1 value then don't include that buffer in the list
 " of eligible buffers.
@@ -1479,8 +1479,8 @@ function! <SID>HasEligibleBuffers(delBufNum)
   let l:save_rep = &report
   let l:save_sc = &showcmd
   let &report = 10000
-  set noshowcmd 
-  
+  set noshowcmd
+
   let l:NBuffers = bufnr('$')     " Get the number of the last buffer.
   let l:i        = 0              " Set the buffer index to zero.
   let l:found    = 0              " No buffer found
@@ -1493,9 +1493,9 @@ function! <SID>HasEligibleBuffers(delBufNum)
   " Loop through every buffer less than the total number of buffers.
   while(l:i <= l:NBuffers && l:found < l:needed)
     let l:i = l:i + 1
-   
+
     " If we have a delBufNum and it is the current
-    " buffer then ignore the current buffer. 
+    " buffer then ignore the current buffer.
     " Otherwise, continue.
     if (a:delBufNum == -1 || l:i != a:delBufNum)
       " Make sure the buffer in question is listed.
@@ -1505,12 +1505,12 @@ function! <SID>HasEligibleBuffers(delBufNum)
         " Check to see if the buffer is a blank or not. If the buffer does have
         " a name, process it.
         if (strlen(l:BufName))
-          " Only show modifiable buffers (The idea is that we don't 
+          " Only show modifiable buffers (The idea is that we don't
           " want to show Explorers)
           if ((getbufvar(l:i, '&modifiable') == 1) && (BufName != '-MiniBufExplorer-'))
-            
+
               let l:found = l:found + 1
-  
+
           endif
         endif
       endif
@@ -1523,7 +1523,7 @@ function! <SID>HasEligibleBuffers(delBufNum)
   call <SID>DEBUG('HasEligibleBuffers found '.l:found.' eligible buffers of '.l:needed.' needed',6)
 
   return (l:found >= l:needed)
-  
+
 endfunction
 
 " }}}
@@ -1580,9 +1580,9 @@ endfunction
 "    we have enough eligible buffers THEN
 " Update our explorer and get back to the current window
 "
-" If we get a buffer number for a buffer that 
-" is being deleted, we need to make sure and 
-" remove the buffer from the list of eligible 
+" If we get a buffer number for a buffer that
+" is being deleted, we need to make sure and
+" remove the buffer from the list of eligible
 " buffers in case we are down to one eligible
 " buffer, in which case we will want to close
 " the MBE window.
@@ -1627,12 +1627,12 @@ function! <SID>AutoUpdate(delBufNum,currBufName)
   endif
 
   call <SID>MRUPush(bufnr("%"))
-  
+
   if (a:delBufNum != -1)
     call <SID>DEBUG('AutoUpdate will make sure that buffer '.a:delBufNum.' is not included in the buffer list.', 5)
     call <SID>MRUPop(a:delBufNum)
   endif
-  
+
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
   if g:miniBufExplorerAutoUpdate == 1
@@ -1649,7 +1649,7 @@ function! <SID>AutoUpdate(delBufNum,currBufName)
         " changed
           let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 0, a:currBufName)
           if (l:ListChanged)
-            call <SID>DEBUG('About to call StartExplorer (Update MBE)', 9) 
+            call <SID>DEBUG('About to call StartExplorer (Update MBE)', 9)
             call <SID>StartExplorer(0, a:delBufNum, bufnr("%"))
           endif
         endif
@@ -1689,7 +1689,7 @@ endfunction
 
 " }}}
 " GetSelectedBuffer - From the MBE window, return the bufnum for buf under cursor {{{
-" 
+"
 " If we are in our explorer window then return the buffer number
 " for the buffer under the cursor.
 "
@@ -1718,7 +1718,7 @@ endfunction
 
 " }}}
 " MBESelectBuffer - From the MBE window, open buffer under the cursor {{{
-" 
+"
 " If we are in our explorer, then we attempt to open the buffer under the
 " cursor in the previous window.
 "
@@ -1732,14 +1732,14 @@ function! <SID>MBESelectBuffer(split)
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('MBESelectBuffer called in invalid window',1)
-    return 
+    return
   endif
 
   let l:save_rep = &report
   let l:save_sc  = &showcmd
   let &report    = 10000
-  set noshowcmd 
-  
+  set noshowcmd
+
   let l:bufnr  = <SID>GetSelectedBuffer()
   let l:resize = 0
 
@@ -1799,10 +1799,10 @@ endfunction
 
 " }}}
 " MBEDeleteBuffer - From the MBE window, delete selected buffer from list {{{
-" 
-" After making sure that we are in our explorer, This will delete the buffer 
+"
+" After making sure that we are in our explorer, This will delete the buffer
 " under the cursor. If the buffer under the cursor is being displayed in a
-" window, this routine will attempt to get different buffers into the 
+" window, this routine will attempt to get different buffers into the
 " windows that will be affected so that windows don't get removed.
 "
 function! <SID>MBEDeleteBuffer(prevBufName)
@@ -1813,7 +1813,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('MBEDeleteBuffer called in invalid window',1)
-    return 
+    return
   endif
 
   let l:curLine    = line('.')
@@ -1829,10 +1829,10 @@ function! <SID>MBEDeleteBuffer(prevBufName)
   let l:save_rep = &report
   let l:save_sc  = &showcmd
   let &report    = 10000
-  set noshowcmd 
-  
-  
-  if l:selBuf != -1 
+  set noshowcmd
+
+
+  if l:selBuf != -1
 
     " Don't want auto updates while we are processing a delete
     " request.
@@ -1848,12 +1848,12 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     call <SID>DEBUG('Previous window: '.l:prevWin.' buffer in window: '.l:prevWinBuf,5)
     call <SID>DEBUG('Selected buffer is <'.l:selBufName.'>['.l:selBuf.']',5)
 
-    " If buffer is being displayed in a window then 
-    " move window to a different buffer before 
-    " deleting this one. 
+    " If buffer is being displayed in a window then
+    " move window to a different buffer before
+    " deleting this one.
     let l:winNum = (bufwinnr(l:selBufName) + 0)
     " while we have windows that contain our buffer
-    while l:winNum != -1 
+    while l:winNum != -1
         call <SID>DEBUG('Buffer '.l:selBuf.' is being displayed in window: '.l:winNum,5)
 
         " move to window that contains our selected buffer
@@ -1868,7 +1868,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
         call <SID>DEBUG('Window now contains buffer: '.bufnr('%').' which should not be: '.l:selBuf,5)
 
         if l:origBuf == l:curBuf
-            " we wrapped so we are going to have to delete a buffer 
+            " we wrapped so we are going to have to delete a buffer
             " that is in an open window.
             let l:winNum = -1
         else
@@ -1881,7 +1881,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     call <SID>DEBUG('Restoring previous window to: '.l:prevWin,5)
     exec l:prevWin.' wincmd w'
 
-    " Try to get back to the -MiniBufExplorer- window 
+    " Try to get back to the -MiniBufExplorer- window
     let l:winNum = bufwinnr(bufnr('-MiniBufExplorer-'))
     if l:winNum != -1
         exec l:winNum.' wincmd w'
@@ -1889,12 +1889,12 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     else
         call <SID>DEBUG('Unable to get to -MiniBufExplorer- window',1)
     endif
-  
+
     " Delete the buffer selected.
     call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
     exec('silent! bd '.l:selBuf)
 
-    let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate 
+    let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
     call <SID>DisplayBuffers(-1,a:prevBufName)
     call cursor(l:curLine, l:curCol)
 
@@ -1928,10 +1928,10 @@ endfunction
 " }}}
 " CycleBuffer - Cycle Through Buffers {{{
 "
-" Move to next or previous buffer in the current window. If there 
+" Move to next or previous buffer in the current window. If there
 " are no more modifiable buffers then stay on the current buffer.
 " can be called with no parameters in which case the buffers are
-" cycled forward. Otherwise a single argument is accepted, if 
+" cycled forward. Otherwise a single argument is accepted, if
 " it's 0 then the buffers are cycled backwards, otherwise they
 " are cycled forward.
 "
@@ -1944,7 +1944,7 @@ function! <SID>CycleBuffer(forward)
     resize
     let g:miniBufExplorerAutoUpdate = 0
   endif
-  
+
   " Change buffer (keeping track of before and after buffers)
   let l:origBuf = bufnr('%')
   if (a:forward == 1)
@@ -1998,8 +1998,8 @@ endfunction
 " }}}
 " DEBUG - Display debug output when debugging is turned on {{{
 "
-" Thanks to Charles E. Campbell, Jr. PhD <cec@NgrOyphSon.gPsfAc.nMasa.gov> 
-" for Decho.vim which was the inspiration for this enhanced debugging 
+" Thanks to Charles E. Campbell, Jr. PhD <cec@NgrOyphSon.gPsfAc.nMasa.gov>
+" for Decho.vim which was the inspiration for this enhanced debugging
 " capability.
 "
 function! <SID>DEBUG(msg, level)
@@ -2010,7 +2010,7 @@ function! <SID>DEBUG(msg, level)
     let l:save_rep    = &report
     let l:save_sc     = &showcmd
     let &report       = 10000
-    set noshowcmd 
+    set noshowcmd
 
     " Debug output to a buffer
     if g:miniBufExplorerDebugMode == 0
@@ -2022,8 +2022,8 @@ function! <SID>DEBUG(msg, level)
 
         " Get into the debug window or create it if needed
         call <SID>FindCreateWindow('MiniBufExplorer.DBG', 1, 0, 0)
-    
-        " Make sure we really got to our window, if not we 
+
+        " Make sure we really got to our window, if not we
         " will display a confirm dialog and turn debugging
         " off so that we won't break things even more.
         if bufname('%') != 'MiniBufExplorer.DBG'
@@ -2084,7 +2084,7 @@ endfunction " }}}
 "    History:   6.4.3 o Fix MBE losing highlighting when a buffer is closed.
 "                       Thanks to Markus Koller for the pull request!
 "                     o Disable spellcheck on MBE buffer.
-"                     o Don't use colorcolumn setting on MBE buffer. Thanks to 
+"                     o Don't use colorcolumn setting on MBE buffer. Thanks to
 "                       grassofhust for the pull requests for this and the
 "                       previous issue!
 "               6.4.2 o Moving current build out of beta. Getting ready for a
@@ -2137,26 +2137,26 @@ endfunction " }}}
 "      	    	6.3.3 o Added additional keybindings. In addition to <TAB> and
 "      		        	<S-TAB>, l and h can now be used. In addition to <CR>,
 "      		        	and e can now be used.
-"      		          o You can open the selected buffer in a new split window 
+"      		          o You can open the selected buffer in a new split window
 "      		            by pressing s while in the minibufexplorer window.
 "      		          o You can open the selected buffer in a new vertically
 "      		            split window while pressing v while in the
 "      		            minibufexplorer window. Patched by Oliver Uvman.
 "      	    	6.3.2 o For some reason there was still a call to StopExplorer
-"                       with 2 params. Very old bug. I know I fixed before, 
+"                       with 2 params. Very old bug. I know I fixed before,
 "                       any way many thanks to Jason Mills for reporting this!
-"               6.3.1 o Include folds in source so that it's easier to 
+"               6.3.1 o Include folds in source so that it's easier to
 "                       navigate.
 "                     o Added g:miniBufExplForceSyntaxEnable setting for folks
-"                       that want a :syntax enable to be called when we enter 
+"                       that want a :syntax enable to be called when we enter
 "                       buffers. This can resolve issues caused by a vim bug
-"                       where buffers show up without highlighting when another 
+"                       where buffers show up without highlighting when another
 "                       buffer has been closed, quit, wiped or deleted.
 "               6.3.0 o Added an option to allow single click (rather than
 "                       the default double click) to select buffers in the
 "                       MBE window. This feature was requested by AW Law
-"                       and was inspired by taglist.vim. Note that you will 
-"                       need the latest version of taglist.vim if you want to 
+"                       and was inspired by taglist.vim. Note that you will
+"                       need the latest version of taglist.vim if you want to
 "                       use MBE and taglist both with singleclick turned on.
 "                       Also thanks to AW Law for pointing out that you can
 "                       make an Explorer not be listed in a standard :ls.
@@ -2183,24 +2183,24 @@ endfunction " }}}
 "                       this update.
 "               6.2.6 o Moved history to end of source file
 "                     o Updated highlighting documentation
-"                     o Created global commands MBEbn and MBEbp that can be 
-"                       used in mappings if folks want to cycle buffers while 
+"                     o Created global commands MBEbn and MBEbp that can be
+"                       used in mappings if folks want to cycle buffers while
 "                       skipping non-eligible buffers.
 "               6.2.5 o Added <Leader>mbt key mapping which will toggle
 "                       the MBE window. I map this to F3 in my .vimrc
-"                       with "map <F3> :TMiniBufExplorer<CR>" which 
-"                       means I can easily close the MBE window when I'm 
+"                       with "map <F3> :TMiniBufExplorer<CR>" which
+"                       means I can easily close the MBE window when I'm
 "                       not using it and get it back when I want it.
 "                     o Changed default debug mode to 3 (write to global
 "                       g:miniBufExplorerDebugOutput)
-"                     o Made a pass through the documentation to clarify 
+"                     o Made a pass through the documentation to clarify
 "                       serveral issues and provide more complete docs
 "                       for mappings and commands.
-"               6.2.4 o Because of the autocommand switch (see 6.2.0) it 
+"               6.2.4 o Because of the autocommand switch (see 6.2.0) it
 "                       was possible to remove the restriction on the
 "                       :set hidden option. It is now possible to use
 "                       this option with MBE.
-"               6.2.3 o Added miniBufExplTabWrap option. It is turned 
+"               6.2.3 o Added miniBufExplTabWrap option. It is turned
 "                       off by default. When turned on spaces are added
 "                       between tabs and gq} is issued to perform line
 "                       formatting. This won't work very well if filenames
@@ -2222,13 +2222,13 @@ endfunction " }}}
 "                       NOTE: in 6.3.0 we started using MinSize instead of
 "                       Minheight. This will still work if MinSize is not
 "                       specified, but it is depreciated. Use MinSize instead.
-"                     o I now setlocal foldcolumn=0 and nonumber in the MBE 
+"                     o I now setlocal foldcolumn=0 and nonumber in the MBE
 "                       window. This is for those of you that like to have
 "                       these options turned on locally. I'm assuming noone
 "                       outthere wants foldcolumns and line numbers in the
 "                       MBE window? :)
 "                     o Fixed a bug where an empty MBE window was taking half
-"                       of the screen (partly why the MinHeight option was 
+"                       of the screen (partly why the MinHeight option was
 "                       added.)
 "               6.2.1 o If MBE is the only window (because of :bd for example)
 "                       and there are still eligible buffers then one of them
@@ -2236,13 +2236,13 @@ endfunction " }}}
 "                     o The <Leader>mbe mapping now highlights the buffer from
 "                       the current window.
 "                     o The delete ('d') binding in the MBE window now restors
-"                       the cursor position, which can help if you want to 
+"                       the cursor position, which can help if you want to
 "                       delete several buffers in a row that are not at the
 "                       beginning of the buffer list.
-"                     o Added a new key binding ('p') in the MBE window to 
+"                     o Added a new key binding ('p') in the MBE window to
 "                       switch to the previous window (last edit window)
 "               6.2.0 o Major overhaul of autocommand and list updating code,
-"                       we now have much better handling of :bd (which is the 
+"                       we now have much better handling of :bd (which is the
 "                       most requested feature.) As well as resolving other
 "                       issues where the buffer list would not be updated
 "                       automatically. The old version tried to trap specific
@@ -2256,7 +2256,7 @@ endfunction " }}}
 "                       MaxHeight. This will still work if MaxSize is not
 "                       specified, but it is depreciated. Use MaxSize instead.
 "                     o Improvement to internal syntax highlighting code
-"                       I renamed the syntax group names. Anyone who has 
+"                       I renamed the syntax group names. Anyone who has
 "                       figured out how to use them already shouldn't have
 "                       any trouble with the new Nameing :)
 "                     o Added debug mode 3 which writes to a global variable
@@ -2267,8 +2267,8 @@ endfunction " }}}
 "                       Thanks to Gerry Patterson for finding this!
 "                       This code is very stable (although it has some
 "                       idiocyncracies.)
-"               6.0.9 o Double clicking tabs was overwriting the cliboard 
-"                       register on MS Windows.  Thanks to Shoeb Bhinderwala 
+"               6.0.9 o Double clicking tabs was overwriting the cliboard
+"                       register on MS Windows.  Thanks to Shoeb Bhinderwala
 "                       for reporting this issue.
 "               6.0.8 o Apparently some VIM builds are having a hard time with
 "                       line continuation in scripts so the few that were here
@@ -2280,44 +2280,44 @@ endfunction " }}}
 "                       a buffer which can then be written to disk or emailed
 "                       to me when someone is having a major issue. Can also
 "                       write directly to a file (VERY SLOWLY) on UNIX or Win32
-"                       (not 95 or 98 at the moment) or use VIM's echo function 
+"                       (not 95 or 98 at the moment) or use VIM's echo function
 "                       to display the output to the screen.
-"                     o Several people have had issues when the hidden option 
+"                     o Several people have had issues when the hidden option
 "                       is turned on. So I have put in several checks to make
 "                       sure folks know this if they try to use MBE with this
 "                       option set.
-"               6.0.7 o Handling BufDelete autocmd so that the UI updates 
-"                       properly when using :bd (rather than going through 
+"               6.0.7 o Handling BufDelete autocmd so that the UI updates
+"                       properly when using :bd (rather than going through
 "                       the MBE UI.)
-"                     o The AutoUpdate code will now close the MBE window when 
+"                     o The AutoUpdate code will now close the MBE window when
 "                       there is a single eligible buffer available.
 "                       This has the usefull side effect of stopping the MBE
-"                       window from blocking the VIM session open when you close 
+"                       window from blocking the VIM session open when you close
 "                       the last buffer.
 "                     o Added functions, commands and maps to close & update
 "                       the MBE window (<leader>mbc and <leader>mbu.)
 "                     o Made MBE open/close state be sticky if set through
-"                       StartExplorer(1) or StopExplorer(1), which are 
+"                       StartExplorer(1) or StopExplorer(1), which are
 "                       called from the standard mappings. So if you close
-"                       the mbe window with \mbc it won't be automatically 
+"                       the mbe window with \mbc it won't be automatically
 "                       opened again unless you do a \mbe (or restart VIM).
 "                     o Removed spaces between "tabs" (even more mini :)
-"                     o Simplified MBE tab processing 
+"                     o Simplified MBE tab processing
 "               6.0.6 o Fixed register overwrite bug found by S?bastien Pierre
-"               6.0.5 o Fixed an issue with window sizing when we run out of 
-"                       buffers.  
-"                     o Fixed some weird commenting bugs.  
+"               6.0.5 o Fixed an issue with window sizing when we run out of
+"                       buffers.
+"                     o Fixed some weird commenting bugs.
 "                     o Added more optional fancy window/buffer navigation:
-"                     o You can turn on the capability to use control and the 
+"                     o You can turn on the capability to use control and the
 "                       arrow keys to move between windows.
-"                     o You can turn on the ability to use <C-TAB> and 
-"                       <C-S-TAB> to open the next and previous (respectively) 
+"                     o You can turn on the ability to use <C-TAB> and
+"                       <C-S-TAB> to open the next and previous (respectively)
 "                       buffer in the current window.
-"                     o You can turn on the ability to use <C-TAB> and 
-"                       <C-S-TAB> to switch windows (forward and backwards 
+"                     o You can turn on the ability to use <C-TAB> and
+"                       <C-S-TAB> to switch windows (forward and backwards
 "                       respectively.)
-"               6.0.4 o Added optional fancy window navigation: 
-"                     o Holding down control and pressing a vim direction 
+"               6.0.4 o Added optional fancy window navigation:
+"                     o Holding down control and pressing a vim direction
 "                       [hjkl] will switch windows in the indicated direction.
 "               6.0.3 o Changed buffer name to -MiniBufExplorer- to resolve
 "                       Issue in filename pattern matching on Windows.
@@ -2328,8 +2328,8 @@ endfunction " }}}
 "                       MiniBufExplorer will not automatically open until
 "                       more than one eligible buffers are opened. This
 "                       reduces cluter when you are only working on a
-"                       single file. 
-"                       NOTE: See change log for 6.2.2 for more details about 
+"                       single file.
+"                       NOTE: See change log for 6.2.2 for more details about
 "                             this feature
 "               6.0.0 o Initial Release on November 20, 2001
 "
