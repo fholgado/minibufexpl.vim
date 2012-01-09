@@ -1937,6 +1937,11 @@ endfunction
 "
 function! <SID>CycleBuffer(forward)
 
+  " If we are in the MBE window, switch to the next one, otherwise a new
+  " window will be created
+  if (bufname("%") == "-MiniBufExplorer-")
+    wincmd w
+  endif
   " The following hack handles the case where we only have one
   " window open and it is too small
   let l:saveAutoUpdate = g:miniBufExplorerAutoUpdate
