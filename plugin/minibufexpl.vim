@@ -612,6 +612,8 @@ function! <SID>StartExplorer(curBufNum)
   " and restores it.
   nnoremap <buffer> l       :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
   nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  nnoremap <buffer> <right> :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+  nnoremap <buffer> <left>  :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
 
   " Attempt to perform single click mapping
   " It would be much nicer if we could 'nnoremap <buffer> ...', however
