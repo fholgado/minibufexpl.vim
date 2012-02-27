@@ -689,6 +689,11 @@ augroup NONE
 " }}}
 
 " Functions
+" EscapeTilde - escapes "~" {{{
+function! <SID>EscapeTilde(str)
+   return substitute(a:str, "\\\~","\\\\\~","g")
+endfunction
+" }}}
 "
 " StartExplorer - Sets up our explorer and causes it to be displayed {{{
 "
@@ -819,7 +824,8 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   call <SID>DisplayBuffers(a:delBufNum,a:currBufName)
 
   if (l:curBuf != -1)
-    call search('\['.l:curBuf.':'.expand('#'.l:curBuf.':t').'\]')
+    let l:bname = <SID>EscapeTilde(expand('#'.l:curBuf.':t'))
+    call search('\['.l:curBuf.':'.l:bname.'\]')
   else
     call <SID>DEBUG('No current buffer to search for',9)
   endif
