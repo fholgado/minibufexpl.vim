@@ -378,8 +378,8 @@ might not take you to the expected window.
  Last Updated: Federico Holgado <fholgado@gmail.com>
           URL: http://vim.sourceforge.net/scripts/script.php?script_id=159
    GitHub URL: https://github.com/fholgado/minibufexpl.vim
-  Last Change: Friday, October 21, 2011
-      Version: 6.4.3
+  Last Change: Sunday, February 26, 2012
+      Version: 6.4.4
                Derived from Jeff Lanzarotta's bufexplorer.vim version 6.0.7
                Jeff can be reached at (jefflanzarotta@yahoo.com) and the
                original plugin can be found at:
@@ -390,6 +390,14 @@ might not take you to the expected window.
 ==============================================================================
 8. Changelog                                            *MiniBufExplChangelog*
 
+
+6.4.4
+    - Set up proper documentation. Thanks to Claytron :)
+    - Fix colorcolum feature detection. Thanks to sandaya :)
+    - MBE now ignores buffers with empty name. Thanks to Folke
+      for the pull :)
+    - Fix incompatibility with tildes in filenames. Thanks to
+      future for the pull :)
 
 6.4.3
     - Fix MBE losing highlighting when a buffer is closed.
