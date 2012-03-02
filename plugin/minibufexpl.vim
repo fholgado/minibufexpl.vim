@@ -456,6 +456,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
   " them off for the MBE window
   setlocal foldcolumn=0
   setlocal nonumber
+  setlocal norelativenumber
   "don't highlight matching parentheses, etc.
   setlocal matchpairs=
   "Depending on what type of split, make sure the MBE buffer is not
