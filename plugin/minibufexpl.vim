@@ -545,7 +545,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
 
   if (l:curBuf != -1)
     let l:bname = <SID>EscapeTilde(expand('#'.l:curBuf.':t'))
-    call search('\['.l:curBuf.':'.l:bname.'\]')
+    call search('\['.l:curBuf.':'.l:bname.'\]', 'w')
   else
     call <SID>DEBUG('No current buffer to search for',9)
   endif
