@@ -58,7 +58,7 @@ You can map these additional commands as follows:
   map <Leader>t :TMiniBufExplorer<cr>
 
 NOTE: you can change the key binding used in these mappings
-so that they fit with your configuration of vim.
+so that they fit with your configuration of Vim.
 
 You can also call each of these features by typing the following in command
 mode:
@@ -92,7 +92,7 @@ the setting:
                                  " current or on the
                                  " right for vertical split
 
-The default for this is read from the 'splitbelow' VIM option.
+The default for this is read from the 'splitbelow' Vim option.
 
                                                   *'g:miniBufExplSplitToEdge'*
 By default we are now (as of 6.0.2) forcing the -MiniBufExplorer- window to
@@ -120,7 +120,7 @@ It is now (as of 6.1.1) possible to set a maximum height
 for the -MiniBufExplorer- window. You can set the max height by letting the
 following variable in your .vimrc:
 
-  let g:miniBufExplMaxSize = <max lines: defualt 0>
+  let g:miniBufExplMaxSize = <max lines: default 0>
 
 setting this to 0 will mean the window gets as big as needed to fit all your
 buffers.
@@ -268,7 +268,7 @@ following in your .vimrc:
     let g:miniBufExplShowBufNumbers = 0
 
                                             *'g:miniBufExplForceSyntaxEnable'*
-There is a VIM bug that can cause buffers to show up without their
+There is a Vim bug that can cause buffers to show up without their
 highlighting. The following setting will cause MBE to try and turn
 highlighting back on (introduced in 6.3.1):
 
@@ -291,21 +291,21 @@ You can also set a DebugMode to cause output to be target as follows (default
 is mode 3):
 
   let g:miniBufExplorerDebugMode  = 0  " Errors will show up in
-                                       " a vim window
-  let g:miniBufExplorerDebugMode  = 1  " Uses VIM's echo function
+                                       " a Vim window
+  let g:miniBufExplorerDebugMode  = 1  " Uses Vim's echo function
                                        " to display on the screen
   let g:miniBufExplorerDebugMode  = 2  " Writes to a file
                                        " MiniBufExplorer.DBG
   let g:miniBufExplorerDebugMode  = 3  " Store output in global:
                                   " g:miniBufExplorerDebugOutput
 
-Or if you are able to start VIM, you might just perform these at a command
+Or if you are able to start Vim, you might just perform these at a command
 prompt right before you do the operation that is failing.
 
 ==============================================================================
 5. Highlighting                                      *MiniBufExplHighlighting*
 
-It is possible to customize the the highlighting for the tabs in the MBE by
+It is possible to customize the highlighting for the tabs in the MBE by
 configuring the following highlighting groups:
 
   MBENormal               - for buffers that have NOT CHANGED and
@@ -370,7 +370,7 @@ might not take you to the expected window.
                notice is copied with it. Like anything else that's free,
                minibufexpl.vim is provided *as is* and comes with no
                warranty of any kind, either expressed or implied. In no
-               event will the copyright holder be liable for any damamges
+               event will the copyright holder be liable for any damages
                resulting from the use of this software.
 
   Description: Mini Buffer Explorer Vim Plugin
@@ -393,7 +393,7 @@ might not take you to the expected window.
 
 6.4.4
     - Set up proper documentation. Thanks to Claytron :)
-    - Fix colorcolum feature detection. Thanks to sandaya :)
+    - Fix colorcolumn feature detection. Thanks to sandaya :)
     - MBE now ignores buffers with empty name. Thanks to Folke
       for the pull :)
     - Fix incompatibility with tildes in filenames. Thanks to
@@ -412,7 +412,7 @@ might not take you to the expected window.
       re-write!
 
 6.4.1b5
-    - Allow users to turn off Buffer number display on exporer
+    - Allow users to turn off Buffer number display on explorer
       tabs courtesy of jmatraszek.
     - Allow users to turn off duplicate buffer name checking
       to speed up MBE buffer switching. We are working on
@@ -420,7 +420,7 @@ might not take you to the expected window.
       many buffers open.
     - Set Shellslash fix for Windows users so that duplicate
       buffer name checking works properly.
-    - Re-enable synatx highlighitng after cycling the buffer
+    - Re-enable syntax highlighting after cycling the buffer
       courtesy of Sontek.
     - Fix erratic :q behavior when MBE is the last buffer
       courtesy of Moopet.
@@ -494,7 +494,7 @@ might not take you to the expected window.
       navigate.
     - Added g:miniBufExplForceSyntaxEnable setting for folks
       that want a :syntax enable to be called when we enter
-      buffers. This can resolve issues caused by a vim bug
+      buffers. This can resolve issues caused by a Vim bug
       where buffers show up without highlighting when another
       buffer has been closed, quit, wiped or deleted.
 
@@ -585,8 +585,8 @@ might not take you to the expected window.
       specified, but it is depreciated. Use MinSize instead.
     - I now setlocal foldcolumn=0 and nonumber in the MBE
       window. This is for those of you that like to have
-      these options turned on locally. I'm assuming noone
-      outthere wants foldcolumns and line numbers in the
+      these options turned on locally. I'm assuming no one
+      out there wants foldcolumns and line numbers in the
       MBE window? :)
     - Fixed a bug where an empty MBE window was taking half
       of the screen (partly why the MinHeight option was
@@ -636,12 +636,12 @@ might not take you to the expected window.
       idiocyncracies.)
 
 6.0.9
-    - Double clicking tabs was overwriting the cliboard
+    - Double clicking tabs was overwriting the clipboard
       register on MS Windows.  Thanks to Shoeb Bhinderwala
       for reporting this issue.
 
 6.0.8
-    - Apparently some VIM builds are having a hard time with
+    - Apparently some Vim builds are having a hard time with
       line continuation in scripts so the few that were here
       have been removed.
     - Generalized FindExplorer and FindCreateExplorer so
@@ -651,7 +651,7 @@ might not take you to the expected window.
       a buffer which can then be written to disk or emailed
       to me when someone is having a major issue. Can also
       write directly to a file (VERY SLOWLY) on UNIX or Win32
-      (not 95 or 98 at the moment) or use VIM's echo function
+      (not 95 or 98 at the moment) or use Vim's echo function
       to display the output to the screen.
     - Several people have had issues when the hidden option
       is turned on. So I have put in several checks to make
@@ -664,8 +664,8 @@ might not take you to the expected window.
       the MBE UI.)
     - The AutoUpdate code will now close the MBE window when
       there is a single eligible buffer available.
-      This has the usefull side effect of stopping the MBE
-      window from blocking the VIM session open when you close
+      This has the useful side effect of stopping the MBE
+      window from blocking the Vim session open when you close
       the last buffer.
     - Added functions, commands and maps to close & update
       the MBE window (<leader>mbc and <leader>mbu.)
@@ -673,12 +673,12 @@ might not take you to the expected window.
       StartExplorer(1) or StopExplorer(1), which are
       called from the standard mappings. So if you close
       the mbe window with \mbc it won't be automatically
-      opened again unless you do a \mbe (or restart VIM).
+      opened again unless you do a \mbe (or restart Vim).
     - Removed spaces between "tabs" (even more mini :)
     - Simplified MBE tab processing
 
 6.0.6
-    - Fixed register overwrite bug found by S?bastien Pierre
+    - Fixed register overwrite bug found by Sébastien Pierre
 
 6.0.5
     - Fixed an issue with window sizing when we run out of
@@ -696,7 +696,7 @@ might not take you to the expected window.
 
 6.0.4
     - Added optional fancy window navigation:
-    - Holding down control and pressing a vim direction
+    - Holding down control and pressing a Vim direction
       [hjkl] will switch windows in the indicated direction.
 
 6.0.3
@@ -712,7 +712,7 @@ might not take you to the expected window.
     - Added MoreThanOne option and set it on by default
       MiniBufExplorer will not automatically open until
       more than one eligible buffers are opened. This
-      reduces cluter when you are only working on a
+      reduces clutter when you are only working on a
       single file.
       NOTE: See change log for 6.2.2 for more details about
       this feature
