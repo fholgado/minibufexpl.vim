@@ -878,7 +878,7 @@ function! <SID>ShowBuffers(delBufNum,currBufName)
     set noshowcmd 
 
     " Delete all lines in buffer.
-    1,$d _
+    silent 1,$d _
   
     " Goto the end of the buffer put the buffer list 
     " and then delete the extra trailing blank line
