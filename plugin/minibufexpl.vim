@@ -1369,7 +1369,7 @@ function! <SID>AutoUpdate(delBufNum,currBufName)
         let l:bufnr = <SID>FindWindow('-MiniBufExplorer-', 0)
         if (l:bufnr == -1)
           call <SID>DEBUG('About to call StartExplorer (Create MBE)', 9)
-          call <SID>StartExplorer(0, a:delBufNum, bufname("%"))
+          call <SID>StartExplorer(0, a:delBufNum, bufnr("%"))
         else
         " otherwise only update the window if the contents have
         " changed
