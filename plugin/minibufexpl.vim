@@ -470,7 +470,7 @@ function! <SID>StartExplorer(sticky,delBufNum,currBufName)
 
   " Set the text of the statusline for the MBE buffer. See help:stl for
   " many options
-  setlocal stl=%!g:statusLineText
+  exec 'setlocal statusline='.g:statusLineText
 
   " No spell check
   setlocal nospell
