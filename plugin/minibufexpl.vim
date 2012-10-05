@@ -975,6 +975,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
     let l:CurrBufName = a:currBufName
     let l:NBuffers = bufnr('$')     " Get the number of the last buffer.
     let l:i = 0                     " Set the buffer index to zero.
+    let l:y = 0                     " Displayed buffers: more sugestive
 
     let l:fileNames = ''
     let l:tabList = []
@@ -1096,11 +1097,15 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
             endif
         endif
 
+        if (getbufvar(l:i, '&modifiable') == 1 && BufName != '-MiniBufExplorer-')
+            let l:y =l:y +1
+        endif
+
         " Establish the tab's content, including the differentiating root
         " dir if neccessary
         let l:tab = '['
         if g:miniBufExplShowBufNumbers == 1
-            let l:tab .= l:i.':'
+            let l:tab .= l:y.':'
         endif
 
         if (g:miniBufExplCheckDupeBufs == 0)
