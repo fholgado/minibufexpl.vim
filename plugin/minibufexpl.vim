@@ -26,16 +26,18 @@
 "
 " Startup Check
 "
-" Has this plugin already been loaded? {{{
-"
+" Stop auto starting MBE in diff mode? {{{
 if !exists('g:miniBufExplorerHideWhenDiff')
     let g:miniBufExplorerHideWhenDiff = 0
 endif
 
 if g:miniBufExplorerHideWhenDiff==1 && &diff
-  finish
+    let g:miniBufExplorerAutoUpdate = 0
 endif
+" }}}
 
+" Has this plugin already been loaded? {{{
+"
 if exists('loaded_minibufexplorer')
   finish
 endif
@@ -412,7 +414,9 @@ autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter Checking 
 autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
 autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
-autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter AutoCmd', 10) |let g:miniBufExplorerAutoUpdate = 1 |call <SID>AutoUpdate(-1,bufnr("%"))
+autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter AutoCmd', 10) |
+            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let g:miniBufExplorerAutoUpdate = 1 |endif |
+            \ call <SID>AutoUpdate(-1,bufnr("%"))
 augroup NONE
 " }}}
 
