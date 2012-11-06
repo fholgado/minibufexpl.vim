@@ -1730,6 +1730,10 @@ function! <SID>DEBUG(msg, level)
 
     " Debug output to a buffer
     if g:miniBufExplorerDebugMode == 0
+        if bufname('%') == 'MiniBufExplorer.DBG'
+            return
+        endif
+
         " Save the current window number so we can come back here
         let l:prevWin     = winnr()
         wincmd p
