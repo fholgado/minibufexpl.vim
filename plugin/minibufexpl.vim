@@ -1741,7 +1741,7 @@ function! <SID>DEBUG(msg, level)
         wincmd p
 
         " Get into the debug window or create it if needed
-        call <SID>FindCreateWindow('MiniBufExplorer.DBG', 1, 0, 0)
+        call <SID>FindCreateWindow('MiniBufExplorer.DBG', 1, 1, 0)
 
         " Make sure we really got to our window, if not we
         " will display a confirm dialog and turn debugging
