@@ -938,7 +938,7 @@ endfunction
 "
 function! <SID>IgnoreBuffer(buf)
   " Skip temporary buffers with buftype set.
-  if empty(getbufvar(a:buf, "&buftype") == 0)
+  if empty(getbufvar(a:buf, "&buftype")) == 0
     return 1
   endif
 
