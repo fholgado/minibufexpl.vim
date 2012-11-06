@@ -314,7 +314,7 @@ configuring the following highlighting groups:
                             NOT VISIBLE
   MBEVisibleNormal        - buffers that have NOT CHANGED and are
                             VISIBLE
-  MBEVisibleNormalActive  - buffers that have NOT CHANGED and are
+  MBEVisibleActive        - buffers that have NOT CHANGED and are
                             VISIBLE and is the active buffer
   MBEVisibleChanged       - for buffers that have CHANGED and are 
                             VISIBLE
