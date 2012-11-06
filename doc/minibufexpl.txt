@@ -5,8 +5,8 @@ CONTENTS                                                *MiniBufExpl-contents*
                                                         *MiniBufExpl*
 
     1. Install................................|MiniBufExplInstall|
-    2. Key Mappings...........................|MiniBufExplKeymap|
-    3. Commands...............................|MiniBufExplCommands|
+    2. Key Mappings...........................|MiniBufExplMappings|
+    3. Commands...............................|MiniBufExplCommand|
     4. Options................................|MiniBufExplOptions|
        4.1 Splits.............................|MiniBufExplSplits|
        4.2 Horizontal Size....................|MiniBufExplWindowSize|
