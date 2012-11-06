@@ -28,6 +28,14 @@
 "
 " Has this plugin already been loaded? {{{
 "
+if !exists('g:miniBufExplorerHideWhenDiff')
+    let g:miniBufExplorerHideWhenDiff = 0
+endif
+
+if g:miniBufExplorerHideWhenDiff==1 && &diff
+  finish
+endif
+
 if exists('loaded_minibufexplorer')
   finish
 endif
