@@ -26,16 +26,6 @@
 "
 " Startup Check
 "
-" Stop auto starting MBE in diff mode? {{{
-if !exists('g:miniBufExplorerHideWhenDiff')
-    let g:miniBufExplorerHideWhenDiff = 0
-endif
-
-if g:miniBufExplorerHideWhenDiff==1 && &diff
-    let g:miniBufExplorerAutoUpdate = 0
-endif
-" }}}
-
 " Has this plugin already been loaded? {{{
 "
 if exists('loaded_minibufexplorer')
@@ -131,6 +121,16 @@ if !exists('g:miniBufExplorerAutoUpdate')
 endif
 
 " }}}
+" Stop auto starting MBE in diff mode? {{{
+if !exists('g:miniBufExplorerHideWhenDiff')
+    let g:miniBufExplorerHideWhenDiff = 0
+endif
+
+if g:miniBufExplorerHideWhenDiff==1 && &diff
+    let g:miniBufExplorerAutoUpdate = 0
+endif
+" }}}
+
 " MoreThanOne? {{{
 " Display Mini Buf Explorer when there are 'More Than One' eligible buffers
 "
