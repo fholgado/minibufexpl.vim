@@ -626,17 +626,7 @@ function! <SID>FindWindow(bufName, doDebug)
 
   " Try to find an existing window that contains
   " our buffer.
-  let l:bufNum = bufnr(a:bufName)
-  if l:bufNum != -1
-    if a:doDebug
-      call <SID>DEBUG('Found buffer ('.a:bufName.'): '.l:bufNum,9)
-    endif
-    let l:winNum = bufwinnr(l:bufNum)
-  else
-    let l:winNum = -1
-  endif
-
-  return l:winNum
+  return bufwinnr(a:bufName)
 
 endfunction
 
