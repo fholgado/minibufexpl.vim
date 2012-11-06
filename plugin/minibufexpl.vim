@@ -1124,7 +1124,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, currBufName)
 
         " If the buffer matches the)current buffer name, then  mark it
         call <SID>DEBUG('l:i is '.l:i.' and l:CurrBufName is '.l:CurrBufName,10)
-        if(l:i == l:CurrBufName)
+        if(bufname(l:i) == l:CurrBufName)
             let l:tab .= '!'
         endif
 
@@ -1375,7 +1375,7 @@ function! <SID>AutoUpdate(delBufNum,currBufName)
           let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 0, a:currBufName)
           if (l:ListChanged)
             call <SID>DEBUG('About to call StartExplorer (Update MBE)', 9)
-            call <SID>StartExplorer(0, a:delBufNum, bufnr("%"))
+            call <SID>StartExplorer(0, a:delBufNum, bufname("%"))
           endif
         endif
 
