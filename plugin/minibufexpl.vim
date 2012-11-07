@@ -663,12 +663,6 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
     call <SID>DEBUG('Entering FindCreateWindow('.a:bufName.')',10)
   endif
 
-  " Save the user's split setting.
-  let l:saveSplitBelow = &splitbelow
-
-  " Set to our new values.
-  let &splitbelow = g:miniBufExplSplitBelow
-
   " Try to find an existing explorer window
   let l:winNum = <SID>FindWindow(a:bufName, a:doDebug)
 
@@ -677,6 +671,11 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
   if l:winNum != -1
     exec l:winNum.' wincmd w'
   else
+    " Save the user's split setting.
+    let l:saveSplitBelow = &splitbelow
+
+    " Set to our new values.
+    let &splitbelow = g:miniBufExplSplitBelow
 
     if g:miniBufExplSplitToEdge == 1 || a:forceEdge >= 0
       let l:edge = &splitbelow
@@ -712,6 +711,9 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
       endif
     endif
 
+    " Restore the user's split setting.
+    let &splitbelow = l:saveSplitBelow
+
     let g:miniBufExplForceDisplay = 1
 
     " Try to find an existing explorer window
@@ -742,9 +744,6 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
       endif
     endif
   endif
-
-  " Restore the user's split setting.
-  let &splitbelow = l:saveSplitBelow
 
   return l:winNum
 endfunction
