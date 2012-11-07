@@ -717,7 +717,7 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
     let g:miniBufExplForceDisplay = 1
 
     " Try to find an existing explorer window
-    let l:winNum = <SID>FindWindow(a:bufName, a:doDebug)
+    let l:winNum = <SID>FindWindow(a:bufName, 0)
 
     if l:winNum != -1
       if a:doDebug
