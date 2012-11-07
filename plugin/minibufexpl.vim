@@ -451,6 +451,13 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
     return
   endif
 
+  if g:miniBufExplVSplit == 0
+    setlocal wrap
+  else
+    setlocal nowrap
+    exec('setlocal winwidth='.g:miniBufExplMinSize)
+  endif
+
   " !!! We may want to make the following optional -- Bindu
   " New windows don't cause all windows to be resized to equal sizes
   set noequalalways
@@ -731,17 +738,11 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
     endif
 
     if a:isExplorer
-      " Turn off the swapfile, set the buffer type so that it won't get written,
-      " and so that it will get deleted when it gets hidden and turn on word wrap.
+      " Turn off the swapfile, set the buftype and bufhidden option, so that it
+      " won't get written and will be deleted when it gets hidden.
       setlocal noswapfile
       setlocal buftype=nofile
       setlocal bufhidden=delete
-      if g:miniBufExplVSplit == 0
-        setlocal wrap
-      else
-        setlocal nowrap
-        exec('setlocal winwidth='.g:miniBufExplMinSize)
-      endif
     endif
   endif
 
