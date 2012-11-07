@@ -676,7 +676,6 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
   " split open a new window.
   if l:winNum != -1
     exec l:winNum.' wincmd w'
-    let l:winFound = 1
   else
 
     if g:miniBufExplSplitToEdge == 1 || a:forceEdge >= 0
