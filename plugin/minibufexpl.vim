@@ -726,7 +726,6 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
       if a:doDebug
         call <SID>DEBUG('Failed to create window with buffer ('.a:bufName.').',1)
       endif
-      return
     endif
 
     if a:isExplorer
@@ -746,6 +745,8 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
 
   " Restore the user's split setting.
   let &splitbelow = l:saveSplitBelow
+
+  return l:winNum
 endfunction
 
 " }}}
