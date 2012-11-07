@@ -443,6 +443,8 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
 
   call <SID>FindCreateWindow('-MiniBufExplorer-', -1, 1, 1)
 
+  let g:miniBufExplForceDisplay = 1
+
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('StartExplorer called in invalid window',1)
@@ -720,8 +722,6 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
 
     " Restore the user's split setting.
     let &splitbelow = l:saveSplitBelow
-
-    let g:miniBufExplForceDisplay = 1
 
     " Try to find an existing explorer window
     let l:winNum = <SID>FindWindow(a:bufName, 0)
