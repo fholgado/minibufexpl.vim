@@ -634,7 +634,6 @@ function! <SID>FindWindow(bufName, doDebug)
   " Try to find an existing window that contains
   " our buffer.
   return bufwinnr(a:bufName)
-
 endfunction
 
 " }}}
@@ -671,44 +670,45 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
     let l:winFound = 1
   else
 
-      if g:miniBufExplSplitToEdge == 1 || a:forceEdge >= 0
+    if g:miniBufExplSplitToEdge == 1 || a:forceEdge >= 0
+      let l:edge = &splitbelow
 
-          let l:edge = &splitbelow
-          if a:forceEdge >= 0
-              let l:edge = a:forceEdge
-          endif
-
-          if l:edge
-              if g:miniBufExplVSplit == 0
-                  silent exec 'bo sp '.a:bufName
-              else
-                  silent exec 'bo vsp '.a:bufName
-              endif
-          else
-              if g:miniBufExplVSplit == 0
-                  silent exec 'to sp '.a:bufName
-              else
-                  silent exec 'to vsp '.a:bufName
-              endif
-          endif
-      else
-          if g:miniBufExplVSplit == 0
-              silent exec 'sp '.a:bufName
-          else
-              " &splitbelow doesn't affect vertical splits
-              " so we have to do this explicitly.. ugh.
-              if &splitbelow
-                  silent exec 'rightb vsp '.a:bufName
-              else
-                  silent exec 'vsp '.a:bufName
-              endif
-          endif
+      if a:forceEdge >= 0
+        let l:edge = a:forceEdge
       endif
+
+      if l:edge
+        if g:miniBufExplVSplit == 0
+          silent exec 'bo sp '.a:bufName
+        else
+          silent exec 'bo vsp '.a:bufName
+        endif
+      else
+        if g:miniBufExplVSplit == 0
+          silent exec 'to sp '.a:bufName
+        else
+          silent exec 'to vsp '.a:bufName
+        endif
+      endif
+    else
+      if g:miniBufExplVSplit == 0
+        silent exec 'sp '.a:bufName
+      else
+        " &splitbelow doesn't affect vertical splits
+        " so we have to do this explicitly.. ugh.
+        if &splitbelow
+          silent exec 'rightb vsp '.a:bufName
+        else
+          silent exec 'vsp '.a:bufName
+        endif
+      endif
+    endif
 
     let g:miniBufExplForceDisplay = 1
 
     " Try to find an existing explorer window
     let l:winNum = <SID>FindWindow(a:bufName, a:doDebug)
+
     if l:winNum != -1
       if a:doDebug
         call <SID>DEBUG('Created and then found window ('.a:bufName.'): '.l:winNum,9)
@@ -738,12 +738,10 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
     if a:doDebug
       call <SID>DEBUG('Window ('.a:bufName.') created: '.winnr(),9)
     endif
-
   endif
 
   " Restore the user's split setting.
   let &splitbelow = l:saveSplitBelow
-
 endfunction
 
 " }}}
