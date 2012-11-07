@@ -417,7 +417,7 @@ autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCm
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter AutoCmd', 10) |
             \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let g:miniBufExplorerAutoUpdate = 1 |endif |
             \ call <SID>AutoUpdate(-1,bufnr("%"))
-augroup NONE
+augroup END
 " }}}
 
 " Functions
