@@ -633,7 +633,19 @@ function! <SID>FindWindow(bufName, doDebug)
 
   " Try to find an existing window that contains
   " our buffer.
-  return bufwinnr(a:bufName)
+  let l:winnr = bufwinnr(a:bufName)
+
+  if l:winnr != -1
+    if a:doDebug
+      call <SID>DEBUG('Found window '.l:winnr.' with buffer ('.winbufnr(l:winnr).' : '.bufname(winbufnr(l:winnr)).')',9)
+    endif
+  else
+    if a:doDebug
+      call <SID>DEBUG('Can not find window with buffer ('.a:bufName.')',9)
+    endif
+  endif
+
+  return l:winnr
 endfunction
 
 " }}}
@@ -663,9 +675,6 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
   " If found goto the existing window, otherwise
   " split open a new window.
   if l:winNum != -1
-    if a:doDebug
-      call <SID>DEBUG('Found window ('.a:bufName.'): '.l:winNum,9)
-    endif
     exec l:winNum.' wincmd w'
     let l:winFound = 1
   else
@@ -711,12 +720,12 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
 
     if l:winNum != -1
       if a:doDebug
-        call <SID>DEBUG('Created and then found window ('.a:bufName.'): '.l:winNum,9)
+        call <SID>DEBUG('Created window '.l:winNum.' with buffer ('.a:bufName.')',9)
       endif
       exec l:winNum.' wincmd w'
     else
       if a:doDebug
-        call <SID>DEBUG('FindCreateWindow failed to create window ('.a:bufName.').',1)
+        call <SID>DEBUG('Failed to create window with buffer ('.a:bufName.').',1)
       endif
       return
     endif
@@ -733,10 +742,6 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
         setlocal nowrap
         exec('setlocal winwidth='.g:miniBufExplMinSize)
       endif
-    endif
-
-    if a:doDebug
-      call <SID>DEBUG('Window ('.a:bufName.') created: '.winnr(),9)
     endif
   endif
 
