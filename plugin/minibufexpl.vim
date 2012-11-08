@@ -441,7 +441,7 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   let &report    = 10000
   set noshowcmd
 
-  call <SID>FindCreateWindow('-MiniBufExplorer-', -1, 1, 1)
+  call <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplSplitToEdge, 1, 1)
 
   let g:miniBufExplForceDisplay = 1
 
@@ -689,7 +689,7 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
     " Set to our new values.
     let &splitbelow = g:miniBufExplSplitBelow
 
-    if g:miniBufExplSplitToEdge == 1 || a:forceEdge >= 0
+    if a:forceEdge >= 0
       let l:edge = &splitbelow
 
       if a:forceEdge >= 0
