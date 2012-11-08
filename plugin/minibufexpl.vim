@@ -139,12 +139,27 @@ if !exists('g:miniBufExplorerMoreThanOne')
 endif
 
 " }}}
+" Horizontal or Vertical explorer? {{{
+" For folks that like vertical explorers, I'm caving in and providing for
+" veritcal splits. If this is set to 0 then the current horizontal
+" splitting logic will be run. If however you want a vertical split,
+" assign the width (in characters) you wish to assign to the MBE window.
+"
+if !exists('g:miniBufExplVSplit')
+  let g:miniBufExplVSplit = 0
+endif
+
+" }}}
 " Split below/above/left/right? {{{
 " When opening a new -MiniBufExplorer- window, split the new windows below or
 " above the current window?  1 = below, 0 = above.
 "
-if !exists('g:miniBufExplSplitBelow')
-  let g:miniBufExplSplitBelow = &splitbelow
+if exists('g:miniBufExplSplitBelow') "Depreciated
+  let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
+endif
+
+if !exists('g:miniBufExplBRSplit')
+  let g:miniBufExplBRSplit = g:miniBufExplVSplit ? &splitright : &splitbelow
 endif
 
 " }}}
@@ -193,17 +208,6 @@ endif
 " this is ignored unless g:miniBufExplMax(Size|Height) are specified.
 if !exists('g:miniBufExplMinSize')
   let g:miniBufExplMinSize = g:miniBufExplMinHeight
-endif
-
-" }}}
-" Horizontal or Vertical explorer? {{{
-" For folks that like vertical explorers, I'm caving in and providing for
-" veritcal splits. If this is set to 0 then the current horizontal
-" splitting logic will be run. If however you want a vertical split,
-" assign the width (in characters) you wish to assign to the MBE window.
-"
-if !exists('g:miniBufExplVSplit')
-  let g:miniBufExplVSplit = 0
 endif
 
 " }}}
@@ -441,7 +445,7 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   let &report    = 10000
   set noshowcmd
 
-  call <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplSplitBelow, g:miniBufExplSplitToEdge, 1, 1)
+  call <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
 
   let g:miniBufExplForceDisplay = 1
 
@@ -689,12 +693,14 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWin
   else
     " Save the user's split setting.
     let l:saveSplitBelow = &splitbelow
+    let l:saveSplitRight = &splitright
 
     " Set to our new values.
     let &splitbelow = a:brSplit
+    let &splitright = a:brSplit
 
     if a:forceEdge == 1
-      let l:edge = &splitbelow
+      let l:edge = a:vSplit ? &splitright : &splitbelow
 
       if l:edge
         if a:vSplit == 0
@@ -713,18 +719,13 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWin
       if a:vSplit == 0
         silent exec 'sp '.a:bufName
       else
-        " &splitbelow doesn't affect vertical splits
-        " so we have to do this explicitly.. ugh.
-        if &splitbelow
-          silent exec 'rightb vsp '.a:bufName
-        else
-          silent exec 'vsp '.a:bufName
-        endif
+        silent exec 'vsp '.a:bufName
       endif
     endif
 
     " Restore the user's split setting.
     let &splitbelow = l:saveSplitBelow
+    let &splitright = l:saveSplitRight
 
     " Try to find an existing explorer window
     let l:winNum = <SID>FindWindow(a:bufName, 0)
