@@ -664,8 +664,11 @@ endfunction
 " configures it and moves there.
 "
 " forceEdge, -1 use defaults, 0 below, 1 above
+"   split the window at the edege of the editor
 " isExplorer, 0 no, 1 yes
+"   if it is an explorer plugin window
 " doDebug, 0 no, 1 yes
+"   show debugging message or not
 "
 function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
   if a:doDebug
