@@ -663,7 +663,7 @@ endfunction
 " If it is found then moves there. Otherwise creates a new window and
 " configures it and moves there.
 "
-" forceEdge, -1 use defaults, 0 below, 1 above
+" forceEdge, 0 no, 1 yes
 "   split the window at the edege of the editor
 " isExplorer, 0 no, 1 yes
 "   if it is an explorer plugin window
@@ -689,12 +689,8 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
     " Set to our new values.
     let &splitbelow = g:miniBufExplSplitBelow
 
-    if a:forceEdge >= 0
+    if a:forceEdge == 1
       let l:edge = &splitbelow
-
-      if a:forceEdge >= 0
-        let l:edge = a:forceEdge
-      endif
 
       if l:edge
         if g:miniBufExplVSplit == 0
