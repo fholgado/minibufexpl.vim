@@ -662,6 +662,79 @@ function! <SID>FindWindow(bufName, doDebug)
 endfunction
 
 " }}}
+" CreateWindow {{{
+"
+" vSplit, 0 no, 1 yes
+"   split vertically or horizontally
+" brSplit, 0 no, 1 yes
+"   split the window below/right to current window
+" forceEdge, 0 no, 1 yes
+"   split the window at the edege of the editor
+" isPluginWindow, 0 no, 1 yes
+"   if it is a plugin window
+" doDebug, 0 no, 1 yes
+"   show debugging message or not
+"
+function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow, doDebug)
+  if a:doDebug
+    call <SID>DEBUG('Entering CreateWindow()',10)
+  endif
+
+  " Save the user's split setting.
+  let l:saveSplitBelow = &splitbelow
+  let l:saveSplitRight = &splitright
+
+  " Set to our new values.
+  let &splitbelow = a:brSplit
+  let &splitright = a:brSplit
+
+  let l:bufNum = bufnr(a:bufName)
+
+  if l:bufNum == -1
+    let l:spCmd = 'sp'
+  else
+    let l:spCmd = 'sb'
+  endif
+
+  if a:forceEdge == 1
+    let l:edge = a:vSplit ? &splitright : &splitbelow
+
+    if l:edge
+      if a:vSplit == 0
+        silent exec 'bo '.l:spCmd.' '.a:bufName
+      else
+        silent exec 'bo vert '.l:spCmd.' '.a:bufName
+      endif
+    else
+      if a:vSplit == 0
+        silent exec 'to '.l:spCmd.' '.a:bufName
+      else
+        silent exec 'to vert '.l:spCmd.' '.a:bufName
+      endif
+    endif
+  else
+    if a:vSplit == 0
+      silent exec l:spCmd.' '.a:bufName
+    else
+      silent exec 'vert '.l:spCmd.' '.a:bufName
+    endif
+  endif
+
+  " Restore the user's split setting.
+  let &splitbelow = l:saveSplitBelow
+  let &splitright = l:saveSplitRight
+
+
+  if a:isPluginWindow
+    " Turn off the swapfile, set the buftype and bufhidden option, so that it
+    " won't get written and will be deleted when it gets hidden.
+    setlocal noswapfile
+    setlocal buftype=nofile
+    setlocal bufhidden=delete
+  endif
+endfunction
+
+" }}}
 " FindCreateWindow - Attempts to find a window for a named buffer. {{{
 "
 " If it is found then moves there. Otherwise creates a new window and
@@ -691,49 +764,11 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWin
   if l:winNum != -1
     exec l:winNum.' wincmd w'
   else
-    " Save the user's split setting.
-    let l:saveSplitBelow = &splitbelow
-    let l:saveSplitRight = &splitright
-
-    " Set to our new values.
-    let &splitbelow = a:brSplit
-    let &splitright = a:brSplit
-
-    let l:bufNum = bufnr(a:bufName)
-
-    if l:bufNum == -1
-      let l:spCmd = 'sp'
-    else
-      let l:spCmd = 'sb'
+    if a:doDebug
+      call <SID>DEBUG('Creating a new window with buffer ('.a:bufName.')',9)
     endif
 
-    if a:forceEdge == 1
-      let l:edge = a:vSplit ? &splitright : &splitbelow
-
-      if l:edge
-        if a:vSplit == 0
-          silent exec 'bo '.l:spCmd.' '.a:bufName
-        else
-          silent exec 'bo vert '.l:spCmd.' '.a:bufName
-        endif
-      else
-        if a:vSplit == 0
-          silent exec 'to '.l:spCmd.' '.a:bufName
-        else
-          silent exec 'to vert '.l:spCmd.' '.a:bufName
-        endif
-      endif
-    else
-      if a:vSplit == 0
-        silent exec l:spCmd.' '.a:bufName
-      else
-        silent exec 'vert '.l:spCmd.' '.a:bufName
-      endif
-    endif
-
-    " Restore the user's split setting.
-    let &splitbelow = l:saveSplitBelow
-    let &splitright = l:saveSplitRight
+    call <SID>CreateWindow(a:bufName, a:vSplit, a:brSplit, a:forceEdge, a:isPluginWindow, a:doDebug)
 
     " Try to find an existing explorer window
     let l:winNum = <SID>FindWindow(a:bufName, 0)
@@ -747,14 +782,6 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWin
       if a:doDebug
         call <SID>DEBUG('Failed to create window with buffer ('.a:bufName.').',1)
       endif
-    endif
-
-    if a:isPluginWindow
-      " Turn off the swapfile, set the buftype and bufhidden option, so that it
-      " won't get written and will be deleted when it gets hidden.
-      setlocal noswapfile
-      setlocal buftype=nofile
-      setlocal bufhidden=delete
     endif
   endif
 
