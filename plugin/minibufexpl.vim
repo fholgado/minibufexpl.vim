@@ -669,12 +669,12 @@ endfunction
 "   split the window below/right to current window
 " forceEdge, 0 no, 1 yes
 "   split the window at the edege of the editor
-" isExplorer, 0 no, 1 yes
-"   if it is an explorer plugin window
+" isPluginWindow, 0 no, 1 yes
+"   if it is a plugin window
 " doDebug, 0 no, 1 yes
 "   show debugging message or not
 "
-function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isExplorer, doDebug)
+function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow, doDebug)
   if a:doDebug
     call <SID>DEBUG('Entering FindCreateWindow('.a:bufName.')',10)
   endif
@@ -740,7 +740,7 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isExplorer,
       endif
     endif
 
-    if a:isExplorer
+    if a:isPluginWindow
       " Turn off the swapfile, set the buftype and bufhidden option, so that it
       " won't get written and will be deleted when it gets hidden.
       setlocal noswapfile
