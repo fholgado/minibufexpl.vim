@@ -441,7 +441,7 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   let &report    = 10000
   set noshowcmd
 
-  call <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplSplitToEdge, 1, 1)
+  call <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplSplitBelow, g:miniBufExplSplitToEdge, 1, 1)
 
   let g:miniBufExplForceDisplay = 1
 
@@ -663,6 +663,8 @@ endfunction
 " If it is found then moves there. Otherwise creates a new window and
 " configures it and moves there.
 "
+" brSplit, 0 no, 1 yes
+"   split the window below/right to current window
 " forceEdge, 0 no, 1 yes
 "   split the window at the edege of the editor
 " isExplorer, 0 no, 1 yes
@@ -670,7 +672,7 @@ endfunction
 " doDebug, 0 no, 1 yes
 "   show debugging message or not
 "
-function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
+function! <SID>FindCreateWindow(bufName, brSplit, forceEdge, isExplorer, doDebug)
   if a:doDebug
     call <SID>DEBUG('Entering FindCreateWindow('.a:bufName.')',10)
   endif
@@ -687,7 +689,7 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
     let l:saveSplitBelow = &splitbelow
 
     " Set to our new values.
-    let &splitbelow = g:miniBufExplSplitBelow
+    let &splitbelow = a:brSplit
 
     if a:forceEdge == 1
       let l:edge = &splitbelow
@@ -1750,7 +1752,7 @@ function! <SID>DEBUG(msg, level)
         wincmd p
 
         " Get into the debug window or create it if needed
-        call <SID>FindCreateWindow('MiniBufExplorer.DBG', 1, 1, 0)
+        call <SID>FindCreateWindow('MiniBufExplorer.DBG', 1, 1, 1, 0)
 
         " Make sure we really got to our window, if not we
         " will display a confirm dialog and turn debugging
