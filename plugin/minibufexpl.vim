@@ -441,7 +441,7 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   let &report    = 10000
   set noshowcmd
 
-  call <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplSplitBelow, g:miniBufExplSplitToEdge, 1, 1)
+  call <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplSplitBelow, g:miniBufExplSplitToEdge, 1, 1)
 
   let g:miniBufExplForceDisplay = 1
 
@@ -663,6 +663,8 @@ endfunction
 " If it is found then moves there. Otherwise creates a new window and
 " configures it and moves there.
 "
+" vSplit, 0 no, 1 yes
+"   split vertically or horizontally
 " brSplit, 0 no, 1 yes
 "   split the window below/right to current window
 " forceEdge, 0 no, 1 yes
@@ -672,7 +674,7 @@ endfunction
 " doDebug, 0 no, 1 yes
 "   show debugging message or not
 "
-function! <SID>FindCreateWindow(bufName, brSplit, forceEdge, isExplorer, doDebug)
+function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isExplorer, doDebug)
   if a:doDebug
     call <SID>DEBUG('Entering FindCreateWindow('.a:bufName.')',10)
   endif
@@ -695,20 +697,20 @@ function! <SID>FindCreateWindow(bufName, brSplit, forceEdge, isExplorer, doDebug
       let l:edge = &splitbelow
 
       if l:edge
-        if g:miniBufExplVSplit == 0
+        if a:vSplit == 0
           silent exec 'bo sp '.a:bufName
         else
           silent exec 'bo vsp '.a:bufName
         endif
       else
-        if g:miniBufExplVSplit == 0
+        if a:vSplit == 0
           silent exec 'to sp '.a:bufName
         else
           silent exec 'to vsp '.a:bufName
         endif
       endif
     else
-      if g:miniBufExplVSplit == 0
+      if a:vSplit == 0
         silent exec 'sp '.a:bufName
       else
         " &splitbelow doesn't affect vertical splits
@@ -1752,7 +1754,7 @@ function! <SID>DEBUG(msg, level)
         wincmd p
 
         " Get into the debug window or create it if needed
-        call <SID>FindCreateWindow('MiniBufExplorer.DBG', 1, 1, 1, 0)
+        call <SID>FindCreateWindow('MiniBufExplorer.DBG', 0, 1, 1, 1, 0)
 
         " Make sure we really got to our window, if not we
         " will display a confirm dialog and turn debugging
