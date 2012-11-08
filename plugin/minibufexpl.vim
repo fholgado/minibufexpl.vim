@@ -699,27 +699,35 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWin
     let &splitbelow = a:brSplit
     let &splitright = a:brSplit
 
+    let l:bufNum = bufnr(a:bufName)
+
+    if l:bufNum == -1
+      let l:spCmd = 'sp'
+    else
+      let l:spCmd = 'sb'
+    endif
+
     if a:forceEdge == 1
       let l:edge = a:vSplit ? &splitright : &splitbelow
 
       if l:edge
         if a:vSplit == 0
-          silent exec 'bo sp '.a:bufName
+          silent exec 'bo '.l:spCmd.' '.a:bufName
         else
-          silent exec 'bo vsp '.a:bufName
+          silent exec 'bo vert '.l:spCmd.' '.a:bufName
         endif
       else
         if a:vSplit == 0
-          silent exec 'to sp '.a:bufName
+          silent exec 'to '.l:spCmd.' '.a:bufName
         else
-          silent exec 'to vsp '.a:bufName
+          silent exec 'to vert '.l:spCmd.' '.a:bufName
         endif
       endif
     else
       if a:vSplit == 0
-        silent exec 'sp '.a:bufName
+        silent exec l:spCmd.' '.a:bufName
       else
-        silent exec 'vsp '.a:bufName
+        silent exec 'vert '.l:spCmd.' '.a:bufName
       endif
     endif
 
