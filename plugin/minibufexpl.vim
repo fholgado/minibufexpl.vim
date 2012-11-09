@@ -724,9 +724,9 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
   let &splitbelow = l:saveSplitBelow
   let &splitright = l:saveSplitRight
 
+  " Turn off the swapfile, set the buftype and bufhidden option, so that it
+  " won't get written and will be deleted when it gets hidden.
   if a:isPluginWindow
-    " Turn off the swapfile, set the buftype and bufhidden option, so that it
-    " won't get written and will be deleted when it gets hidden.
     setlocal noswapfile
     setlocal buftype=nofile
     setlocal bufhidden=delete
