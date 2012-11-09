@@ -447,8 +447,6 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
 
   call <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
 
-  let g:miniBufExplForceDisplay = 1
-
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('StartExplorer called in invalid window',1)
@@ -456,6 +454,8 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
     let &showcmd = l:save_sc
     return
   endif
+
+  let g:miniBufExplForceDisplay = 1
 
   if g:miniBufExplVSplit == 0
     setlocal wrap
