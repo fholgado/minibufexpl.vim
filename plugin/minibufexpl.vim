@@ -139,12 +139,27 @@ if !exists('g:miniBufExplorerMoreThanOne')
 endif
 
 " }}}
+" Horizontal or Vertical explorer? {{{
+" For folks that like vertical explorers, I'm caving in and providing for
+" veritcal splits. If this is set to 0 then the current horizontal
+" splitting logic will be run. If however you want a vertical split,
+" assign the width (in characters) you wish to assign to the MBE window.
+"
+if !exists('g:miniBufExplVSplit')
+  let g:miniBufExplVSplit = 0
+endif
+
+" }}}
 " Split below/above/left/right? {{{
 " When opening a new -MiniBufExplorer- window, split the new windows below or
 " above the current window?  1 = below, 0 = above.
 "
-if !exists('g:miniBufExplSplitBelow')
-  let g:miniBufExplSplitBelow = &splitbelow
+if exists('g:miniBufExplSplitBelow') "Depreciated
+  let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
+endif
+
+if !exists('g:miniBufExplBRSplit')
+  let g:miniBufExplBRSplit = g:miniBufExplVSplit ? &splitright : &splitbelow
 endif
 
 " }}}
@@ -193,17 +208,6 @@ endif
 " this is ignored unless g:miniBufExplMax(Size|Height) are specified.
 if !exists('g:miniBufExplMinSize')
   let g:miniBufExplMinSize = g:miniBufExplMinHeight
-endif
-
-" }}}
-" Horizontal or Vertical explorer? {{{
-" For folks that like vertical explorers, I'm caving in and providing for
-" veritcal splits. If this is set to 0 then the current horizontal
-" splitting logic will be run. If however you want a vertical split,
-" assign the width (in characters) you wish to assign to the MBE window.
-"
-if !exists('g:miniBufExplVSplit')
-  let g:miniBufExplVSplit = 0
 endif
 
 " }}}
@@ -441,7 +445,9 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   let &report    = 10000
   set noshowcmd
 
-  call <SID>FindCreateWindow('-MiniBufExplorer-', -1, 1, 1)
+  call <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
+
+  let g:miniBufExplForceDisplay = 1
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
@@ -449,6 +455,13 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
     let &report  = l:save_rep
     let &showcmd = l:save_sc
     return
+  endif
+
+  if g:miniBufExplVSplit == 0
+    setlocal wrap
+  else
+    setlocal nowrap
+    exec('setlocal winwidth='.g:miniBufExplMinSize)
   endif
 
   " !!! We may want to make the following optional -- Bindu
@@ -633,8 +646,92 @@ function! <SID>FindWindow(bufName, doDebug)
 
   " Try to find an existing window that contains
   " our buffer.
-  return bufwinnr(a:bufName)
+  let l:winnr = bufwinnr(a:bufName)
 
+  if l:winnr != -1
+    if a:doDebug
+      call <SID>DEBUG('Found window '.l:winnr.' with buffer ('.winbufnr(l:winnr).' : '.bufname(winbufnr(l:winnr)).')',9)
+    endif
+  else
+    if a:doDebug
+      call <SID>DEBUG('Can not find window with buffer ('.a:bufName.')',9)
+    endif
+  endif
+
+  return l:winnr
+endfunction
+
+" }}}
+" CreateWindow {{{
+"
+" vSplit, 0 no, 1 yes
+"   split vertically or horizontally
+" brSplit, 0 no, 1 yes
+"   split the window below/right to current window
+" forceEdge, 0 no, 1 yes
+"   split the window at the edege of the editor
+" isPluginWindow, 0 no, 1 yes
+"   if it is a plugin window
+" doDebug, 0 no, 1 yes
+"   show debugging message or not
+"
+function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow, doDebug)
+  if a:doDebug
+    call <SID>DEBUG('Entering CreateWindow()',10)
+  endif
+
+  " Save the user's split setting.
+  let l:saveSplitBelow = &splitbelow
+  let l:saveSplitRight = &splitright
+
+  " Set to our new values.
+  let &splitbelow = a:brSplit
+  let &splitright = a:brSplit
+
+  let l:bufNum = bufnr(a:bufName)
+
+  if l:bufNum == -1
+    let l:spCmd = 'sp'
+  else
+    let l:spCmd = 'sb'
+  endif
+
+  if a:forceEdge == 1
+    let l:edge = a:vSplit ? &splitright : &splitbelow
+
+    if l:edge
+      if a:vSplit == 0
+        silent exec 'bo '.l:spCmd.' '.a:bufName
+      else
+        silent exec 'bo vert '.l:spCmd.' '.a:bufName
+      endif
+    else
+      if a:vSplit == 0
+        silent exec 'to '.l:spCmd.' '.a:bufName
+      else
+        silent exec 'to vert '.l:spCmd.' '.a:bufName
+      endif
+    endif
+  else
+    if a:vSplit == 0
+      silent exec l:spCmd.' '.a:bufName
+    else
+      silent exec 'vert '.l:spCmd.' '.a:bufName
+    endif
+  endif
+
+  " Restore the user's split setting.
+  let &splitbelow = l:saveSplitBelow
+  let &splitright = l:saveSplitRight
+
+
+  if a:isPluginWindow
+    " Turn off the swapfile, set the buftype and bufhidden option, so that it
+    " won't get written and will be deleted when it gets hidden.
+    setlocal noswapfile
+    setlocal buftype=nofile
+    setlocal bufhidden=delete
+  endif
 endfunction
 
 " }}}
@@ -643,20 +740,21 @@ endfunction
 " If it is found then moves there. Otherwise creates a new window and
 " configures it and moves there.
 "
-" forceEdge, -1 use defaults, 0 below, 1 above
-" isExplorer, 0 no, 1 yes
+" vSplit, 0 no, 1 yes
+"   split vertically or horizontally
+" brSplit, 0 no, 1 yes
+"   split the window below/right to current window
+" forceEdge, 0 no, 1 yes
+"   split the window at the edege of the editor
+" isPluginWindow, 0 no, 1 yes
+"   if it is a plugin window
 " doDebug, 0 no, 1 yes
+"   show debugging message or not
 "
-function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
+function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow, doDebug)
   if a:doDebug
     call <SID>DEBUG('Entering FindCreateWindow('.a:bufName.')',10)
   endif
-
-  " Save the user's split setting.
-  let l:saveSplitBelow = &splitbelow
-
-  " Set to our new values.
-  let &splitbelow = g:miniBufExplSplitBelow
 
   " Try to find an existing explorer window
   let l:winNum = <SID>FindWindow(a:bufName, a:doDebug)
@@ -664,86 +762,30 @@ function! <SID>FindCreateWindow(bufName, forceEdge, isExplorer, doDebug)
   " If found goto the existing window, otherwise
   " split open a new window.
   if l:winNum != -1
-    if a:doDebug
-      call <SID>DEBUG('Found window ('.a:bufName.'): '.l:winNum,9)
-    endif
     exec l:winNum.' wincmd w'
-    let l:winFound = 1
   else
+    if a:doDebug
+      call <SID>DEBUG('Creating a new window with buffer ('.a:bufName.')',9)
+    endif
 
-      if g:miniBufExplSplitToEdge == 1 || a:forceEdge >= 0
-
-          let l:edge = &splitbelow
-          if a:forceEdge >= 0
-              let l:edge = a:forceEdge
-          endif
-
-          if l:edge
-              if g:miniBufExplVSplit == 0
-                  silent exec 'bo sp '.a:bufName
-              else
-                  silent exec 'bo vsp '.a:bufName
-              endif
-          else
-              if g:miniBufExplVSplit == 0
-                  silent exec 'to sp '.a:bufName
-              else
-                  silent exec 'to vsp '.a:bufName
-              endif
-          endif
-      else
-          if g:miniBufExplVSplit == 0
-              silent exec 'sp '.a:bufName
-          else
-              " &splitbelow doesn't affect vertical splits
-              " so we have to do this explicitly.. ugh.
-              if &splitbelow
-                  silent exec 'rightb vsp '.a:bufName
-              else
-                  silent exec 'vsp '.a:bufName
-              endif
-          endif
-      endif
-
-    let g:miniBufExplForceDisplay = 1
+    call <SID>CreateWindow(a:bufName, a:vSplit, a:brSplit, a:forceEdge, a:isPluginWindow, a:doDebug)
 
     " Try to find an existing explorer window
-    let l:winNum = <SID>FindWindow(a:bufName, a:doDebug)
+    let l:winNum = <SID>FindWindow(a:bufName, 0)
+
     if l:winNum != -1
       if a:doDebug
-        call <SID>DEBUG('Created and then found window ('.a:bufName.'): '.l:winNum,9)
+        call <SID>DEBUG('Created window '.l:winNum.' with buffer ('.a:bufName.')',9)
       endif
       exec l:winNum.' wincmd w'
     else
       if a:doDebug
-        call <SID>DEBUG('FindCreateWindow failed to create window ('.a:bufName.').',1)
-      endif
-      return
-    endif
-
-    if a:isExplorer
-      " Turn off the swapfile, set the buffer type so that it won't get written,
-      " and so that it will get deleted when it gets hidden and turn on word wrap.
-      setlocal noswapfile
-      setlocal buftype=nofile
-      setlocal bufhidden=delete
-      if g:miniBufExplVSplit == 0
-        setlocal wrap
-      else
-        setlocal nowrap
-        exec('setlocal winwidth='.g:miniBufExplMinSize)
+        call <SID>DEBUG('Failed to create window with buffer ('.a:bufName.').',1)
       endif
     endif
-
-    if a:doDebug
-      call <SID>DEBUG('Window ('.a:bufName.') created: '.winnr(),9)
-    endif
-
   endif
 
-  " Restore the user's split setting.
-  let &splitbelow = l:saveSplitBelow
-
+  return l:winNum
 endfunction
 
 " }}}
@@ -1748,7 +1790,7 @@ function! <SID>DEBUG(msg, level)
         wincmd p
 
         " Get into the debug window or create it if needed
-        call <SID>FindCreateWindow('MiniBufExplorer.DBG', 1, 1, 0)
+        call <SID>FindCreateWindow('MiniBufExplorer.DBG', 0, 1, 1, 1, 0)
 
         " Make sure we really got to our window, if not we
         " will display a confirm dialog and turn debugging
