@@ -447,8 +447,6 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
 
   call <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
 
-  let g:miniBufExplForceDisplay = 1
-
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('StartExplorer called in invalid window',1)
@@ -457,12 +455,7 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
     return
   endif
 
-  if g:miniBufExplVSplit == 0
-    setlocal wrap
-  else
-    setlocal nowrap
-    exec('setlocal winwidth='.g:miniBufExplMinSize)
-  endif
+  let g:miniBufExplForceDisplay = 1
 
   " !!! We may want to make the following optional -- Bindu
   " New windows don't cause all windows to be resized to equal sizes
@@ -470,6 +463,13 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   " !!! We may want to make the following optional -- Bindu
   " We don't want the mouse to change focus without a click
   set nomousefocus
+
+  if g:miniBufExplVSplit == 0
+    setlocal wrap
+  else
+    setlocal nowrap
+    exec('setlocal winwidth='.g:miniBufExplMinSize)
+  endif
 
   " If folks turn numbering and columns on by default we will turn
   " them off for the MBE window
@@ -724,10 +724,9 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
   let &splitbelow = l:saveSplitBelow
   let &splitright = l:saveSplitRight
 
-
+  " Turn off the swapfile, set the buftype and bufhidden option, so that it
+  " won't get written and will be deleted when it gets hidden.
   if a:isPluginWindow
-    " Turn off the swapfile, set the buftype and bufhidden option, so that it
-    " won't get written and will be deleted when it gets hidden.
     setlocal noswapfile
     setlocal buftype=nofile
     setlocal bufhidden=delete
@@ -761,9 +760,7 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWin
 
   " If found goto the existing window, otherwise
   " split open a new window.
-  if l:winNum != -1
-    exec l:winNum.' wincmd w'
-  else
+  if l:winNum == -1
     if a:doDebug
       call <SID>DEBUG('Creating a new window with buffer ('.a:bufName.')',9)
     endif
@@ -777,12 +774,15 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWin
       if a:doDebug
         call <SID>DEBUG('Created window '.l:winNum.' with buffer ('.a:bufName.')',9)
       endif
-      exec l:winNum.' wincmd w'
     else
       if a:doDebug
         call <SID>DEBUG('Failed to create window with buffer ('.a:bufName.').',1)
       endif
     endif
+  endif
+
+  if l:winNum != -1
+    exec l:winNum.' wincmd w'
   endif
 
   return l:winNum
