@@ -457,19 +457,19 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
 
   let g:miniBufExplForceDisplay = 1
 
-  if g:miniBufExplVSplit == 0
-    setlocal wrap
-  else
-    setlocal nowrap
-    exec('setlocal winwidth='.g:miniBufExplMinSize)
-  endif
-
   " !!! We may want to make the following optional -- Bindu
   " New windows don't cause all windows to be resized to equal sizes
   set noequalalways
   " !!! We may want to make the following optional -- Bindu
   " We don't want the mouse to change focus without a click
   set nomousefocus
+
+  if g:miniBufExplVSplit == 0
+    setlocal wrap
+  else
+    setlocal nowrap
+    exec('setlocal winwidth='.g:miniBufExplMinSize)
+  endif
 
   " If folks turn numbering and columns on by default we will turn
   " them off for the MBE window
