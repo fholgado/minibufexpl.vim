@@ -760,9 +760,7 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWin
 
   " If found goto the existing window, otherwise
   " split open a new window.
-  if l:winNum != -1
-    exec l:winNum.' wincmd w'
-  else
+  if l:winNum == -1
     if a:doDebug
       call <SID>DEBUG('Creating a new window with buffer ('.a:bufName.')',9)
     endif
@@ -776,12 +774,15 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWin
       if a:doDebug
         call <SID>DEBUG('Created window '.l:winNum.' with buffer ('.a:bufName.')',9)
       endif
-      exec l:winNum.' wincmd w'
     else
       if a:doDebug
         call <SID>DEBUG('Failed to create window with buffer ('.a:bufName.').',1)
       endif
     endif
+  endif
+
+  if l:winNum != -1
+    exec l:winNum.' wincmd w'
   endif
 
   return l:winNum
