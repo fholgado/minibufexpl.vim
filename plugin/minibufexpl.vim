@@ -563,13 +563,6 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
 
   call <SID>DisplayBuffers(a:delBufNum,a:curBufNum)
 
-  if (a:curBufNum != -1)
-    let l:curBufName = expand('#'.a:curBufNum.':t')
-    call search('\V['.a:curBufNum.':'.l:curBufName.']', 'w')
-  else
-    call <SID>DEBUG('No current buffer to search for',9)
-  endif
-
   wincmd p
 
   call <SID>DEBUG('===========================',10)
@@ -800,6 +793,13 @@ function! <SID>DisplayBuffers(delBufNum,curBufNum)
 
   call <SID>ShowBuffers(a:delBufNum,a:curBufNum)
   call <SID>ResizeWindow()
+
+  if (a:curBufNum != -1)
+    let l:curBufName = expand('#'.a:curBufNum.':t')
+    call search('\V['.a:curBufNum.':'.l:curBufName.']', 'w')
+  else
+    call <SID>DEBUG('No current buffer to search for',9)
+  endif
 endfunction
 
 " }}}
