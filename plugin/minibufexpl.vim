@@ -803,8 +803,6 @@ function! <SID>DisplayBuffers(delBufNum,curBufNum)
   call <SID>ShowBuffers(a:delBufNum,a:curBufNum)
   call <SID>ResizeWindow()
 
-  normal! zz
-
   " Prevent the buffer from being modified.
   setlocal nomodifiable
   set nobuflisted
@@ -894,6 +892,8 @@ function! <SID>ResizeWindow()
     endif
 
   endif
+
+  normal! zz
 
   let &report  = l:save_rep
   let &showcmd = l:save_sc
