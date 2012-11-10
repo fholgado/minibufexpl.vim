@@ -421,8 +421,7 @@ autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost AutoC
 autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter AutoCmd', 10) |
-            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let g:miniBufExplorerAutoUpdate = 1 |endif |
-            \ call <SID>AutoUpdate(-1,bufnr("%"))
+            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let g:miniBufExplorerAutoUpdate = 1 |endif
 augroup END
 " }}}
 
