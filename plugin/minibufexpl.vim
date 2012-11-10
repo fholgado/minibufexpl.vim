@@ -438,10 +438,25 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
     let g:miniBufExplorerAutoUpdate = 1
   endif
 
-  let l:winNum = <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
+  let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
   if l:winNum == -1
-    call <SID>DEBUG('Failed to get the MBE window, abort',1)
+    call <SID>CreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
+
+    let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
+
+    if l:winNum == -1
+      call <SID>DEBUG('Failed to create the MBE window, aborting...',1)
+      call <SID>DEBUG('===========================',10)
+      call <SID>DEBUG('Terminated StartExplorer()' ,10)
+      call <SID>DEBUG('===========================',10)
+      return
+    endif
+  else
+    call <SID>DEBUG('There is already a MBE window, aborting...',1)
+    call <SID>DEBUG('===========================',10)
+    call <SID>DEBUG('Terminated StartExplorer()' ,10)
+    call <SID>DEBUG('===========================',10)
     return
   endif
 
@@ -621,6 +636,40 @@ function! <SID>ToggleExplorer()
 
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Completed ToggleExplorer()' ,10)
+  call <SID>DEBUG('===========================',10)
+endfunction
+
+" }}}
+" UpdateExplorer {{{
+"
+function! <SID>UpdateExplorer(delBufNum,curBufNum)
+  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Entering UpdateExplorer()'  ,10)
+  call <SID>DEBUG('===========================',10)
+
+  let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
+
+  if l:winNum == -1
+    call <SID>DEBUG('Found no MBE window, aborting...',1)
+    call <SID>DEBUG('===========================',10)
+    call <SID>DEBUG('Terminated UpdateExplorer()',10)
+    call <SID>DEBUG('===========================',10)
+    return
+  endif
+
+  if l:winNum != winnr()
+    let l:winChanged = 1
+    exec l:winNum.' wincmd w'
+  endif
+
+  call <SID>DisplayBuffers(a:delBufNum,a:curBufNum)
+
+  if exists('l:winChanged')
+    wincmd p
+  endif
+
+  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Completed UpdateExplorer()' ,10)
   call <SID>DEBUG('===========================',10)
 endfunction
 
@@ -1420,15 +1469,15 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
         let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
 
         if (l:winnr == -1)
-          call <SID>DEBUG('About to call StartExplorer (Create MBE)', 9)
+          call <SID>DEBUG('Starting MiniBufExplorer...', 9)
           call <SID>StartExplorer(0, a:delBufNum, bufname("%"))
         else
           " otherwise only update the window if the contents have
           " changed
           let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 0, a:curBufNum)
           if (l:ListChanged)
-            call <SID>DEBUG('About to call StartExplorer (Update MBE)', 9)
-            call <SID>StartExplorer(0, a:delBufNum, bufname("%"))
+            call <SID>DEBUG('Updating MiniBufExplorer...', 9)
+            call <SID>UpdateExplorer(a:delBufNum, a:curBufNum)
           endif
         endif
       else
