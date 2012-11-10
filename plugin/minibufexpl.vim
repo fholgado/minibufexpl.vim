@@ -1798,6 +1798,7 @@ function! <SID>DEBUG(msg, level)
         if bufname('%') != 'MiniBufExplorer.DBG'
             call confirm('Error in window debugging code. Dissabling MiniBufExplorer debugging.', 'OK')
             let g:miniBufExplorerDebugLevel = 0
+            return
         endif
 
         set modified
