@@ -731,6 +731,9 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
     setlocal buftype=nofile
     setlocal bufhidden=delete
   endif
+
+  " Return to the previous window.
+  wincmd p
 endfunction
 
 " }}}
