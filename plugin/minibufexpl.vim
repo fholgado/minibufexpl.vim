@@ -1801,10 +1801,12 @@ function! <SID>DEBUG(msg, level)
             let g:miniBufExplorerDebugLevel = 0
         endif
 
+        set modified
+
         " Write Message to DBG buffer
         let res=append("$",s:debugIndex.':'.a:level.':'.a:msg)
 
-        "set nomodified
+        set nomodified
 
         norm G
 
