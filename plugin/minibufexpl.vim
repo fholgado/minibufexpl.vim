@@ -438,9 +438,6 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
     let g:miniBufExplorerAutoUpdate = 1
   endif
 
-  " Store the current buffer
-  let l:curBuf = bufnr('%')
-
   " Prevent a report of our actions from showing up.
   let l:save_rep = &report
   let l:save_sc  = &showcmd
@@ -574,9 +571,9 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
 
   call <SID>DisplayBuffers(a:delBufNum,a:curBufNum)
 
-  if (l:curBuf != -1)
-    let l:bname = expand('#'.l:curBuf.':t')
-    call search('\V['.l:curBuf.':'.l:bname.']', 'w')
+  if (a:curBufNum != -1)
+    let l:curBufName = expand('#'.a:curBufNum.':t')
+    call search('\V['.a:curBufNum.':'.l:curBufName.']', 'w')
   else
     call <SID>DEBUG('No current buffer to search for',9)
   endif
