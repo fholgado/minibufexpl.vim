@@ -445,7 +445,14 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   let &report    = 10000
   set noshowcmd
 
-  call <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
+  let l:winNum = <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
+
+  if l:winNum == -1
+    call <SID>DEBUG('Failed to get the MBE window, abort',1)
+    return
+  endif
+
+  exec l:winNum.'wincmd w'
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
@@ -783,11 +790,6 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWin
       endif
     endif
   endif
-
-  if l:winNum != -1
-    exec l:winNum.' wincmd w'
-  endif
-
   return l:winNum
 endfunction
 
@@ -1793,7 +1795,19 @@ function! <SID>DEBUG(msg, level)
         wincmd p
 
         " Get into the debug window or create it if needed
-        call <SID>FindCreateWindow('MiniBufExplorer.DBG', 0, 1, 1, 1, 0)
+        let l:winNum = <SID>FindCreateWindow('MiniBufExplorer.DBG', 0, 1, 1, 1, 0)
+
+        if l:winNum == -1
+          let g:miniBufExplorerDebugMode == 3
+          call <SID>DEBUG('Failed to get the MBE debugging window, reset debugging mode to 3.',1)
+          call <SID>DEBUG('Forwarding message...',1)
+          call <SID>DEBUG(a:msg,1)
+          call <SID>DEBUG('Forwarding message end.',1)
+          return
+        endif
+
+        " Change to debug window
+        exec l:winNum wincmd w'
 
         " Make sure we really got to our window, if not we
         " will display a confirm dialog and turn debugging
