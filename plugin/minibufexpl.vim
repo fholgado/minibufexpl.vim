@@ -798,14 +798,8 @@ function! <SID>DisplayBuffers(delBufNum,curBufNum)
     return
   endif
 
-  " We need to be able to modify the buffer
-  setlocal modifiable
-
   call <SID>ShowBuffers(a:delBufNum,a:curBufNum)
   call <SID>ResizeWindow()
-
-  " Prevent the buffer from being modified.
-  setlocal nomodifiable
 endfunction
 
 " }}}
@@ -917,6 +911,9 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     let &report = 10000
     set noshowcmd
 
+    " We need to be able to modify the buffer
+    setlocal modifiable
+
     " Delete all lines in buffer.
     silent 1,$d _
 
@@ -925,6 +922,9 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     $
     put! =g:miniBufExplBufList
     silent $ d _
+
+    " Prevent the buffer from being modified.
+    setlocal nomodifiable
 
     let g:miniBufExplForceDisplay = 0
 
