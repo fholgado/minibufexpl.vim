@@ -479,7 +479,7 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
     setlocal wrap
   else
     setlocal nowrap
-    exec('setlocal winwidth='.g:miniBufExplMinSize)
+    exec 'setlocal winwidth='.g:miniBufExplMinSize
   endif
 
   " If folks turn numbering and columns on by default we will turn
@@ -858,7 +858,7 @@ function! <SID>ResizeWindow()
         endif
       endif
     else
-      exec("setlocal textwidth=".l:width)
+      exec "setlocal textwidth=".l:width
       normal gg
       normal gq}
       normal G
@@ -880,7 +880,7 @@ function! <SID>ResizeWindow()
 
     call <SID>DEBUG('ResizeWindow to '.l:height.' lines',9)
 
-    exec('resize '.l:height)
+    exec 'resize '.l:height
 
   " Vertical Resize
   else
@@ -899,7 +899,7 @@ function! <SID>ResizeWindow()
 
     if l:width != l:newWidth
       call <SID>DEBUG('ResizeWindow to '.l:newWidth.' columns',9)
-      exec('vertical resize '.l:newWidth)
+      exec 'vertical resize '.l:newWidth
     endif
 
   endif
@@ -1529,11 +1529,11 @@ function! <SID>MBESelectBuffer(split)
     endif
 
     if a:split == 0
-	    exec('b! '.l:bufnr)
+	    exec 'b! '.l:bufnr
     elseif a:split == 1
-	    exec('sb! '.l:bufnr)
+	    exec 'sb! '.l:bufnr
     elseif a:split == 2
-	    exec('vertical sb! '.l:bufnr)
+	    exec 'vertical sb! '.l:bufnr
     endif
 
     if (l:resize)
@@ -1651,7 +1651,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
 
     " Delete the buffer selected.
     call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
-    exec('silent! bd '.l:selBuf)
+    exec 'silent! bd '.l:selBuf
 
     let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
     call <SID>DisplayBuffers(-1,a:prevBufName)
