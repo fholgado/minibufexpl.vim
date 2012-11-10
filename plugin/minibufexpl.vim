@@ -1785,9 +1785,9 @@ function! <SID>DEBUG(msg, level)
         endif
 
         " Save the current window number so we can come back here
-        let l:prevWin     = winnr()
+        let l:currWin = winnr()
         wincmd p
-        let l:prevPrevWin = winnr()
+        let l:prevWin = winnr()
 
         " Change to debug window
         exec l:winNum wincmd w'
@@ -1810,8 +1810,8 @@ function! <SID>DEBUG(msg, level)
         norm G
 
         " Return to original window
-        exec l:prevPrevWin.' wincmd w'
         exec l:prevWin.' wincmd w'
+        exec l:currWin.' wincmd w'
     " Debug output using VIM's echo facility
     elseif g:miniBufExplorerDebugMode == 1
       echo s:debugIndex.':'.a:level.':'.a:msg
