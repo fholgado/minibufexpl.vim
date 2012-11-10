@@ -1375,10 +1375,6 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
     " If this is the only buffer left then toggle the buffer
     if (winbufnr(2) == -1)
       call <SID>CycleBuffer(1)
-      if g:miniBufExplForceSyntaxEnable
-        call <SID>DEBUG('Enable Syntax', 9)
-        exec 'syntax enable'
-      endif
       call <SID>DEBUG('AutoUpdate does not run for cycled windows', 9)
     else
       call <SID>DEBUG('AutoUpdate does not run for the MBE window', 9)
@@ -1728,6 +1724,11 @@ function! <SID>CycleBuffer(forward)
     endif
     let l:curBuf = bufnr('%')
   endwhile
+
+  if g:miniBufExplForceSyntaxEnable
+    call <SID>DEBUG('Enable Syntax', 9)
+    exec 'syntax enable'
+  endif
 
   let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
   if (l:saveAutoUpdate == 1)
