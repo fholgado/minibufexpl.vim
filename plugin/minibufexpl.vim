@@ -1788,7 +1788,6 @@ function! <SID>DEBUG(msg, level)
         let l:prevWin     = winnr()
         wincmd p
         let l:prevPrevWin = winnr()
-        wincmd p
 
         " Change to debug window
         exec l:winNum wincmd w'
