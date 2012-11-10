@@ -1699,11 +1699,13 @@ function! <SID>CycleBuffer(forward)
 
   " The following hack handles the case where we only have one
   " window open and it is too small
-  let l:saveAutoUpdate = g:miniBufExplorerAutoUpdate
   if (winbufnr(2) == -1)
     resize
-    let g:miniBufExplorerAutoUpdate = 0
   endif
+
+  let l:saveAutoUpdate = g:miniBufExplorerAutoUpdate
+
+  let g:miniBufExplorerAutoUpdate = 0
 
   " Change buffer (keeping track of before and after buffers)
   let l:origBuf = bufnr('%')
@@ -1730,10 +1732,10 @@ function! <SID>CycleBuffer(forward)
     exec 'syntax enable'
   endif
 
-  let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
   if (l:saveAutoUpdate == 1)
     call <SID>AutoUpdate(-1,bufnr("%"))
   endif
+  let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
 endfunction
 
 " }}}
