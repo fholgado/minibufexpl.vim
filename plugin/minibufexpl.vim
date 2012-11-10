@@ -1697,7 +1697,8 @@ function! <SID>CycleBuffer(forward)
   " If we are in the MBE window, switch to the next one, otherwise a new
   " window will be created
   if (bufname("%") == "-MiniBufExplorer-")
-    wincmd w
+    call <SID>DEBUG('Can not cycle buffer inside MBE window', 1)
+    return
   endif
 
   " The following hack handles the case where we only have one
