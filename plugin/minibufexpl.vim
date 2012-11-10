@@ -1772,12 +1772,6 @@ function! <SID>DEBUG(msg, level)
             return
         endif
 
-        " Save the current window number so we can come back here
-        let l:prevWin     = winnr()
-        wincmd p
-        let l:prevPrevWin = winnr()
-        wincmd p
-
         " Get into the debug window or create it if needed
         let l:winNum = <SID>FindCreateWindow('MiniBufExplorer.DBG', 0, 1, 1, 1, 0)
 
@@ -1789,6 +1783,12 @@ function! <SID>DEBUG(msg, level)
           call <SID>DEBUG('Forwarding message end.',1)
           return
         endif
+
+        " Save the current window number so we can come back here
+        let l:prevWin     = winnr()
+        wincmd p
+        let l:prevPrevWin = winnr()
+        wincmd p
 
         " Change to debug window
         exec l:winNum wincmd w'
