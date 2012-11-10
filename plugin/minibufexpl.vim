@@ -724,6 +724,7 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
   " won't get written and will be deleted when it gets hidden.
   if a:isPluginWindow
     setlocal noswapfile
+    setlocal nobuflisted
     setlocal buftype=nofile
     setlocal bufhidden=delete
   endif
@@ -805,7 +806,6 @@ function! <SID>DisplayBuffers(delBufNum,curBufNum)
 
   " Prevent the buffer from being modified.
   setlocal nomodifiable
-  set nobuflisted
 endfunction
 
 " }}}
