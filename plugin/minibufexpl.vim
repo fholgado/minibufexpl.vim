@@ -438,12 +438,6 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
     let g:miniBufExplorerAutoUpdate = 1
   endif
 
-  " Prevent a report of our actions from showing up.
-  let l:save_rep = &report
-  let l:save_sc  = &showcmd
-  let &report    = 10000
-  set noshowcmd
-
   let l:winNum = <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
 
   if l:winNum == -1
@@ -456,8 +450,6 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('StartExplorer called in invalid window',1)
-    let &report  = l:save_rep
-    let &showcmd = l:save_sc
     return
   endif
 
@@ -579,9 +571,6 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   endif
 
   wincmd p
-
-  let &report  = l:save_rep
-  let &showcmd = l:save_sc
 
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Completed StartExplorer()'  ,10)
@@ -836,6 +825,12 @@ function! <SID>ResizeWindow()
     return
   endif
 
+  " Prevent a report of our actions from showing up.
+  let l:save_rep = &report
+  let l:save_sc  = &showcmd
+  let &report    = 10000
+  set noshowcmd
+
   let l:width  = winwidth('.')
 
   " Horizontal Resize
@@ -899,6 +894,9 @@ function! <SID>ResizeWindow()
     endif
 
   endif
+
+  let &report  = l:save_rep
+  let &showcmd = l:save_sc
 endfunction
 
 " }}}
