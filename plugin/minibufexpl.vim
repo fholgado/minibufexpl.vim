@@ -577,6 +577,8 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
     call <SID>DEBUG('No current buffer to search for',9)
   endif
 
+  wincmd p
+
   let &report  = l:save_rep
   let &showcmd = l:save_sc
 
@@ -1422,11 +1424,6 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
             call <SID>DEBUG('About to call StartExplorer (Update MBE)', 9)
             call <SID>StartExplorer(0, a:delBufNum, bufname("%"))
           endif
-        endif
-
-        " go back to the working buffer
-        if (bufname('%') == '-MiniBufExplorer-')
-          wincmd p
         endif
       else
         call <SID>DEBUG('Failed in eligible check', 9)
