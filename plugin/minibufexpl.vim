@@ -1405,9 +1405,9 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
     if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1 && bufname('%') != ""))
       if <SID>HasEligibleBuffers(a:delBufNum) == 1
         " if we don't have a window then create one
-        let l:bufnr = <SID>FindWindow('-MiniBufExplorer-', 0)
+        let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
 
-        if (l:bufnr == -1)
+        if (l:winnr == -1)
           call <SID>DEBUG('About to call StartExplorer (Create MBE)', 9)
           call <SID>StartExplorer(0, a:delBufNum, bufname("%"))
         else
