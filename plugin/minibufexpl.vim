@@ -793,13 +793,7 @@ function! <SID>DisplayBuffers(delBufNum,curBufNum)
 
   call <SID>ShowBuffers(a:delBufNum,a:curBufNum)
   call <SID>ResizeWindow()
-
-  if (a:curBufNum != -1)
-    let l:curBufName = expand('#'.a:curBufNum.':t')
-    call search('\V['.a:curBufNum.':'.l:curBufName.']', 'w')
-  else
-    call <SID>DEBUG('No current buffer to search for',9)
-  endif
+  call <SID>FocusCurrentBuffer(a:curBufNum)
 endfunction
 
 " }}}
@@ -938,6 +932,23 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     let &showcmd = l:save_sc
   else
     call <SID>DEBUG('Buffer list not update since there was no change',9)
+  endif
+endfunction
+
+" }}}
+" FocusCurrentBuffer {{{
+function! <SID>FocusCurrentBuffer(bufnr)
+  " Make sure we are in our window
+  if bufname('%') != '-MiniBufExplorer-'
+    call <SID>DEBUG('UpdateExplorer called in invalid window',1)
+    return
+  endif
+
+  if (a:bufnr != -1)
+    let l:bufname = expand('#'.a:bufnr.':t')
+    call search('\V['.a:bufnr.':'.l:bufname.']', 'w')
+  else
+    call <SID>DEBUG('No current buffer to search for',9)
   endif
 endfunction
 
