@@ -1772,12 +1772,6 @@ function! <SID>DEBUG(msg, level)
             return
         endif
 
-        " Save the current window number so we can come back here
-        let l:prevWin     = winnr()
-        wincmd p
-        let l:prevPrevWin = winnr()
-        wincmd p
-
         " Get into the debug window or create it if needed
         let l:winNum = <SID>FindCreateWindow('MiniBufExplorer.DBG', 0, 1, 1, 1, 0)
 
@@ -1790,6 +1784,11 @@ function! <SID>DEBUG(msg, level)
           return
         endif
 
+        " Save the current window number so we can come back here
+        let l:currWin = winnr()
+        wincmd p
+        let l:prevWin = winnr()
+
         " Change to debug window
         exec l:winNum wincmd w'
 
@@ -1799,18 +1798,21 @@ function! <SID>DEBUG(msg, level)
         if bufname('%') != 'MiniBufExplorer.DBG'
             call confirm('Error in window debugging code. Dissabling MiniBufExplorer debugging.', 'OK')
             let g:miniBufExplorerDebugLevel = 0
+            return
         endif
+
+        set modified
 
         " Write Message to DBG buffer
         let res=append("$",s:debugIndex.':'.a:level.':'.a:msg)
 
-        "set nomodified
+        set nomodified
 
         norm G
 
         " Return to original window
-        exec l:prevPrevWin.' wincmd w'
         exec l:prevWin.' wincmd w'
+        exec l:currWin.' wincmd w'
     " Debug output using VIM's echo facility
     elseif g:miniBufExplorerDebugMode == 1
       echo s:debugIndex.':'.a:level.':'.a:msg
