@@ -903,6 +903,12 @@ endfunction
 function! <SID>ShowBuffers(delBufNum,curBufNum)
   call <SID>DEBUG('Entering ShowBuffers()',10)
 
+  " Make sure we are in our window
+  if bufname('%') != '-MiniBufExplorer-'
+    call <SID>DEBUG('ShowBuffers called in invalid window',1)
+    return
+  endif
+
   let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 1, a:curBufNum)
 
   if (l:ListChanged == 1 || g:miniBufExplForceDisplay)
