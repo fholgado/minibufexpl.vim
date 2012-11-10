@@ -1374,8 +1374,8 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   if (bufname('%') == '-MiniBufExplorer-' || bufname('%') == '[fuf]' || bufname('%') == '')
     " If this is the only buffer left then toggle the buffer
     if (winbufnr(2) == -1)
-      call <SID>CycleBuffer(1)
-      call <SID>DEBUG('AutoUpdate does not run for cycled windows', 9)
+      quit
+      call <SID>DEBUG('MBE is the last open window, quit it', 9)
     else
       call <SID>DEBUG('AutoUpdate does not run for the MBE window', 9)
     endif
@@ -1695,12 +1695,6 @@ function! <SID>CycleBuffer(forward)
   if (bufname("%") == "-MiniBufExplorer-")
     call <SID>DEBUG('Can not cycle buffer inside MBE window', 1)
     return
-  endif
-
-  " The following hack handles the case where we only have one
-  " window open and it is too small
-  if (winbufnr(2) == -1)
-    resize
   endif
 
   let l:saveAutoUpdate = g:miniBufExplorerAutoUpdate
