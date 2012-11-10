@@ -1373,7 +1373,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   " (Thanks toupeira!)
   if (bufname('%') == '-MiniBufExplorer-' || bufname('%') == '[fuf]' || bufname('%') == '')
     " If this is the only buffer left then toggle the buffer
-    if (winbufnr(2) == -1)
+    if (winbufnr(<SID>NextNormalWindow()) == -1)
       quit
       call <SID>DEBUG('MBE is the last open window, quit it', 9)
     else
@@ -1677,6 +1677,31 @@ endfunction
 function! s:MBEDoubleClick()
   call <SID>DEBUG('Entering MBEDoubleClick()',10)
   call <SID>MBESelectBuffer(0)
+endfunction
+
+" }}}
+" NextNormalWindow {{{
+"
+function! <SID>NextNormalWindow()
+  call <SID>DEBUG('Entering NextNormalWindow()',10)
+
+  let l:winSum = winnr('$')
+  call <SID>DEBUG('Total number of open windows are'.l:winSum,9)
+
+  let l:i = 1
+  while(l:i <= l:winSum)
+    call <SID>DEBUG('window: '.l:i.', buffer: ('.winbufnr(l:i).':'.bufname(winbufnr(l:i)).')',9)
+    if (!<SID>IgnoreBuffer(winbufnr(l:i)))
+        call <SID>DEBUG('Found window '.l:i,8)
+        call <SID>DEBUG('Leaving NextNormalWindow()',10)
+        return l:i
+    endif
+    let l:i = l:i + 1
+  endwhile
+
+  call <SID>DEBUG('Found no window',8)
+  call <SID>DEBUG('Leaving NextNormalWindow()',9)
+  return -1
 endfunction
 
 " }}}
