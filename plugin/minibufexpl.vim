@@ -117,9 +117,6 @@ if !exists('g:miniBufExplorerHideWhenDiff')
     let g:miniBufExplorerHideWhenDiff = 0
 endif
 
-if g:miniBufExplorerHideWhenDiff==1 && &diff
-    let s:miniBufExplorerAutoUpdate = 0
-endif
 " }}}
 " MoreThanOne? {{{
 " Display Mini Buf Explorer when there are 'More Than One' eligible buffers
