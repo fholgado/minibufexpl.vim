@@ -416,7 +416,6 @@ augroup MiniBufExplorer
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete ModTrackingListClean AutoCmd for buffer '.bufnr("%"), 10) |call <SID>CleanModTrackingList(bufnr("%"))
 autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
-autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter Checking for Last window', 10) |call <SID>CheckForLastWindow()
 autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
 autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
@@ -487,7 +486,7 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
     setlocal wrap
   else
     setlocal nowrap
-    exec('setlocal winwidth='.g:miniBufExplMinSize)
+    exec 'setlocal winwidth='.g:miniBufExplMinSize
   endif
 
   " If folks turn numbering and columns on by default we will turn
@@ -884,7 +883,7 @@ function! <SID>ResizeWindow()
         endif
       endif
     else
-      exec("setlocal textwidth=".l:width)
+      exec "setlocal textwidth=".l:width
       normal gg
       normal gq}
       normal G
@@ -906,7 +905,7 @@ function! <SID>ResizeWindow()
 
     call <SID>DEBUG('ResizeWindow to '.l:height.' lines',9)
 
-    exec('resize '.l:height)
+    exec 'resize '.l:height
 
   " Vertical Resize
   else
@@ -925,7 +924,7 @@ function! <SID>ResizeWindow()
 
     if l:width != l:newWidth
       call <SID>DEBUG('ResizeWindow to '.l:newWidth.' columns',9)
-      exec('vertical resize '.l:newWidth)
+      exec 'vertical resize '.l:newWidth
     endif
 
   endif
@@ -1433,13 +1432,9 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   " (Thanks toupeira!)
   if (bufname('%') == '-MiniBufExplorer-' || bufname('%') == '[fuf]' || bufname('%') == '')
     " If this is the only buffer left then toggle the buffer
-    if (winbufnr(2) == -1)
-      call <SID>CycleBuffer(1)
-      if g:miniBufExplForceSyntaxEnable
-        call <SID>DEBUG('Enable Syntax', 9)
-        exec 'syntax enable'
-      endif
-      call <SID>DEBUG('AutoUpdate does not run for cycled windows', 9)
+    if (winbufnr(<SID>NextNormalWindow()) == -1)
+      quit
+      call <SID>DEBUG('MBE is the last open window, quit it', 9)
     else
       call <SID>DEBUG('AutoUpdate does not run for the MBE window', 9)
     endif
@@ -1589,11 +1584,11 @@ function! <SID>MBESelectBuffer(split)
     endif
 
     if a:split == 0
-	    exec('b! '.l:bufnr)
+	    exec 'b! '.l:bufnr
     elseif a:split == 1
-	    exec('sb! '.l:bufnr)
+	    exec 'sb! '.l:bufnr
     elseif a:split == 2
-	    exec('vertical sb! '.l:bufnr)
+	    exec 'vertical sb! '.l:bufnr
     endif
 
     if (l:resize)
@@ -1711,7 +1706,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
 
     " Delete the buffer selected.
     call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
-    exec('silent! bd '.l:selBuf)
+    exec 'silent! bd '.l:selBuf
 
     let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
     call <SID>DisplayBuffers(-1,a:prevBufName)
@@ -1744,6 +1739,31 @@ function! s:MBEDoubleClick()
 endfunction
 
 " }}}
+" NextNormalWindow {{{
+"
+function! <SID>NextNormalWindow()
+  call <SID>DEBUG('Entering NextNormalWindow()',10)
+
+  let l:winSum = winnr('$')
+  call <SID>DEBUG('Total number of open windows are'.l:winSum,9)
+
+  let l:i = 1
+  while(l:i <= l:winSum)
+    call <SID>DEBUG('window: '.l:i.', buffer: ('.winbufnr(l:i).':'.bufname(winbufnr(l:i)).')',9)
+    if (!<SID>IgnoreBuffer(winbufnr(l:i)))
+        call <SID>DEBUG('Found window '.l:i,8)
+        call <SID>DEBUG('Leaving NextNormalWindow()',10)
+        return l:i
+    endif
+    let l:i = l:i + 1
+  endwhile
+
+  call <SID>DEBUG('Found no window',8)
+  call <SID>DEBUG('Leaving NextNormalWindow()',9)
+  return -1
+endfunction
+
+" }}}
 " CycleBuffer - Cycle Through Buffers {{{
 "
 " Move to next or previous buffer in the current window. If there
@@ -1754,13 +1774,16 @@ endfunction
 " are cycled forward.
 "
 function! <SID>CycleBuffer(forward)
-  " The following hack handles the case where we only have one
-  " window open and it is too small
-  let l:saveAutoUpdate = g:miniBufExplorerAutoUpdate
-  if (winbufnr(2) == -1)
-    resize
-    let g:miniBufExplorerAutoUpdate = 0
+  " If we are in the MBE window, switch to the next one, otherwise a new
+  " window will be created
+  if (bufname("%") == "-MiniBufExplorer-")
+    call <SID>DEBUG('Can not cycle buffer inside MBE window', 1)
+    return
   endif
+
+  let l:saveAutoUpdate = g:miniBufExplorerAutoUpdate
+
+  let g:miniBufExplorerAutoUpdate = 0
 
   " Change buffer (keeping track of before and after buffers)
   let l:origBuf = bufnr('%')
@@ -1782,10 +1805,15 @@ function! <SID>CycleBuffer(forward)
     let l:curBuf = bufnr('%')
   endwhile
 
-  let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
+  if g:miniBufExplForceSyntaxEnable
+    call <SID>DEBUG('Enable Syntax', 9)
+    exec 'syntax enable'
+  endif
+
   if (l:saveAutoUpdate == 1)
     call <SID>AutoUpdate(-1,bufnr("%"))
   endif
+  let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
 endfunction
 
 " }}}
@@ -1832,12 +1860,6 @@ function! <SID>DEBUG(msg, level)
             return
         endif
 
-        " Save the current window number so we can come back here
-        let l:prevWin     = winnr()
-        wincmd p
-        let l:prevPrevWin = winnr()
-        wincmd p
-
         " Get into the debug window or create it if needed
         let l:winNum = <SID>FindCreateWindow('MiniBufExplorer.DBG', 0, 1, 1, 1, 0)
 
@@ -1850,6 +1872,11 @@ function! <SID>DEBUG(msg, level)
           return
         endif
 
+        " Save the current window number so we can come back here
+        let l:currWin = winnr()
+        wincmd p
+        let l:prevWin = winnr()
+
         " Change to debug window
         exec l:winNum wincmd w'
 
@@ -1859,18 +1886,21 @@ function! <SID>DEBUG(msg, level)
         if bufname('%') != 'MiniBufExplorer.DBG'
             call confirm('Error in window debugging code. Dissabling MiniBufExplorer debugging.', 'OK')
             let g:miniBufExplorerDebugLevel = 0
+            return
         endif
+
+        set modified
 
         " Write Message to DBG buffer
         let res=append("$",s:debugIndex.':'.a:level.':'.a:msg)
 
-        "set nomodified
+        set nomodified
 
         norm G
 
         " Return to original window
-        exec l:prevPrevWin.' wincmd w'
         exec l:prevWin.' wincmd w'
+        exec l:currWin.' wincmd w'
     " Debug output using VIM's echo facility
     elseif g:miniBufExplorerDebugMode == 1
       echo s:debugIndex.':'.a:level.':'.a:msg
@@ -1898,19 +1928,6 @@ function! <SID>DEBUG(msg, level)
     let &showcmd = l:save_sc
   endif
 endfunc
-
-" }}}
-" CheckForLastWindow - Quit Vim if :q is excecuted when no files are open {{{
-"
-function! <SID>CheckForLastWindow()
-  " if the window is quickfix go on
-  if &buftype=="quickfix"
-    " if this window is last on screen quit without warning
-    if winbufnr(2) == -1
-      quit
-    endif
-  endif
-endfunction
 
 " }}}
 
