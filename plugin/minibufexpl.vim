@@ -112,22 +112,13 @@ if !exists('g:miniBufExplorerDebugMode')
 endif
 
 " }}}
-" Allow auto update? {{{
-"
-" We start out with this off for startup, but once vim is running we
-" turn this on.
-if !exists('g:miniBufExplorerAutoUpdate')
-  let g:miniBufExplorerAutoUpdate = 0
-endif
-
-" }}}
 " Stop auto starting MBE in diff mode? {{{
 if !exists('g:miniBufExplorerHideWhenDiff')
     let g:miniBufExplorerHideWhenDiff = 0
 endif
 
 if g:miniBufExplorerHideWhenDiff==1 && &diff
-    let g:miniBufExplorerAutoUpdate = 0
+    let s:miniBufExplorerAutoUpdate = 0
 endif
 " }}}
 " MoreThanOne? {{{
@@ -400,6 +391,11 @@ let s:debugIndex = 0
 " command line are picked up correctly.
 let s:MRUList = range(1, bufnr('$'))
 
+" We start out with this off for startup, but once vim is running we
+" turn this on. This prevent any BufEnter event from being triggered
+" before VimEnter event.
+let s:miniBufExplorerAutoUpdate = 0
+
 " }}}
 
 " Auto Commands
@@ -420,7 +416,7 @@ autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost AutoC
 autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter AutoCmd', 10) |
-            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let g:miniBufExplorerAutoUpdate = 1 |endif
+            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let s:miniBufExplorerAutoUpdate = 1 |endif
 augroup END
 " }}}
 
@@ -434,7 +430,7 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   call <SID>DEBUG('===========================',10)
 
   if a:sticky == 1
-    let g:miniBufExplorerAutoUpdate = 1
+    let s:miniBufExplorerAutoUpdate = 1
   endif
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
@@ -593,7 +589,7 @@ function! <SID>StopExplorer(sticky)
   call <SID>DEBUG('===========================',10)
 
   if a:sticky == 1
-    let g:miniBufExplorerAutoUpdate = 0
+    let s:miniBufExplorerAutoUpdate = 0
   endif
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
@@ -622,7 +618,7 @@ function! <SID>ToggleExplorer()
   call <SID>DEBUG('Entering ToggleExplorer()'  ,10)
   call <SID>DEBUG('===========================',10)
 
-  let g:miniBufExplorerAutoUpdate = 0
+  let s:miniBufExplorerAutoUpdate = 0
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
@@ -1456,7 +1452,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
-  if g:miniBufExplorerAutoUpdate == 1
+  if s:miniBufExplorerAutoUpdate == 1
     " Only show MiniBufExplorer if we have a real buffer
     if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1 && bufname('%') != ""))
       if <SID>HasEligibleBuffers(a:delBufNum) == 1
@@ -1559,8 +1555,8 @@ function! <SID>MBESelectBuffer(split)
 
   if(l:bufnr != -1)             " If the buffer exists.
 
-    let l:saveAutoUpdate = g:miniBufExplorerAutoUpdate
-    let g:miniBufExplorerAutoUpdate = 0
+    let l:saveAutoUpdate = s:miniBufExplorerAutoUpdate
+    let s:miniBufExplorerAutoUpdate = 0
     " Switch to the previous window
     wincmd p
 
@@ -1594,7 +1590,7 @@ function! <SID>MBESelectBuffer(split)
     if (l:resize)
       resize
     endif
-    let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
+    let s:miniBufExplorerAutoUpdate = l:saveAutoUpdate
     call <SID>AutoUpdate(-1,bufnr("%"))
 
   endif
@@ -1650,8 +1646,8 @@ function! <SID>MBEDeleteBuffer(prevBufName)
 
     " Don't want auto updates while we are processing a delete
     " request.
-    let l:saveAutoUpdate = g:miniBufExplorerAutoUpdate
-    let g:miniBufExplorerAutoUpdate = 0
+    let l:saveAutoUpdate = s:miniBufExplorerAutoUpdate
+    let s:miniBufExplorerAutoUpdate = 0
 
     " Save previous window so that if we show a buffer after
     " deleting. The show will come up in the correct window.
@@ -1708,7 +1704,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
     exec 'silent! bd '.l:selBuf
 
-    let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
+    let s:miniBufExplorerAutoUpdate = l:saveAutoUpdate
     call <SID>DisplayBuffers(-1,a:prevBufName)
     call cursor(l:curLine, l:curCol)
 
@@ -1781,9 +1777,9 @@ function! <SID>CycleBuffer(forward)
     return
   endif
 
-  let l:saveAutoUpdate = g:miniBufExplorerAutoUpdate
+  let l:saveAutoUpdate = s:miniBufExplorerAutoUpdate
 
-  let g:miniBufExplorerAutoUpdate = 0
+  let s:miniBufExplorerAutoUpdate = 0
 
   " Change buffer (keeping track of before and after buffers)
   let l:origBuf = bufnr('%')
@@ -1813,7 +1809,7 @@ function! <SID>CycleBuffer(forward)
   if (l:saveAutoUpdate == 1)
     call <SID>AutoUpdate(-1,bufnr("%"))
   endif
-  let g:miniBufExplorerAutoUpdate = l:saveAutoUpdate
+  let s:miniBufExplorerAutoUpdate = l:saveAutoUpdate
 endfunction
 
 " }}}
