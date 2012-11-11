@@ -420,8 +420,7 @@ autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost AutoC
 autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter AutoCmd', 10) |
-            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let g:miniBufExplorerAutoUpdate = 1 |endif |
-            \ call <SID>AutoUpdate(-1,bufnr("%"))
+            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let g:miniBufExplorerAutoUpdate = 1 |endif
 augroup END
 " }}}
 
@@ -438,19 +437,25 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
     let g:miniBufExplorerAutoUpdate = 1
   endif
 
-  " Store the current buffer
-  let l:curBuf = bufnr('%')
-
-  " Prevent a report of our actions from showing up.
-  let l:save_rep = &report
-  let l:save_sc  = &showcmd
-  let &report    = 10000
-  set noshowcmd
-
-  let l:winNum = <SID>FindCreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
+  let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
   if l:winNum == -1
-    call <SID>DEBUG('Failed to get the MBE window, abort',1)
+    call <SID>CreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
+
+    let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
+
+    if l:winNum == -1
+      call <SID>DEBUG('Failed to create the MBE window, aborting...',1)
+      call <SID>DEBUG('===========================',10)
+      call <SID>DEBUG('Terminated StartExplorer()' ,10)
+      call <SID>DEBUG('===========================',10)
+      return
+    endif
+  else
+    call <SID>DEBUG('There is already a MBE window, aborting...',1)
+    call <SID>DEBUG('===========================',10)
+    call <SID>DEBUG('Terminated StartExplorer()' ,10)
+    call <SID>DEBUG('===========================',10)
     return
   endif
 
@@ -459,8 +464,6 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('StartExplorer called in invalid window',1)
-    let &report  = l:save_rep
-    let &showcmd = l:save_sc
     return
   endif
 
@@ -473,6 +476,11 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   " !!! We may want to make the following optional -- Bindu
   " We don't want the mouse to change focus without a click
   set nomousefocus
+
+  " Set shellslash for Windows/DOS Vim for dupeBufName checking to Work
+  if (has("win32") || has("win64"))
+      set shellslash
+  endif
 
   if g:miniBufExplVSplit == 0
     setlocal wrap
@@ -492,11 +500,6 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   "automatically rezised by CTRL + W =, etc...
   setlocal winfixheight
   setlocal winfixwidth
-
-  " Set shellslash for Windows/DOS Vim for dupeBufName checking to Work
-  if (has("win32") || has("win64"))
-      set shellslash
-  endif
 
   " Set the text of the statusline for the MBE buffer. See help:stl for
   " many options
@@ -574,17 +577,7 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
 
   call <SID>DisplayBuffers(a:delBufNum,a:curBufNum)
 
-  if (l:curBuf != -1)
-    let l:bname = expand('#'.l:curBuf.':t')
-    call search('\V['.l:curBuf.':'.l:bname.']', 'w')
-  else
-    call <SID>DEBUG('No current buffer to search for',9)
-  endif
-
   wincmd p
-
-  let &report  = l:save_rep
-  let &showcmd = l:save_sc
 
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Completed StartExplorer()'  ,10)
@@ -642,6 +635,40 @@ function! <SID>ToggleExplorer()
 
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Completed ToggleExplorer()' ,10)
+  call <SID>DEBUG('===========================',10)
+endfunction
+
+" }}}
+" UpdateExplorer {{{
+"
+function! <SID>UpdateExplorer(delBufNum,curBufNum)
+  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Entering UpdateExplorer()'  ,10)
+  call <SID>DEBUG('===========================',10)
+
+  let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
+
+  if l:winNum == -1
+    call <SID>DEBUG('Found no MBE window, aborting...',1)
+    call <SID>DEBUG('===========================',10)
+    call <SID>DEBUG('Terminated UpdateExplorer()',10)
+    call <SID>DEBUG('===========================',10)
+    return
+  endif
+
+  if l:winNum != winnr()
+    let l:winChanged = 1
+    exec l:winNum.' wincmd w'
+  endif
+
+  call <SID>DisplayBuffers(a:delBufNum,a:curBufNum)
+
+  if exists('l:winChanged')
+    wincmd p
+  endif
+
+  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Completed UpdateExplorer()' ,10)
   call <SID>DEBUG('===========================',10)
 endfunction
 
@@ -738,6 +765,7 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
   " won't get written and will be deleted when it gets hidden.
   if a:isPluginWindow
     setlocal noswapfile
+    setlocal nobuflisted
     setlocal buftype=nofile
     setlocal bufhidden=delete
   endif
@@ -811,17 +839,9 @@ function! <SID>DisplayBuffers(delBufNum,curBufNum)
     return
   endif
 
-  " We need to be able to modify the buffer
-  setlocal modifiable
-
   call <SID>ShowBuffers(a:delBufNum,a:curBufNum)
   call <SID>ResizeWindow()
-
-  normal! zz
-
-  " Prevent the buffer from being modified.
-  setlocal nomodifiable
-  set nobuflisted
+  call <SID>FocusCurrentBuffer(a:curBufNum)
 endfunction
 
 " }}}
@@ -838,6 +858,12 @@ function! <SID>ResizeWindow()
     call <SID>DEBUG('ResizeWindow called in invalid window',1)
     return
   endif
+
+  " Prevent a report of our actions from showing up.
+  let l:save_rep = &report
+  let l:save_sc  = &showcmd
+  let &report    = 10000
+  set noshowcmd
 
   let l:width  = winwidth('.')
 
@@ -902,6 +928,11 @@ function! <SID>ResizeWindow()
     endif
 
   endif
+
+  normal! zz
+
+  let &report  = l:save_rep
+  let &showcmd = l:save_sc
 endfunction
 
 " }}}
@@ -914,6 +945,12 @@ endfunction
 function! <SID>ShowBuffers(delBufNum,curBufNum)
   call <SID>DEBUG('Entering ShowBuffers()',10)
 
+  " Make sure we are in our window
+  if bufname('%') != '-MiniBufExplorer-'
+    call <SID>DEBUG('ShowBuffers called in invalid window',1)
+    return
+  endif
+
   let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 1, a:curBufNum)
 
   if (l:ListChanged == 1 || g:miniBufExplForceDisplay)
@@ -921,6 +958,9 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     let l:save_sc = &showcmd
     let &report = 10000
     set noshowcmd
+
+    " We need to be able to modify the buffer
+    setlocal modifiable
 
     " Delete all lines in buffer.
     silent 1,$d _
@@ -931,12 +971,32 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     put! =g:miniBufExplBufList
     silent $ d _
 
+    " Prevent the buffer from being modified.
+    setlocal nomodifiable
+
     let g:miniBufExplForceDisplay = 0
 
     let &report  = l:save_rep
     let &showcmd = l:save_sc
   else
     call <SID>DEBUG('Buffer list not update since there was no change',9)
+  endif
+endfunction
+
+" }}}
+" FocusCurrentBuffer {{{
+function! <SID>FocusCurrentBuffer(bufnr)
+  " Make sure we are in our window
+  if bufname('%') != '-MiniBufExplorer-'
+    call <SID>DEBUG('UpdateExplorer called in invalid window',1)
+    return
+  endif
+
+  if (a:bufnr != -1)
+    let l:bufname = expand('#'.a:bufnr.':t')
+    call search('\V['.a:bufnr.':'.l:bufname.']', 'w')
+  else
+    call <SID>DEBUG('No current buffer to search for',9)
   endif
 endfunction
 
@@ -1401,18 +1461,18 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
     if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1 && bufname('%') != ""))
       if <SID>HasEligibleBuffers(a:delBufNum) == 1
         " if we don't have a window then create one
-        let l:bufnr = <SID>FindWindow('-MiniBufExplorer-', 0)
+        let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
 
-        if (l:bufnr == -1)
-          call <SID>DEBUG('About to call StartExplorer (Create MBE)', 9)
+        if (l:winnr == -1)
+          call <SID>DEBUG('Starting MiniBufExplorer...', 9)
           call <SID>StartExplorer(0, a:delBufNum, bufname("%"))
         else
           " otherwise only update the window if the contents have
           " changed
           let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 0, a:curBufNum)
           if (l:ListChanged)
-            call <SID>DEBUG('About to call StartExplorer (Update MBE)', 9)
-            call <SID>StartExplorer(0, a:delBufNum, bufname("%"))
+            call <SID>DEBUG('Updating MiniBufExplorer...', 9)
+            call <SID>UpdateExplorer(a:delBufNum, a:curBufNum)
           endif
         endif
       else
