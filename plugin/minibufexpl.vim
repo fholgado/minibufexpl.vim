@@ -87,6 +87,13 @@ endif " }}}
 
 " Global Configuration Variables
 "
+" Start MBE automatically ? {{{
+"
+if !exists('g:miniBufExplorerAutoStart')
+  let g:miniBufExplorerAutoStart = 1
+endif
+
+" }}}
 " Debug Level {{{
 "
 " 0 = no logging
@@ -1451,8 +1458,17 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 
       if <SID>HasEligibleBuffers(a:delBufNum) == 1
         if (l:winnr == -1)
-          call <SID>DEBUG('Starting MiniBufExplorer...', 9)
-          call <SID>StartExplorer(a:delBufNum, bufname("%"))
+          if g:miniBufExplorerAutoStart == 1
+            call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
+            call <SID>StartExplorer(a:delBufNum, bufname("%"))
+          else
+            call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
+            call <SID>DEBUG('===========================',10)
+            call <SID>DEBUG('Terminated AutoUpdate()'    ,10)
+            call <SID>DEBUG('===========================',10)
+            let g:miniBufExplInAutoUpdate = 0
+            return
+          endif
         else
           " otherwise only update the window if the contents have
           " changed

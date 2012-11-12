@@ -170,6 +170,11 @@ setting is backwards compatible if you don't use MinSize.
 ------------------------------------------------------------------------------
 4.3 Automatic Opening                                    *MiniBufExplAutoOpen*
 
+                                                *'g:miniBufExplorerAutoStart'*
+If you only want open MBE manually when needed, you can put the following into
+your .vimrc:
+
+  let g:miniBufExplorerAutoStart = 0
                                               *'g:miniBufExplorerMoreThanOne'*
 By default we are now (as of 6.0.1) turning on the MoreThanOne option. This
 stops the -MiniBufExplorer- from opening automatically until more than one
