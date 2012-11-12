@@ -1446,10 +1446,10 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   if s:miniBufExplAutoUpdate == 1
     " Only show MiniBufExplorer if we have a real buffer
     if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1 && bufname('%') != ""))
-      if <SID>HasEligibleBuffers(a:delBufNum) == 1
-        " if we don't have a window then create one
-        let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
+      " if we don't have a window then create one
+      let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
 
+      if <SID>HasEligibleBuffers(a:delBufNum) == 1
         if (l:winnr == -1)
           call <SID>DEBUG('Starting MiniBufExplorer...', 9)
           call <SID>StartExplorer(a:delBufNum, bufname("%"))
@@ -1463,10 +1463,19 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
           endif
         endif
       else
-        call <SID>DEBUG('Failed in eligible check', 9)
-        call <SID>StopExplorer()
-        " we do not want to turn auto-updating off
-        let s:miniBufExplAutoUpdate = 1
+        if (l:winnr == -1)
+          call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
+          call <SID>DEBUG('===========================',10)
+          call <SID>DEBUG('Terminated AutoUpdate()'    ,10)
+          call <SID>DEBUG('===========================',10)
+          let g:miniBufExplInAutoUpdate = 0
+          return
+        else
+          call <SID>DEBUG('Failed in eligible check', 9)
+          call <SID>StopExplorer()
+          " we do not want to turn auto-updating off
+          let s:miniBufExplAutoUpdate = 1
+        endif
       endif
 
 	    " VIM sometimes turns syntax highlighting off,
