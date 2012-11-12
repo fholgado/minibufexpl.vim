@@ -57,8 +57,8 @@ endif
 " }}}
 " MBE <Script> internal map {{{
 "
-noremap <unique> <script> <Plug>MiniBufExplorer  :call <SID>StartExplorer(1, -1, bufnr("%"))<CR>:<BS>
-noremap <unique> <script> <Plug>CMiniBufExplorer :call <SID>StopExplorer(1)<CR>:<BS>
+noremap <unique> <script> <Plug>MiniBufExplorer  :call <SID>StartExplorer(-1, bufnr("%"))<CR>:<BS>
+noremap <unique> <script> <Plug>CMiniBufExplorer :call <SID>StopExplorer()<CR>:<BS>
 noremap <unique> <script> <Plug>UMiniBufExplorer :call <SID>AutoUpdate(-1,bufnr("%"))<CR>:<BS>
 noremap <unique> <script> <Plug>TMiniBufExplorer :call <SID>ToggleExplorer()<CR>:<BS>
 noremap <unique> <script> <Plug>MBEMarkCurrent :call <SID>MarkCurrentBuffer(bufname("%"),1)<CR>:<BS>
@@ -67,10 +67,10 @@ noremap <unique> <script> <Plug>MBEMarkCurrent :call <SID>MarkCurrentBuffer(bufn
 " MBE commands {{{
 "
 if !exists(':MiniBufExplorer')
-  command! MiniBufExplorer  call <SID>StartExplorer(1, -1, bufnr("%"))
+  command! MiniBufExplorer  call <SID>StartExplorer(-1, bufnr("%"))
 endif
 if !exists(':CMiniBufExplorer')
-  command! CMiniBufExplorer  call <SID>StopExplorer(1)
+  command! CMiniBufExplorer  call <SID>StopExplorer()
 endif
 if !exists(':UMiniBufExplorer')
   command! UMiniBufExplorer  call <SID>AutoUpdate(-1,bufnr("%"))
@@ -421,14 +421,12 @@ augroup END
 "
 " StartExplorer - Sets up our explorer and causes it to be displayed {{{
 "
-function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
+function! <SID>StartExplorer(delBufNum,curBufNum)
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Entering StartExplorer()'   ,10)
   call <SID>DEBUG('===========================',10)
 
-  if a:sticky == 1
-    let s:miniBufExplAutoUpdate = 1
-  endif
+  let s:miniBufExplAutoUpdate = 1
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
@@ -580,14 +578,12 @@ endfunction
 " }}}
 " StopExplorer - Looks for our explorer and closes the window if it is open {{{
 "
-function! <SID>StopExplorer(sticky)
+function! <SID>StopExplorer()
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Entering StopExplorer()'    ,10)
   call <SID>DEBUG('===========================',10)
 
-  if a:sticky == 1
-    let s:miniBufExplAutoUpdate = 0
-  endif
+  let s:miniBufExplAutoUpdate = 0
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
@@ -615,14 +611,12 @@ function! <SID>ToggleExplorer()
   call <SID>DEBUG('Entering ToggleExplorer()'  ,10)
   call <SID>DEBUG('===========================',10)
 
-  let s:miniBufExplAutoUpdate = 0
-
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
   if l:winNum != -1
-    call <SID>StopExplorer(1)
+    call <SID>StopExplorer()
   else
-    call <SID>StartExplorer(1, -1, bufnr("%"))
+    call <SID>StartExplorer(-1, bufnr("%"))
     wincmd p
   endif
 
@@ -1458,7 +1452,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 
         if (l:winnr == -1)
           call <SID>DEBUG('Starting MiniBufExplorer...', 9)
-          call <SID>StartExplorer(0, a:delBufNum, bufname("%"))
+          call <SID>StartExplorer(a:delBufNum, bufname("%"))
         else
           " otherwise only update the window if the contents have
           " changed
@@ -1470,7 +1464,9 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
         endif
       else
         call <SID>DEBUG('Failed in eligible check', 9)
-        call <SID>StopExplorer(0)
+        call <SID>StopExplorer()
+        " we do not want to turn auto-updating off
+        let s:miniBufExplAutoUpdate = 1
       endif
 
 	    " VIM sometimes turns syntax highlighting off,
@@ -1596,7 +1592,7 @@ function! <SID>MBESelectBuffer(split)
   let &showcmd = l:save_sc
 
   if g:miniBufExplCloseOnSelect == 1
-    call <SID>StopExplorer(1)
+    call <SID>StopExplorer()
   endif
 
   call <SID>DEBUG('===========================',10)
