@@ -400,6 +400,10 @@ let s:MRUList = range(1, bufnr('$'))
 " before VimEnter event.
 let s:miniBufExplAutoUpdate = 0
 
+" If MBE was opened manually, then we should skip eligible buffers checking,
+" open MBE window no matter what value 'g:miniBufExplorerMoreThanOne' is set.
+let s:skipEligibleBuffersCheck = 0
+
 " }}}
 
 " Auto Commands
@@ -617,6 +621,8 @@ function! <SID>ToggleExplorer()
   call <SID>DEBUG('===========================',10)
   call <SID>DEBUG('Entering ToggleExplorer()'  ,10)
   call <SID>DEBUG('===========================',10)
+
+  let s:skipEligibleBuffersCheck = 1
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
@@ -1296,6 +1302,10 @@ endfunction
 "
 function! <SID>HasEligibleBuffers(delBufNum)
   call <SID>DEBUG('Entering HasEligibleBuffers()',10)
+
+  if s:skipEligibleBuffersCheck == 1
+    return 1
+  endif
 
   let l:save_rep = &report
   let l:save_sc = &showcmd
