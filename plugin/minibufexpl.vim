@@ -1019,18 +1019,19 @@ endfunction
 " buffer 1's path at the point where it is different from buffer 2's path
 "
 function! CheckRootDirForDupes(level,path1,path2)
-    call <SID>DEBUG('Entering Dupe Dir Checking Function for at level '.a:level.' for '.join(a:path1).' vs '.join(a:path2),10)
-    if(len(a:path1) >= abs(a:level))
-        call <SID>DEBUG('Level '.a:level.' of path1 is '.get(a:path1,a:level),10)
-        call <SID>DEBUG('Level '.a:level.' of path2 is '.get(a:path2,a:level),10)
-        if(get(a:path1,a:level) == get(a:path2,a:level))
-            let s:bufPathPosition = a:level - 1
-            call CheckRootDirForDupes(s:bufPathPosition,a:path1,a:path2)
-            call <SID>DEBUG('Match in directory name at level '.a:level,10)
+    l:level = l:level
+    call <SID>DEBUG('Entering Dupe Dir Checking Function for at level '.l:level.' for '.join(a:path1).' vs '.join(a:path2),10)
+    if(len(a:path1) >= abs(l:level))
+        call <SID>DEBUG('Level '.l:level.' of path1 is '.get(a:path1,l:level),10)
+        call <SID>DEBUG('Level '.l:level.' of path2 is '.get(a:path2,l:level),10)
+        if(get(a:path1,l:level) == get(a:path2,l:level))
+            call <SID>DEBUG('Match in directory name at level '.l:level,10)
             call <SID>DEBUG('Calling CheckRootForDupes again',10)
+            let l:level = l:level - 1
+            call CheckRootDirForDupes(l:level,a:path1,a:path2)
         else
-            call <SID>DEBUG('Final path Position is '.s:bufPathPosition,10)
-            let s:bufPathPrefix = a:path1[s:bufPathPosition].'/'
+            call <SID>DEBUG('Final path Position is '.l:level,10)
+            let s:bufPathPrefix = a:path1[l:level].'/'
             call <SID>DEBUG('Found non-matching root dir and it is '.s:bufPathPrefix,10)
         endif
     endif
@@ -1194,7 +1195,6 @@ endfunction
 
 function! <SID>CreateBufferName(bufNum, Dupes)
     let s:PathSeparator = '/'
-    let s:bufPathPosition = -2
     let s:bufPathPrefix = ""
 
     let l:bufnrs = a:Dupes
@@ -1207,7 +1207,7 @@ function! <SID>CreateBufferName(bufNum, Dupes)
             continue
         endif
         let l:bufPath2 = expand( "#" . l:bufnr . ":p")
-        call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
+        call CheckRootDirForDupes(-2,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
     endfor
 
     call <SID>DEBUG('Setting ' . l:bufNum . ' to ' .  s:bufPathPrefix.l:bufName,5)
