@@ -1429,7 +1429,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   " (Thanks toupeira!)
   if (bufname('%') == '-MiniBufExplorer-' || bufname('%') == '[fuf]' || bufname('%') == '')
     " If this is the only buffer left then toggle the buffer
-    if (winbufnr(<SID>NextNormalWindow()) == -1)
+    if (<SID>NextNormalWindow() == -1)
       quit
       call <SID>DEBUG('MBE is the last open window, quit it', 9)
     else
