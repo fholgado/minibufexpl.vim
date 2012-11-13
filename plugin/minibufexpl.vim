@@ -1431,8 +1431,8 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
     quit
   endif
 
-  " Skip window with no name and the FuzzyFinder window (Thanks toupeira!)
-  if (bufname('%') == '' || bufname('%') == '[fuf]')
+  " Skip windows holding ignored buffer
+  if <SID>IgnoreBuffer(bufnr('%')) == 1
     call <SID>DEBUG('===========================',10)
     call <SID>DEBUG('Terminated AutoUpdate()'    ,10)
     call <SID>DEBUG('===========================',10)
@@ -1452,7 +1452,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   " this allows us to stop updates on startup.
   if s:miniBufExplAutoUpdate == 1
     " Only show MiniBufExplorer if we have a real buffer
-    if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1 && bufname('%') != ""))
+    if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1))
       " if we don't have a window then create one
       let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
 
