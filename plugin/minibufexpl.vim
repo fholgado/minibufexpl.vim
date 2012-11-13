@@ -1197,20 +1197,21 @@ function! <SID>CreateBufferName(bufNum, Dupes)
     let s:bufPathPosition = -2
     let s:bufPathPrefix = ""
 
-    let l:bufPath = expand( "#" . a:bufNum . ":p")
-    let l:bufName = expand( "#" . a:bufNum . ":p:t")
+    let l:bufNum = 0 + a:bufNum
+    let l:bufPath = expand( "#" . l:bufNum . ":p")
+    let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
     for bufn in a:Dupes
-        if bufn == a:bufNum
+        if bufn == l:bufNum
             continue
         endif
         let l:bufPath2 = expand( "#" . bufn . ":p")
         call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
     endfor
 
-    call <SID>DEBUG('Setting ' . a:bufNum . ' to ' .  s:bufPathPrefix.l:bufName,5)
+    call <SID>DEBUG('Setting ' . l:bufNum . ' to ' .  s:bufPathPrefix.l:bufName,5)
 
-    let s:nameDict[a:bufNum] = s:bufPathPrefix.l:bufName
+    let s:nameDict[l:bufNum] = s:bufPathPrefix.l:bufName
 endfunction
 
 function! <SID>BuildNameDict(bufNum)
