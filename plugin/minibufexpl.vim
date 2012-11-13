@@ -1079,7 +1079,6 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
     let l:NBuffers = bufnr('$')     " Get the number of the last buffer.
     let l:i = 0                     " Set the buffer index to zero.
 
-    let l:fileNames = ''
     let l:tabList = []
     let l:maxTabWidth = 0
     " default separator for *nix file systems
@@ -1211,16 +1210,11 @@ endfunction
 function! <SID>BuildNameDict(bufNum)
     call <SID>DEBUG('Entering BuildNameDict()',5)
 
-    let s:PathSeparator = '/'
-    let s:bufPathPosition = -2
-    let s:bufPathPrefix = ""
-
     let l:bufNum = 0 + a:bufNum
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
     if bufName == ''
         return
     endif
-    let l:bufPath = expand( "#" . l:bufNum . ":p")
 
     if(!has_key(s:bufNameDict, l:bufName))
         call <SID>DEBUG('Adding empty list for ' . l:bufName,5)
