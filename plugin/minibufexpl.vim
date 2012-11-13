@@ -384,6 +384,13 @@ if !exists('g:statusLineText')
   let g:statusLineText = "-MiniBufExplorer-"
 endif
 
+" check to see what platform we are in
+if (has('unix'))
+    let s:PathSeparator = '/'
+else
+    let s:PathSeparator = '\'
+endif
+
 " Variable used to pass maxTabWidth info between functions
 let s:maxTabWidth = 0
 
@@ -1085,9 +1092,6 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
     let l:tabList = []
     let l:maxTabWidth = 0
 
-    " default separator for *nix file systems
-    let s:PathSeparator = '/'
-
     " Loop through every buffer less than the total number of buffers.
     let l:i = 0
     while(l:i <= l:NBuffers)
@@ -1097,17 +1101,6 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
         " buffer then ignore the current buffer.
         " Otherwise, continue.
         if (a:delBufNum == l:i)
-            " check to see what platform we are in
-            if (has('unix'))
-                let s:PathSeparator = '/'
-                call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
-            else
-                let s:PathSeparator = '\'
-                call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
-            endif
-
-            call <SID>DEBUG('Separator is '.s:PathSeparator,10)
-
             continue
         endif
 
@@ -1194,7 +1187,6 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
 endfunction
 
 function! <SID>CreateBufferName(bufNum, Dupes)
-    let s:PathSeparator = '/'
     let s:bufPathPrefix = ""
 
     let l:bufnrs = a:Dupes
