@@ -1828,10 +1828,6 @@ endfunction
 " MRUPush - add buffer to MRU list {{{
 "
 function! <SID>MRUPush(buf)
-  if <SID>IgnoreBuffer(a:buf) == 1
-    return
-  endif
-
   " Remove the buffer number from the list if it already exists.
   call <SID>MRUPop(a:buf)
 
