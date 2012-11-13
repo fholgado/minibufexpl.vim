@@ -344,10 +344,11 @@ endif " }}}
 if !exists('g:miniBufExplCheckDupeBufs')
   let g:miniBufExplCheckDupeBufs = 1
 endif " }}}
-" dictionary used to map buffer numbers to names when the buffer names
-" are not unique.
+" Dictionary used to map buffer numbers to names when the buffer
+" names are not unique.
 let s:nameDict = {}
-" dictionary used to keep track of the names we have seen.
+
+" Dictionary used to keep track of the names we have seen.
 let s:bufNameDict = {}
 
 " Variables used internally
@@ -1076,22 +1077,24 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
     call <SID>DEBUG('Entering BuildBufferList()',10)
 
     let l:CurBufNum = a:curBufNum
-    let l:NBuffers = bufnr('$')     " Get the number of the last buffer.
-    let l:i = 0                     " Set the buffer index to zero.
+
+    " Get the number of the last buffer.
+    let l:NBuffers = bufnr('$')
 
     let l:tabList = []
     let l:maxTabWidth = 0
+
     " default separator for *nix file systems
     let s:PathSeparator = '/'
 
     " Loop through every buffer less than the total number of buffers.
+    let l:i = 0
     while(l:i <= l:NBuffers)
         let l:i = l:i + 1
 
         " If we have a delBufNum and it is the current
         " buffer then ignore the current buffer.
         " Otherwise, continue.
-
         if (a:delBufNum == l:i)
             " check to see what platform we are in
             if (has('unix'))
@@ -1153,6 +1156,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
         endif
 
         let l:maxTabWidth = <SID>Max(strlen(l:tab), l:maxTabWidth)
+
         call add(l:tabList, l:tab)
 
         if g:miniBufExplSortBy == "name"
@@ -1170,7 +1174,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
                 if g:miniBufExplTabWrap != 0
                     let l:fileNames = l:fileNames.' '
                 endif
-                " If not horizontal we need a newline
+            " If not horizontal we need a newline
             else
                 let l:fileNames = l:fileNames . "\n"
             endif
@@ -1203,7 +1207,9 @@ function! <SID>CreateBufferName(bufNum, Dupes)
         let l:bufPath2 = expand( "#" . bufn . ":p")
         call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
     endfor
+
     call <SID>DEBUG('Setting ' . a:bufNum . ' to ' .  s:bufPathPrefix.l:bufName,5)
+
     let s:nameDict[a:bufNum] = s:bufPathPrefix.l:bufName
 endfunction
 
@@ -1212,6 +1218,7 @@ function! <SID>BuildNameDict(bufNum)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
+
     if bufName == ''
         return
     endif
@@ -1220,6 +1227,7 @@ function! <SID>BuildNameDict(bufNum)
         call <SID>DEBUG('Adding empty list for ' . l:bufName,5)
         let s:bufNameDict[l:bufName] = []
     endif
+
     call add(s:bufNameDict[l:bufName], l:bufNum)
 
     if(len(s:bufNameDict[l:bufName]) > 1)
@@ -1228,14 +1236,14 @@ function! <SID>BuildNameDict(bufNum)
             call <SID>CreateBufferName(bufn, s:bufNameDict[l:bufName])
         endfor
     endif
-
 endfunction
 
 function! <SID>BuildAllNameDicts()
-    let l:NBuffers = bufnr('$')     " Get the number of the last buffer.
-    let l:i = 0                     " Set the buffer index to zero.
+    " Get the number of the last buffer.
+    let l:NBuffers = bufnr('$')
 
     " Loop through every buffer less than the total number of buffers.
+    let l:i = 0
     while(l:i <= l:NBuffers)
         if bufexists(l:i)
             call <SID>BuildNameDict(l:i)
@@ -1243,7 +1251,6 @@ function! <SID>BuildAllNameDicts()
         let l:i = l:i + 1
     endwhile
 endfunction
-
 
 " }}}
 " NameCmp - compares tabs based on filename {{{
@@ -1289,9 +1296,11 @@ function! <SID>HasEligibleBuffers(delBufNum)
   let &report = 10000
   set noshowcmd
 
-  let l:NBuffers = bufnr('$')     " Get the number of the last buffer.
-  let l:i        = 0              " Set the buffer index to zero.
-  let l:found    = 0              " No buffer found
+  " Get the number of the last buffer.
+  let l:NBuffers = bufnr('$')
+
+   " No buffer found
+  let l:found = 0
 
   if (g:miniBufExplorerMoreThanOne > 1)
     call <SID>DEBUG('More Than One mode turned on',6)
@@ -1299,6 +1308,7 @@ function! <SID>HasEligibleBuffers(delBufNum)
   let l:needed = g:miniBufExplorerMoreThanOne
 
   " Loop through every buffer less than the total number of buffers.
+  let l:i = 0
   while(l:i <= l:NBuffers && l:found < l:needed)
     let l:i = l:i + 1
 
