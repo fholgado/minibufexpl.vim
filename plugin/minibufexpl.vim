@@ -1021,8 +1021,8 @@ endfunction
 function! CheckRootDirForDupes(level,path1,path2)
     call <SID>DEBUG('Entering Dupe Dir Checking Function for at level '.a:level.' for '.join(a:path1).' vs '.join(a:path2),10)
     if(len(a:path1) >= abs(a:level))
-        call <SID>DEBUG('Path level1 is '.get(a:path1,a:level),10)
-        call <SID>DEBUG('Path level2 is '.get(a:path2,a:level),10)
+        call <SID>DEBUG('Level '.a:level.' of path1 is '.get(a:path1,a:level),10)
+        call <SID>DEBUG('Level '.a:level.' of path2 is '.get(a:path2,a:level),10)
         if(get(a:path1,a:level) == get(a:path2,a:level))
             let s:bufPathPosition = a:level - 1
             call CheckRootDirForDupes(s:bufPathPosition,a:path1,a:path2)
@@ -1232,7 +1232,7 @@ function! <SID>BuildNameDict(bufNum)
 
     if(len(s:bufNameDict[l:bufName]) > 1)
         for bufn in s:bufNameDict[l:bufName]
-            call <SID>DEBUG('creating buffer name for ' . bufn,5)
+            call <SID>DEBUG('Creating buffer name for ' . bufn,5)
             call <SID>CreateBufferName(bufn, s:bufNameDict[l:bufName])
         endfor
     endif
