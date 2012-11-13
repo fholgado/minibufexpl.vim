@@ -1582,9 +1582,9 @@ function! <SID>MBESelectBuffer(split)
   let l:resize = 0
 
   if(l:bufnr != -1)             " If the buffer exists.
-
     let l:saveAutoUpdate = s:miniBufExplAutoUpdate
     let s:miniBufExplAutoUpdate = 0
+
     " Switch to the previous window
     wincmd p
 
@@ -1618,9 +1618,10 @@ function! <SID>MBESelectBuffer(split)
     if (l:resize)
       resize
     endif
-    let s:miniBufExplAutoUpdate = l:saveAutoUpdate
-    call <SID>AutoUpdate(-1,bufnr("%"))
 
+    let s:miniBufExplAutoUpdate = l:saveAutoUpdate
+
+    call <SID>AutoUpdate(-1,bufnr("%"))
   endif
 
   let &report  = l:save_rep
