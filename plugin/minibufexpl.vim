@@ -1197,15 +1197,16 @@ function! <SID>CreateBufferName(bufNum, Dupes)
     let s:bufPathPosition = -2
     let s:bufPathPrefix = ""
 
+    let l:bufnrs = a:Dupes
     let l:bufNum = 0 + a:bufNum
     let l:bufPath = expand( "#" . l:bufNum . ":p")
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
-    for bufn in a:Dupes
-        if bufn == l:bufNum
+    for l:bufnr in l:bufnrs
+        if l:bufnr == l:bufNum
             continue
         endif
-        let l:bufPath2 = expand( "#" . bufn . ":p")
+        let l:bufPath2 = expand( "#" . l:bufnr . ":p")
         call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
     endfor
 
@@ -1232,9 +1233,9 @@ function! <SID>BuildNameDict(bufNum)
     call add(s:bufNameDict[l:bufName], l:bufNum)
 
     if(len(s:bufNameDict[l:bufName]) > 1)
-        for bufn in s:bufNameDict[l:bufName]
-            call <SID>DEBUG('Creating buffer name for ' . bufn,5)
-            call <SID>CreateBufferName(bufn, s:bufNameDict[l:bufName])
+        for l:bufnr in s:bufNameDict[l:bufName]
+            call <SID>DEBUG('Creating buffer name for ' . l:bufnr,5)
+            call <SID>CreateBufferName(l:bufnr, s:bufNameDict[l:bufName])
         endfor
     endif
 endfunction
