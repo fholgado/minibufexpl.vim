@@ -170,6 +170,11 @@ setting is backwards compatible if you don't use MinSize.
 ------------------------------------------------------------------------------
 4.3 Automatic Opening                                    *MiniBufExplAutoOpen*
 
+                                                *'g:miniBufExplorerAutoStart'*
+If you only want open MBE manually when needed, you can put the following into
+your .vimrc:
+
+  let g:miniBufExplorerAutoStart = 0
                                               *'g:miniBufExplorerMoreThanOne'*
 By default we are now (as of 6.0.1) turning on the MoreThanOne option. This
 stops the -MiniBufExplorer- from opening automatically until more than one
@@ -235,11 +240,6 @@ NOTE: If you use the single click option in taglist.vim you may
       need to get an updated version that includes a patch I
       provided to allow both explorers to provide single click
       buffer selection.
-
-                                                 *'g:miniBufExplModSelTarget'*
-If you use other explorers like TagList you can (As of 6.2.8) put:
-
-  let g:miniBufExplModSelTarget = 1
 
                                                 *'g:miniBufExplCloseOnSelect'*
 If you would like MBE to close when you select a buffer, put:
