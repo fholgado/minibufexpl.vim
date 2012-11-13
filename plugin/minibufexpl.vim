@@ -1084,9 +1084,6 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
     let l:maxTabWidth = 0
     " default separator for *nix file systems
     let s:PathSeparator = '/'
-    " counter to see what platform we may be in
-    let l:nixPlatform = 0
-    let l:winPlatform = 0
 
     " Loop through every buffer less than the total number of buffers.
     while(l:i <= l:NBuffers)
