@@ -1124,13 +1124,6 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
 
         let l:BufName = expand( "#" . l:i . ":p:t")
 
-        " See if buffer names are duplicate
-        let l:dupeBufName = 0
-        let l:i2 = 0
-        " Establish initial parent directory position
-        let s:bufPathPosition = -2
-        let s:bufPathPrefix = ""
-        let l:pathList = []
         " Establish the tab's content, including the differentiating root
         " dir if neccessary
         let l:tab = '['
