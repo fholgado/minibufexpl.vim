@@ -1247,9 +1247,12 @@ function! <SID>BuildAllNameDicts()
     " Loop through every buffer less than the total number of buffers.
     let l:i = 0
     while(l:i <= l:NBuffers)
-        if bufexists(l:i)
-            call <SID>BuildNameDict(l:i)
+        if !bufexists(l:i)
+            let l:i = l:i + 1
+            continue
         endif
+
+        call <SID>BuildNameDict(l:i)
         let l:i = l:i + 1
     endwhile
 endfunction
