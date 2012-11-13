@@ -1220,7 +1220,7 @@ function! <SID>BuildNameDict(bufNum)
     let l:bufNum = 0 + a:bufNum
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
-    if bufName == ''
+    if l:bufName == ''
         return
     endif
 
