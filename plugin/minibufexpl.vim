@@ -1425,17 +1425,14 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
     let g:miniBufExplInAutoUpdate = 1
   endif
 
-  " Don't bother autoupdating the MBE window, and skip the FuzzyFinder window
-  " (Thanks toupeira!)
-  if (bufname('%') == '-MiniBufExplorer-' || bufname('%') == '[fuf]' || bufname('%') == '')
-    " If this is the only buffer left then toggle the buffer
-    if (<SID>NextNormalWindow() == -1)
-      quit
-      call <SID>DEBUG('MBE is the last open window, quit it', 9)
-    else
-      call <SID>DEBUG('AutoUpdate does not run for the MBE window', 9)
-    endif
+  " Quit MBE if no more mormal window left
+  if (bufname('%') == '-MiniBufExplorer-') && (<SID>NextNormalWindow() == -1)
+    call <SID>DEBUG('MBE is the last open window, quit it', 9)
+    quit
+  endif
 
+  " Skip window with no name and the FuzzyFinder window (Thanks toupeira!)
+  if (bufname('%') == '' || bufname('%') == '[fuf]')
     call <SID>DEBUG('===========================',10)
     call <SID>DEBUG('Terminated AutoUpdate()'    ,10)
     call <SID>DEBUG('===========================',10)
