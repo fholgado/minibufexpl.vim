@@ -291,13 +291,6 @@ if g:miniBufExplMapCTabSwitchWindows
   noremap <C-S-TAB> <C-W>W
 endif
 
-" }}}
-" Modifiable Select Target {{{
-"
-if !exists('g:miniBufExplModSelTarget')
-  let g:miniBufExplModSelTarget = 0
-endif
-
 "}}}
 " Force Syntax Enable {{{
 "
@@ -1432,17 +1425,14 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
     let g:miniBufExplInAutoUpdate = 1
   endif
 
-  " Don't bother autoupdating the MBE window, and skip the FuzzyFinder window
-  " (Thanks toupeira!)
-  if (bufname('%') == '-MiniBufExplorer-' || bufname('%') == '[fuf]' || bufname('%') == '')
-    " If this is the only buffer left then toggle the buffer
-    if (winbufnr(<SID>NextNormalWindow()) == -1)
-      quit
-      call <SID>DEBUG('MBE is the last open window, quit it', 9)
-    else
-      call <SID>DEBUG('AutoUpdate does not run for the MBE window', 9)
-    endif
+  " Quit MBE if no more mormal window left
+  if (bufname('%') == '-MiniBufExplorer-') && (<SID>NextNormalWindow() == -1)
+    call <SID>DEBUG('MBE is the last open window, quit it', 9)
+    quit
+  endif
 
+  " Skip windows holding ignored buffer
+  if <SID>IgnoreBuffer(bufnr('%')) == 1
     call <SID>DEBUG('===========================',10)
     call <SID>DEBUG('Terminated AutoUpdate()'    ,10)
     call <SID>DEBUG('===========================',10)
@@ -1462,7 +1452,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   " this allows us to stop updates on startup.
   if s:miniBufExplAutoUpdate == 1
     " Only show MiniBufExplorer if we have a real buffer
-    if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1 && bufname('%') != ""))
+    if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1))
       " if we don't have a window then create one
       let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
 
@@ -1582,29 +1572,15 @@ function! <SID>MBESelectBuffer(split)
   let l:resize = 0
 
   if(l:bufnr != -1)             " If the buffer exists.
-
     let l:saveAutoUpdate = s:miniBufExplAutoUpdate
     let s:miniBufExplAutoUpdate = 0
-    " Switch to the previous window
-    wincmd p
 
-    " If we are in the buffer explorer or in a nonmodifiable buffer with
-    " g:miniBufExplModSelTarget set then try another window (a few times)
-    if bufname('%') == '-MiniBufExplorer-' || (g:miniBufExplModSelTarget == 1 && getbufvar(bufnr('%'), '&modifiable') == 0)
-      wincmd w
-      if bufname('%') == '-MiniBufExplorer-' || (g:miniBufExplModSelTarget == 1 && getbufvar(bufnr('%'), '&modifiable') == 0)
-        wincmd w
-        if bufname('%') == '-MiniBufExplorer-' || (g:miniBufExplModSelTarget == 1 && getbufvar(bufnr('%'), '&modifiable') == 0)
-          wincmd w
-          " The following handles the case where -MiniBufExplorer-
-          " is the only window left. We need to resize so we don't
-          " end up with a 1 or two line buffer.
-          if bufname('%') == '-MiniBufExplorer-'
-            let l:resize = 1
-            new
-          endif
-        endif
-      endif
+    let l:winNum = <SID>NextNormalWindow()
+    if l:winNum != -1
+      exec l:winNum.'wincmd w'
+    else
+      call <SID>DEBUG('No elegible window avaliable',1)
+      return
     endif
 
     if a:split == 0
@@ -1618,9 +1594,10 @@ function! <SID>MBESelectBuffer(split)
     if (l:resize)
       resize
     endif
-    let s:miniBufExplAutoUpdate = l:saveAutoUpdate
-    call <SID>AutoUpdate(-1,bufnr("%"))
 
+    let s:miniBufExplAutoUpdate = l:saveAutoUpdate
+
+    call <SID>AutoUpdate(-1,bufnr("%"))
   endif
 
   let &report  = l:save_rep
@@ -1851,10 +1828,6 @@ endfunction
 " MRUPush - add buffer to MRU list {{{
 "
 function! <SID>MRUPush(buf)
-  if <SID>IgnoreBuffer(a:buf) == 1
-    return
-  endif
-
   " Remove the buffer number from the list if it already exists.
   call <SID>MRUPop(a:buf)
 
