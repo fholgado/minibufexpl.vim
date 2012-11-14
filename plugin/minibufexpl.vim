@@ -404,12 +404,12 @@ let s:miniBufExplAutoUpdate = 0
 " open MBE window no matter what value 'g:miniBufExplorerMoreThanOne' is set.
 let s:skipEligibleBuffersCheck = 0
 
-" Dictionary used to map buffer numbers to names when the buffer
-" names are not unique.
-let s:nameDict = {}
-
 " Dictionary used to keep track of the names we have seen.
 let s:bufNameDict = {}
+
+" Dictionary used to map buffer numbers to names when the buffer
+" names are not unique.
+let s:bufUniqNameDict = {}
 
 " }}}
 
@@ -1125,13 +1125,13 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
             let l:tab .= l:i.':'
         endif
 
-        if (empty(s:nameDict) || !has_key(s:nameDict, l:i) || g:miniBufExplCheckDupeBufs == 0)
+        if (empty(s:bufUniqNameDict) || !has_key(s:bufUniqNameDict, l:i) || g:miniBufExplCheckDupeBufs == 0)
             " Get filename & Remove []'s & ()'s
             let l:shortBufName = fnamemodify(l:BufName, ":t")
             let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g')
             let l:tab .= l:shortBufName.']'
         else
-            let l:tab .= s:nameDict[l:i].']'
+            let l:tab .= s:bufUniqNameDict[l:i].']'
         endif
 
         " If the buffer is open in a window mark it
@@ -1205,7 +1205,7 @@ function! <SID>CreateBufferName(bufNum, Dupes)
 
     call <SID>DEBUG('Setting ' . l:bufNum . ' to ' .  s:bufPathPrefix.l:bufName,5)
 
-    let s:nameDict[l:bufNum] = s:bufPathPrefix.l:bufName
+    let s:bufUniqNameDict[l:bufNum] = s:bufPathPrefix.l:bufName
 endfunction
 
 function! <SID>BuildNameDict(bufNum)
