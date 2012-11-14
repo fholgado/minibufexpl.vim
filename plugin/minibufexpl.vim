@@ -431,7 +431,7 @@ autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter AutoCmd',
 autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
 autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
-autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Building NameDict', 5) |call <SID>BuildAllNameDicts()
+autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Building All Buffer Dicts', 5) |call <SID>BuildAllBufferDicts()
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter AutoCmd', 10) |
             \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let s:miniBufExplAutoUpdate = 1 |endif
 augroup END
@@ -1233,7 +1233,12 @@ function! <SID>BuildNameDict(bufNum)
     endif
 endfunction
 
-function! <SID>BuildAllNameDicts()
+" }}}
+" BuildAllBufferDicts {{{
+"
+function! <SID>BuildAllBufferDicts()
+    call <SID>DEBUG('Entering BuildAllBuffersDicts()',5)
+
     " Get the number of the last buffer.
     let l:NBuffers = bufnr('$')
 
@@ -1248,6 +1253,8 @@ function! <SID>BuildAllNameDicts()
         call <SID>BuildNameDict(l:i)
         let l:i = l:i + 1
     endwhile
+
+    call <SID>DEBUG('Leaving BuildAllBuffersDicts()',5)
 endfunction
 
 " }}}
