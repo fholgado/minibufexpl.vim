@@ -344,12 +344,6 @@ endif " }}}
 if !exists('g:miniBufExplCheckDupeBufs')
   let g:miniBufExplCheckDupeBufs = 1
 endif " }}}
-" Dictionary used to map buffer numbers to names when the buffer
-" names are not unique.
-let s:nameDict = {}
-
-" Dictionary used to keep track of the names we have seen.
-let s:bufNameDict = {}
 
 " Variables used internally
 "
@@ -409,6 +403,13 @@ let s:miniBufExplAutoUpdate = 0
 " If MBE was opened manually, then we should skip eligible buffers checking,
 " open MBE window no matter what value 'g:miniBufExplorerMoreThanOne' is set.
 let s:skipEligibleBuffersCheck = 0
+
+" Dictionary used to map buffer numbers to names when the buffer
+" names are not unique.
+let s:nameDict = {}
+
+" Dictionary used to keep track of the names we have seen.
+let s:bufNameDict = {}
 
 " }}}
 
