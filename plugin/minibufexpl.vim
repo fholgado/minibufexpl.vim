@@ -1155,26 +1155,26 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
         call add(l:tabList, l:tab)
     endwhile
 
-        if g:miniBufExplSortBy == "name"
-            call sort(l:tabList, "<SID>NameCmp")
-        elseif g:miniBufExplSortBy == "mru"
-            call sort(l:tabList, "<SID>MRUCmp")
-        endif
+    if g:miniBufExplSortBy == "name"
+        call sort(l:tabList, "<SID>NameCmp")
+    elseif g:miniBufExplSortBy == "mru"
+        call sort(l:tabList, "<SID>MRUCmp")
+    endif
 
-        let l:fileNames = ''
-        for l:tab in l:tabList
-            let l:fileNames = l:fileNames.l:tab
+    let l:fileNames = ''
+    for l:tab in l:tabList
+        let l:fileNames = l:fileNames.l:tab
 
-            " If horizontal and tab wrap is turned on we need to add spaces
-            if g:miniBufExplVSplit == 0
-                if g:miniBufExplTabWrap != 0
-                    let l:fileNames = l:fileNames.' '
-                endif
-            " If not horizontal we need a newline
-            else
-                let l:fileNames = l:fileNames . "\n"
+        " If horizontal and tab wrap is turned on we need to add spaces
+        if g:miniBufExplVSplit == 0
+            if g:miniBufExplTabWrap != 0
+                let l:fileNames = l:fileNames.' '
             endif
-        endfor
+        " If not horizontal we need a newline
+        else
+            let l:fileNames = l:fileNames . "\n"
+        endif
+    endfor
 
     if (g:miniBufExplBufList != l:fileNames)
         if (a:updateBufList)
