@@ -1153,6 +1153,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
         let l:maxTabWidth = <SID>Max(strlen(l:tab), l:maxTabWidth)
 
         call add(l:tabList, l:tab)
+    endwhile
 
         if g:miniBufExplSortBy == "name"
             call sort(l:tabList, "<SID>NameCmp")
@@ -1174,7 +1175,6 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
                 let l:fileNames = l:fileNames . "\n"
             endif
         endfor
-    endwhile
 
     if (g:miniBufExplBufList != l:fileNames)
         if (a:updateBufList)
