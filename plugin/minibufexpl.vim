@@ -1202,7 +1202,7 @@ function! <SID>CreateBufferUniqName(bufNum)
 
     if(!has_key(s:bufNameDict, l:bufName))
         call <SID>DEBUG(l:bufName . 'is not in s:bufNameDict, which should not happen.',5)
-        return
+        return l:bufName
     endif
     let l:bufnrs = s:bufNameDict[l:bufName]
 
@@ -1214,11 +1214,11 @@ function! <SID>CreateBufferUniqName(bufNum)
         let l:bufPathPrefix = FindBufferUniqNamePrefix(-2,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
     endfor
 
-    call <SID>DEBUG('Setting ' . l:bufNum . ' to ' .  l:bufPathPrefix.l:bufName,5)
-
-    let s:bufUniqNameDict[l:bufNum] = l:bufPathPrefix.l:bufName
+    call <SID>DEBUG('Uniq name for ' . l:bufNum . ' is ' .  l:bufPathPrefix.l:bufName,5)
 
     call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
+
+    return l:bufPathPrefix.l:bufName
 endfunction
 
 " }}}
@@ -1245,7 +1245,10 @@ function! <SID>UpdateBufferNameDict(bufNum)
     if(len(s:bufNameDict[l:bufName]) > 1)
         for l:bufnr in s:bufNameDict[l:bufName]
             call <SID>DEBUG('Creating buffer name for ' . l:bufnr,5)
-            call <SID>CreateBufferUniqName(l:bufnr)
+            let l:bufUniqName = <SID>CreateBufferUniqName(l:bufnr)
+
+            call <SID>DEBUG('Setting ' . l:bufNum . ' to ' .  l:bufUniqName,5)
+            let s:bufUniqNameDict[l:bufnr] = l:bufUniqName
         endfor
     endif
 
