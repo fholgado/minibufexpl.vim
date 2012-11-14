@@ -1190,15 +1190,20 @@ endfunction
 " }}}
 " CreateBufferUniqName {{{
 "
-function! <SID>CreateBufferUniqName(bufNum, Dupes)
+function! <SID>CreateBufferUniqName(bufNum)
     call <SID>DEBUG('Entering CreateBufferUniqName()',5)
 
     let s:bufPathPrefix = ""
 
-    let l:bufnrs = a:Dupes
     let l:bufNum = 0 + a:bufNum
     let l:bufPath = expand( "#" . l:bufNum . ":p")
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
+
+    if(!has_key(s:bufNameDict, l:bufName))
+        call <SID>DEBUG(l:bufName . 'is not in s:bufNameDict, which should not happen.',5)
+        return
+    endif
+    let l:bufnrs = s:bufNameDict[l:bufName]
 
     for l:bufnr in l:bufnrs
         if l:bufnr == l:bufNum
@@ -1239,7 +1244,7 @@ function! <SID>UpdateBufferNameDict(bufNum)
     if(len(s:bufNameDict[l:bufName]) > 1)
         for l:bufnr in s:bufNameDict[l:bufName]
             call <SID>DEBUG('Creating buffer name for ' . l:bufnr,5)
-            call <SID>CreateBufferUniqName(l:bufnr, s:bufNameDict[l:bufName])
+            call <SID>CreateBufferUniqName(l:bufnr)
         endfor
     endif
 
