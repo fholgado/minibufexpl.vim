@@ -1036,13 +1036,15 @@ function! FindBufferUniqNamePrefix(level,path1,path2)
             call <SID>DEBUG('Match in directory name at level '.l:level,10)
             call <SID>DEBUG('Calling CheckRootForDupes again',10)
             let l:level = l:level - 1
-            call CheckRootDirForDupes(l:level,a:path1,a:path2)
+            let l:bufPathPrefix = FindBufferUniqNamePrefix(l:level,a:path1,a:path2)
         else
             call <SID>DEBUG('Final path Position is '.l:level,10)
-            let s:bufPathPrefix = a:path1[l:level].'/'
-            call <SID>DEBUG('Found non-matching root dir and it is '.s:bufPathPrefix,10)
+            let l:bufPathPrefix = a:path1[l:level].'/'
+            call <SID>DEBUG('Found non-matching root dir and it is '.l:bufPathPrefix,10)
         endif
     endif
+    call <SID>DEBUG('Path prefix is '.l:bufPathPrefix,10)
+    return l:bufPathPrefix
 endfunction
 
 " }}}
@@ -1193,11 +1195,10 @@ endfunction
 function! <SID>CreateBufferUniqName(bufNum)
     call <SID>DEBUG('Entering CreateBufferUniqName()',5)
 
-    let s:bufPathPrefix = ""
-
     let l:bufNum = 0 + a:bufNum
     let l:bufPath = expand( "#" . l:bufNum . ":p")
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
+    let l:bufPathPrefix = ""
 
     if(!has_key(s:bufNameDict, l:bufName))
         call <SID>DEBUG(l:bufName . 'is not in s:bufNameDict, which should not happen.',5)
@@ -1210,12 +1211,12 @@ function! <SID>CreateBufferUniqName(bufNum)
             continue
         endif
         let l:bufPath2 = expand( "#" . l:bufnr . ":p")
-        call FindBufferUniqNamePrefix(-2,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
+        let l:bufPathPrefix = FindBufferUniqNamePrefix(-2,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
     endfor
 
-    call <SID>DEBUG('Setting ' . l:bufNum . ' to ' .  s:bufPathPrefix.l:bufName,5)
+    call <SID>DEBUG('Setting ' . l:bufNum . ' to ' .  l:bufPathPrefix.l:bufName,5)
 
-    let s:bufUniqNameDict[l:bufNum] = s:bufPathPrefix.l:bufName
+    let s:bufUniqNameDict[l:bufNum] = l:bufPathPrefix.l:bufName
 
     call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
 endfunction
