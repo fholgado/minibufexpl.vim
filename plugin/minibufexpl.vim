@@ -424,7 +424,7 @@ let s:bufUniqNameDict = {}
 setlocal updatetime=300
 
 augroup MiniBufExplorer
-autocmd MiniBufExplorer BufNew         * call <SID>DEBUG('-=> BufNew Building NameDict', 5) |call <SID>BuildNameDict(expand("<abuf>"))
+autocmd MiniBufExplorer BufNew         * call <SID>DEBUG('-=> BufNew Updating bufNameDict', 5) |call <SID>UpdateBufferNameDict(expand("<abuf>"))
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete ModTrackingListClean AutoCmd for buffer '.bufnr("%"), 10) |call <SID>CleanModTrackingList(bufnr("%"))
 autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
@@ -1208,13 +1208,17 @@ function! <SID>CreateBufferName(bufNum, Dupes)
     let s:bufUniqNameDict[l:bufNum] = s:bufPathPrefix.l:bufName
 endfunction
 
-function! <SID>BuildNameDict(bufNum)
-    call <SID>DEBUG('Entering BuildNameDict()',5)
+" }}}
+" UpdateBufferNameDict {{{
+"
+function! <SID>UpdateBufferNameDict(bufNum)
+    call <SID>DEBUG('Entering UpdateBufferNameDict()',5)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
     if l:bufName == ''
+        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
         return
     endif
 
@@ -1231,6 +1235,8 @@ function! <SID>BuildNameDict(bufNum)
             call <SID>CreateBufferName(l:bufnr, s:bufNameDict[l:bufName])
         endfor
     endif
+
+    call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
 endfunction
 
 " }}}
@@ -1250,7 +1256,7 @@ function! <SID>BuildAllBufferDicts()
             continue
         endif
 
-        call <SID>BuildNameDict(l:i)
+        call <SID>UpdateBufferNameDict(l:i)
         let l:i = l:i + 1
     endwhile
 
