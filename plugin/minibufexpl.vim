@@ -1021,12 +1021,12 @@ function! <SID>Max(argOne, argTwo)
 endfunction
 
 " }}}
-" CheckRootDirForDupes - Checks if the buffer parent dirs are the same {{{
+" FindBufferUniqNamePrefix - Checks if the buffer parent dirs are the same {{{
 "
 " Compares 2 buffers with the same filename and returns the directory of
 " buffer 1's path at the point where it is different from buffer 2's path
 "
-function! CheckRootDirForDupes(level,path1,path2)
+function! FindBufferUniqNamePrefix(level,path1,path2)
     l:level = l:level
     call <SID>DEBUG('Entering Dupe Dir Checking Function for at level '.l:level.' for '.join(a:path1).' vs '.join(a:path2),10)
     if(len(a:path1) >= abs(l:level))
@@ -1205,7 +1205,7 @@ function! <SID>CreateBufferUniqName(bufNum, Dupes)
             continue
         endif
         let l:bufPath2 = expand( "#" . l:bufnr . ":p")
-        call CheckRootDirForDupes(-2,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
+        call FindBufferUniqNamePrefix(-2,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
     endfor
 
     call <SID>DEBUG('Setting ' . l:bufNum . ' to ' .  s:bufPathPrefix.l:bufName,5)
