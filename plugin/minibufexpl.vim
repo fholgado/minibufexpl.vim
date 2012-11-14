@@ -424,7 +424,7 @@ let s:bufUniqNameDict = {}
 setlocal updatetime=300
 
 augroup MiniBufExplorer
-autocmd MiniBufExplorer BufNew         * call <SID>DEBUG('-=> BufNew Updating bufNameDict', 5) |call <SID>UpdateBufferNameDict(expand("<abuf>"))
+autocmd MiniBufExplorer BufNew         * call <SID>DEBUG('-=> BufNew Updating All Buffer Dicts', 5) |call <SID>UpdateAllBufferDicts(expand("<abuf>"))
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete ModTrackingListClean AutoCmd for buffer '.bufnr("%"), 10) |call <SID>CleanModTrackingList(bufnr("%"))
 autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
@@ -1242,17 +1242,51 @@ function! <SID>UpdateBufferNameDict(bufNum)
 
     call add(s:bufNameDict[l:bufName], l:bufNum)
 
-    if(len(s:bufNameDict[l:bufName]) > 1)
-        for l:bufnr in s:bufNameDict[l:bufName]
-            call <SID>DEBUG('Creating buffer name for ' . l:bufnr,5)
-            let l:bufUniqName = <SID>CreateBufferUniqName(l:bufnr)
+    call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+endfunction
 
-            call <SID>DEBUG('Setting ' . l:bufNum . ' to ' .  l:bufUniqName,5)
-            let s:bufUniqNameDict[l:bufnr] = l:bufUniqName
-        endfor
+" }}}
+" BuildBufferUniqNameDict {{{
+"
+function! <SID>BuildBufferUniqNameDict(arg)
+    call <SID>DEBUG('Entering BuildBufferUniqNameDict()',5)
+
+    if type(a:arg) == 3
+        let l:bufnrs = a:arg
+    else
+        let l:bufNum = 0 + a:arg
+        let l:bufName = expand( "#" . l:bufNum . ":p:t")
+
+        if(!has_key(s:bufNameDict, l:bufName))
+            call <SID>DEBUG(l:bufName . 'is not in s:bufNameDict, which should not happen.',5)
+            return
+        endif
+
+        let l:bufnrs = s:bufNameDict[l:bufName]
     endif
 
-    call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+    for bufnr in l:bufnrs
+        call <SID>UpdateBufferUniqNameDict(bufnr)
+    endfor
+
+    call <SID>DEBUG('Leaving BuildBufferUniqNameDict()',5)
+endfunction
+
+" }}}
+" UpdateBufferUniqNameDict {{{
+"
+function! <SID>UpdateBufferUniqNameDict(bufNum)
+    call <SID>DEBUG('Entering UpdateBufferUniqNameDict()',5)
+
+    let l:bufNum = 0 + a:bufNum
+
+    call <SID>DEBUG('Creating buffer name for ' . l:bufNum,5)
+    let l:bufUniqName = <SID>CreateBufferUniqName(l:bufNum)
+
+    call <SID>DEBUG('Setting ' . l:bufNum . ' to ' . l:bufUniqName,5)
+    let s:bufUniqNameDict[l:bufNum] = l:bufUniqName
+
+    call <SID>DEBUG('Leaving UpdateBufferUniqNameDict()',5)
 endfunction
 
 " }}}
@@ -1276,7 +1310,23 @@ function! <SID>BuildAllBufferDicts()
         let l:i = l:i + 1
     endwhile
 
+    for bufnrs in values(s:bufNameDict)
+        call <SID>BuildBufferUniqNameDict(bufnrs)
+    endfor
+
     call <SID>DEBUG('Leaving BuildAllBuffersDicts()',5)
+endfunction
+
+" }}}
+" UpdateAllBufferDicts {{{
+"
+function! <SID>UpdateAllBufferDicts(newBufNum)
+    call <SID>DEBUG('Entering UpdateAllBuffersDicts()',5)
+
+    call <SID>UpdateBufferNameDict(a:newBufNum)
+    call <SID>BuildBufferUniqNameDict(a:newBufNum)
+
+    call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
 endfunction
 
 " }}}
