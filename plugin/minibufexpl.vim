@@ -1187,7 +1187,12 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
     endif
 endfunction
 
-function! <SID>CreateBufferName(bufNum, Dupes)
+" }}}
+" CreateBufferUniqName {{{
+"
+function! <SID>CreateBufferUniqName(bufNum, Dupes)
+    call <SID>DEBUG('Entering CreateBufferUniqName()',5)
+
     let s:bufPathPrefix = ""
 
     let l:bufnrs = a:Dupes
@@ -1206,6 +1211,8 @@ function! <SID>CreateBufferName(bufNum, Dupes)
     call <SID>DEBUG('Setting ' . l:bufNum . ' to ' .  s:bufPathPrefix.l:bufName,5)
 
     let s:bufUniqNameDict[l:bufNum] = s:bufPathPrefix.l:bufName
+
+    call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
 endfunction
 
 " }}}
@@ -1232,7 +1239,7 @@ function! <SID>UpdateBufferNameDict(bufNum)
     if(len(s:bufNameDict[l:bufName]) > 1)
         for l:bufnr in s:bufNameDict[l:bufName]
             call <SID>DEBUG('Creating buffer name for ' . l:bufnr,5)
-            call <SID>CreateBufferName(l:bufnr, s:bufNameDict[l:bufName])
+            call <SID>CreateBufferUniqName(l:bufnr, s:bufNameDict[l:bufName])
         endfor
     endif
 
