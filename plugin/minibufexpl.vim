@@ -411,6 +411,12 @@ let s:bufNameDict = {}
 " names are not unique.
 let s:bufUniqNameDict = {}
 
+" Dictionary used to hold the path parts for each buffer
+let s:bufPathDict = {}
+
+" Dictionary used to hold the path signature index for each buffer
+let s:bufPathSignDict = {}
+
 " }}}
 
 " Auto Commands
@@ -1021,33 +1027,6 @@ function! <SID>Max(argOne, argTwo)
 endfunction
 
 " }}}
-" FindBufferUniqNamePrefix - Checks if the buffer parent dirs are the same {{{
-"
-" Compares 2 buffers with the same filename and returns the directory of
-" buffer 1's path at the point where it is different from buffer 2's path
-"
-function! FindBufferUniqNamePrefix(level,path1,path2)
-    l:level = l:level
-    call <SID>DEBUG('Entering Dupe Dir Checking Function for at level '.l:level.' for '.join(a:path1).' vs '.join(a:path2),10)
-    if(len(a:path1) >= abs(l:level))
-        call <SID>DEBUG('Level '.l:level.' of path1 is '.get(a:path1,l:level),10)
-        call <SID>DEBUG('Level '.l:level.' of path2 is '.get(a:path2,l:level),10)
-        if(get(a:path1,l:level) == get(a:path2,l:level))
-            call <SID>DEBUG('Match in directory name at level '.l:level,10)
-            call <SID>DEBUG('Calling CheckRootForDupes again',10)
-            let l:level = l:level - 1
-            let l:bufPathPrefix = FindBufferUniqNamePrefix(l:level,a:path1,a:path2)
-        else
-            call <SID>DEBUG('Final path Position is '.l:level,10)
-            let l:bufPathPrefix = a:path1[l:level].'/'
-            call <SID>DEBUG('Found non-matching root dir and it is '.l:bufPathPrefix,10)
-        endif
-    endif
-    call <SID>DEBUG('Path prefix is '.l:bufPathPrefix,10)
-    return l:bufPathPrefix
-endfunction
-
-" }}}
 " IgnoreBuffer - check to see if buffer should be ignored {{{
 "
 " Returns 0 if this buffer should be displayed in the list, 1 otherwise.
@@ -1192,6 +1171,9 @@ endfunction
 " }}}
 " CreateBufferUniqName {{{
 "
+" Construct a unique buffer name using the parts from the signature index of
+" the path.
+"
 function! <SID>CreateBufferUniqName(bufNum)
     call <SID>DEBUG('Entering CreateBufferUniqName()',5)
 
@@ -1200,19 +1182,35 @@ function! <SID>CreateBufferUniqName(bufNum)
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
     let l:bufPathPrefix = ""
 
-    if(!has_key(s:bufNameDict, l:bufName))
-        call <SID>DEBUG(l:bufName . 'is not in s:bufNameDict, which should not happen.',5)
+    if(!has_key(s:bufPathSignDict, l:bufNum))
+        call <SID>DEBUG(l:bufNum . 'is not in s:bufPathSignDict, which should not happen.',5)
         return l:bufName
     endif
-    let l:bufnrs = s:bufNameDict[l:bufName]
 
-    for l:bufnr in l:bufnrs
-        if l:bufnr == l:bufNum
+    let l:signs = s:bufPathSignDict[l:bufNum]
+    if(empty(l:signs))
+        return l:bufName
+    endif
+
+    for l:sign in l:signs
+        call <SID>DEBUG('l:sign is ' . l:sign,5)
+        if empty(get(s:bufPathDict[l:bufNum],l:sign))
             continue
         endif
-        let l:bufPath2 = expand( "#" . l:bufnr . ":p")
-        let l:bufPathPrefix = FindBufferUniqNamePrefix(-2,split(l:bufPath,s:PathSeparator,0),split(bufPath2,s:PathSeparator,0))
+        let l:bufPathSignPart = get(s:bufPathDict[l:bufNum],l:sign).'/'
+        " If the index is not right after the previous one and it is also not the
+        " last one, then put a '-' before it
+        if exists('l:last') && l:last + 1 != l:sign
+            let l:bufPathSignPart = '-/'.l:bufPathSignPart
+        endif
+        let l:bufPathPrefix = l:bufPathPrefix.l:bufPathSignPart
+        let l:last = l:sign
     endfor
+    " If the last signature index is not the last index of the path, then put
+    " a '-' after it
+    if l:sign < len(s:bufPathDict[l:bufNum]) - 1
+        let l:bufPathPrefix = l:bufPathPrefix.'-/'
+    endif
 
     call <SID>DEBUG('Uniq name for ' . l:bufNum . ' is ' .  l:bufPathPrefix.l:bufName,5)
 
@@ -1246,6 +1244,106 @@ function! <SID>UpdateBufferNameDict(bufNum)
 endfunction
 
 " }}}
+" UpdateBufferPathDict {{{
+"
+function! <SID>UpdateBufferPathDict(bufNum)
+    call <SID>DEBUG('Entering UpdateBufferPathDict()',5)
+
+    let l:bufNum = 0 + a:bufNum
+    let l:bufPath = expand( "#" . l:bufNum . ":p:h")
+
+    let s:bufPathDict[l:bufNum] = split(l:bufPath,s:PathSeparator,0)
+
+    call <SID>DEBUG('Leaving UpdateBufferPathDict()',5)
+endfunction
+
+" }}}
+" BuildBufferPathSignDict {{{
+"
+" Compare the parts from the same index of all the buffer's paths, if there
+" are differences, it means this index is a signature index for all the
+" buffer's paths, mark it. At this point, the buffers are splited into several
+" subsets. Then, doing the same check for each subset on the next index. We
+" should finally get a set of signature locations which will uniquely identify
+" the path. We could then construct a string with these locaitons using as
+" less characters as possible.
+"
+function! <SID>BuildBufferPathSignDict(index,bufnrs)
+    call <SID>DEBUG('Entering BuildBufferPathSignDict() '.a:index,5)
+
+    let index = a:index
+    let bufnrs = a:bufnrs
+
+    " Temporary dictionary to see if there is any different part
+    let partDict = {}
+
+    " Marker to see if there are more avaliable parts
+    let moreParts = 0
+
+    " Group the buffers by this part of the buffer's path
+    for bufnr in bufnrs
+        " Make sure each buffer has an entry in 's:bufPathSignDict'
+        " If index is zero, we force re-initialize the entry
+        if index == 0 || !has_key(s:bufPathSignDict, bufnr)
+            let s:bufPathSignDict[bufnr] = []
+        endif
+
+        " If some buffers' path does not have this index, we skip it
+        if empty(get(s:bufPathDict[bufnr],index))
+            continue
+        endif
+
+        " Mark that there are still available paths
+        let moreParts = 1
+
+        " Get requested part of the path
+        let part = get(s:bufPathDict[bufnr],index)
+
+        " Group the buffers using dictionary by this part
+        if(!has_key(partDict, part))
+            let partDict[part] = []
+        endif
+        call add(partDict[part],bufnr)
+    endfor
+
+    " All the paths have been walked to the end
+    if !moreParts
+        call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.a:index,5)
+        return
+    endif
+
+    " We only need the buffer subsets from now on
+    let subsets = values(partDict)
+
+    " If the buffers have been splited into more than one subset, or all the
+    " remaining buffers are still in the same subset but some buffers' path
+    " have hit the end, then mark this index as signature index.
+    if len(partDict) > 1 || ( len(partDict) == 1 && len(subsets[0]) < len(bufnrs) )
+        " Store the signature index in the 's:bufPathSignDict' variable
+        for bufnr in bufnrs
+            call add(s:bufPathSignDict[bufnr],index)
+        endfor
+        " For all buffer subsets, increase the index by one, run again.
+        let index = index + 1
+        for subset in subsets
+          " If we only have one buffer left in the subset, it means there are
+          " already enough signature index sufficient to identify the buffer
+          if len(subset) <= 1
+              continue
+          endif
+          call <SID>BuildBufferPathSignDict(index, subset)
+        endfor
+    " If all the buffers are in the same subset, then this index is not a
+    " signature index, increase the index by one, run again.
+    else
+        let index = index + 1
+        call <SID>BuildBufferPathSignDict(index, bufnrs)
+    endif
+
+    call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.a:index,5)
+endfunction
+
+" }}}
 " BuildBufferUniqNameDict {{{
 "
 function! <SID>BuildBufferUniqNameDict(arg)
@@ -1264,6 +1362,8 @@ function! <SID>BuildBufferUniqNameDict(arg)
 
         let l:bufnrs = s:bufNameDict[l:bufName]
     endif
+
+    call <SID>BuildBufferPathSignDict(0,l:bufnrs)
 
     for bufnr in l:bufnrs
         call <SID>UpdateBufferUniqNameDict(bufnr)
@@ -1307,6 +1407,8 @@ function! <SID>BuildAllBufferDicts()
         endif
 
         call <SID>UpdateBufferNameDict(l:i)
+        call <SID>UpdateBufferPathDict(l:i)
+
         let l:i = l:i + 1
     endwhile
 
@@ -1324,6 +1426,7 @@ function! <SID>UpdateAllBufferDicts(newBufNum)
     call <SID>DEBUG('Entering UpdateAllBuffersDicts()',5)
 
     call <SID>UpdateBufferNameDict(a:newBufNum)
+    call <SID>UpdateBufferPathDict(a:newBufNum)
     call <SID>BuildBufferUniqNameDict(a:newBufNum)
 
     call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
