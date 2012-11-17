@@ -1450,17 +1450,17 @@ endfunction
 " }}}
 " UpdateAllBufferDicts {{{
 "
-function! <SID>UpdateAllBufferDicts(newBufNum)
-    call <SID>DEBUG('Entering UpdateAllBuffersDicts('.a:newBufNum.')',5)
+function! <SID>UpdateAllBufferDicts(bufNum)
+    call <SID>DEBUG('Entering UpdateAllBuffersDicts('.a:bufNum.')',5)
 
-    if (<SID>IgnoreBuffer(a:newBufNum))
+    if (<SID>IgnoreBuffer(a:bufNum))
         call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
         return
     endif
 
-    call <SID>UpdateBufferNameDict(a:newBufNum)
-    call <SID>UpdateBufferPathDict(a:newBufNum)
-    call <SID>BuildBufferUniqNameDict(a:newBufNum)
+    call <SID>UpdateBufferNameDict(a:bufNum)
+    call <SID>UpdateBufferPathDict(a:bufNum)
+    call <SID>BuildBufferUniqNameDict(a:bufNum)
 
     call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
 endfunction
