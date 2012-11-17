@@ -368,12 +368,6 @@ endif
 " Variables used internally
 "
 " Script/Global variables {{{
-" Global used to store the buffer list so we don't update the
-" UI unless the list has changed.
-if !exists('g:miniBufExplBufList')
-  let g:miniBufExplBufList = ''
-endif
-
 " In debug mode 3 this variable will hold the debug output
 let g:miniBufExplorerDebugOutput = ''
 
@@ -398,6 +392,10 @@ let s:debugIndex = 0
 " Build initial MRUList. This makes sure all the files specified on the
 " command line are picked up correctly.
 let s:MRUList = range(1, bufnr('$'))
+
+" Global used to store the buffer list so that we don't update the MBE
+" unless the list has changed.
+let s:miniBufExplBufList = ''
 
 " We start out with this off for startup, but once vim is running we
 " turn this on. This prevent any BufEnter event from being triggered
@@ -993,7 +991,7 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     " Goto the end of the buffer put the buffer list
     " and then delete the extra trailing blank line
     $
-    put! =g:miniBufExplBufList
+    put! =s:miniBufExplBufList
     silent $ d _
 
     " Prevent the buffer from being modified.
@@ -1170,9 +1168,9 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
         endif
     endfor
 
-    if (g:miniBufExplBufList != l:fileNames)
+    if (s:miniBufExplBufList != l:fileNames)
         if (a:updateBufList)
-            let g:miniBufExplBufList = l:fileNames
+            let s:miniBufExplBufList = l:fileNames
             let s:maxTabWidth = l:maxTabWidth
         endif
         call <SID>DEBUG('Leaving BuildBufferList()',10)
