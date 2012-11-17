@@ -1289,7 +1289,7 @@ endfunction
 " the path. We could then construct a string with these locaitons using as
 " less characters as possible.
 "
-function! <SID>BuildBufferPathSignDict(index,bufnrs)
+function! <SID>BuildBufferPathSignDict(bufnrs,index)
     call <SID>DEBUG('Entering BuildBufferPathSignDict() '.a:index,5)
 
     let index = a:index
@@ -1352,13 +1352,13 @@ function! <SID>BuildBufferPathSignDict(index,bufnrs)
             if len(subset) <= 1
                 continue
             endif
-            call <SID>BuildBufferPathSignDict(index, subset)
+            call <SID>BuildBufferPathSignDict(subset, index)
         endfor
     " If all the buffers are in the same subset, then this index is not a
     " signature index, increase the index by one, run again.
     else
         let index = index + 1
-        call <SID>BuildBufferPathSignDict(index, bufnrs)
+        call <SID>BuildBufferPathSignDict(bufnrs, index)
     endif
 
     call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.a:index,5)
@@ -1385,7 +1385,7 @@ function! <SID>BuildBufferUniqNameDict(arg)
         let l:bufnrs = s:bufNameDict[l:bufName]
     endif
 
-    call <SID>BuildBufferPathSignDict(0,l:bufnrs)
+    call <SID>BuildBufferPathSignDict(l:bufnrs, 0)
 
     for bufnr in l:bufnrs
         call <SID>UpdateBufferUniqNameDict(bufnr)
