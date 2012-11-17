@@ -430,7 +430,8 @@ let s:bufPathSignDict = {}
 setlocal updatetime=300
 
 augroup MiniBufExplorer
-autocmd MiniBufExplorer BufNew         * call <SID>DEBUG('-=> BufNew Updating All Buffer Dicts', 5) |call <SID>UpdateAllBufferDicts(expand("<abuf>"))
+autocmd MiniBufExplorer BufNew         * call <SID>DEBUG('-=> BufNew Updating All Buffer Dicts', 5) |call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
+autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete Updating All Buffer Dicts', 10) |call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete ModTrackingListClean AutoCmd for buffer '.bufnr("%"), 10) |call <SID>CleanModTrackingList(bufnr("%"))
 autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
@@ -1230,8 +1231,8 @@ endfunction
 " }}}
 " UpdateBufferNameDict {{{
 "
-function! <SID>UpdateBufferNameDict(bufNum)
-    call <SID>DEBUG('Entering UpdateBufferNameDict('.a:bufNum.')',5)
+function! <SID>UpdateBufferNameDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferNameDict('.a:bufNum.','.a:deleted.')',5)
 
     let l:bufNum = 0 + a:bufNum
 
@@ -1241,6 +1242,19 @@ function! <SID>UpdateBufferNameDict(bufNum)
     " for 's:bufNameDict' in which empty string is invalid. Also, it does
     " not make sense to check duplicate names for buffers with no name.
     if l:bufName == ''
+        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        return
+    endif
+
+    " Remove a deleted buffer from the buffer name dictionary
+    if a:deleted
+        if has_key(s:bufNameDict, l:bufName)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            let l:bufnrs = s:bufNameDict[l:bufName]
+            call filter(l:bufnrs, 'v:val != '.l:bufNum)
+            let s:bufNameDict[l:bufName] = l:bufnrs
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
         call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
         return
     endif
@@ -1258,8 +1272,8 @@ endfunction
 " }}}
 " UpdateBufferPathDict {{{
 "
-function! <SID>UpdateBufferPathDict(bufNum)
-    call <SID>DEBUG('Entering UpdateBufferPathDict('.a:bufNum.')',5)
+function! <SID>UpdateBufferPathDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferPathDict('.a:bufNum.','.a:deleted.')',5)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufPath = expand( "#" . l:bufNum . ":p:h")
@@ -1269,6 +1283,18 @@ function! <SID>UpdateBufferPathDict(bufNum)
     " we just want make sure entries in 's:bufPathDict' are synced
     " with 's:bufNameDict'.
     if l:bufName == ''
+        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        return
+    endif
+
+    " Remove a deleted buffer from the buffer path dictionary
+    if a:deleted
+        if has_key(s:bufNameDict, l:bufName)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            let l:bufnrs = s:bufNameDict[l:bufName]
+            call filter(s:bufPathDict, 'v:key != '.l:bufNum)
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
         call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
         return
     endif
@@ -1368,9 +1394,31 @@ function! <SID>BuildBufferPathSignDict(bufnrs, ...)
 endfunction
 
 " }}}
+" UpdateBufferPathSignDict {{{
+"
+function! <SID>UpdateBufferPathSignDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferPathSignDict()',5)
+
+    let l:bufNum = 0 + a:bufNum
+
+    " Remove a deleted buffer from the buffer path signature dictionary
+    if a:deleted
+        if has_key(s:bufPathSignDict, l:bufNum)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            call filter(s:bufPathSignDict, 'v:key != '.l:bufNum)
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
+        call <SID>DEBUG('Leaving UpdateBufferPathSignDict()',5)
+        return
+    endif
+
+    call <SID>DEBUG('Leaving UpdateBufferPathSignDict()',5)
+endfunction
+
+" }}}
 " BuildBufferFinalDict {{{
 "
-function! <SID>BuildBufferFinalDict(arg)
+function! <SID>BuildBufferFinalDict(arg,deleted)
     call <SID>DEBUG('Entering BuildBufferFinalDict()',5)
 
     if type(a:arg) == 3
@@ -1378,6 +1426,14 @@ function! <SID>BuildBufferFinalDict(arg)
     else
         let l:bufNum = 0 + a:arg
         let l:bufName = expand( "#" . l:bufNum . ":p:t")
+
+        " Remove a deleted buffer from the buffer unique name dictionary
+        if a:deleted
+            call <SID>UpdateBufferPathSignDict(l:bufNum, a:deleted)
+            call <SID>UpdateBufferUniqNameDict(l:bufNum, a:deleted)
+            call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
+            return
+        endif
 
         if(!has_key(s:bufNameDict, l:bufName))
             call <SID>DEBUG(l:bufName . ' is not in s:bufNameDict, which should not happen.',5)
@@ -1404,7 +1460,7 @@ function! <SID>BuildBufferUniqNameDict(bufnrs)
     let l:bufnrs = a:bufnrs
 
     for bufnr in l:bufnrs
-        call <SID>UpdateBufferUniqNameDict(bufnr)
+        call <SID>UpdateBufferUniqNameDict(bufnr,0)
     endfor
 
     call <SID>DEBUG('Leaving BuildBufferUniqNameDict()',5)
@@ -1413,10 +1469,21 @@ endfunction
 " }}}
 " UpdateBufferUniqNameDict {{{
 "
-function! <SID>UpdateBufferUniqNameDict(bufNum)
-    call <SID>DEBUG('Entering UpdateBufferUniqNameDict('.a:bufNum.')',5)
+function! <SID>UpdateBufferUniqNameDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferUniqNameDict('.a:bufNum.','.a:deleted.')',5)
 
     let l:bufNum = 0 + a:bufNum
+
+    " Remove a deleted buffer from the buffer path dictionary
+    if a:deleted
+        if has_key(s:bufUniqNameDict, l:bufNum)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            call filter(s:bufUniqNameDict, 'v:key != '.l:bufNum)
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
+        call <SID>DEBUG('Leaving UpdateBufferUniqNameDict()',5)
+        return
+    endif
 
     call <SID>DEBUG('Creating buffer name for ' . l:bufNum,5)
     let l:bufUniqName = <SID>CreateBufferUniqName(l:bufNum)
@@ -1444,14 +1511,14 @@ function! <SID>BuildAllBufferDicts()
             continue
         endif
 
-        call <SID>UpdateBufferNameDict(l:i)
-        call <SID>UpdateBufferPathDict(l:i)
+        call <SID>UpdateBufferNameDict(l:i,0)
+        call <SID>UpdateBufferPathDict(l:i,0)
 
         let l:i = l:i + 1
     endwhile
 
     for bufnrs in values(s:bufNameDict)
-        call <SID>BuildBufferFinalDict(bufnrs)
+        call <SID>BuildBufferFinalDict(bufnrs,0)
     endfor
 
     call <SID>DEBUG('Leaving BuildAllBuffersDicts()',5)
@@ -1460,12 +1527,12 @@ endfunction
 " }}}
 " UpdateAllBufferDicts {{{
 "
-function! <SID>UpdateAllBufferDicts(bufNum)
-    call <SID>DEBUG('Entering UpdateAllBuffersDicts('.a:bufNum.')',5)
+function! <SID>UpdateAllBufferDicts(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateAllBuffersDicts('.a:bufNum.','.a:deleted.')',5)
 
-    call <SID>UpdateBufferNameDict(a:bufNum)
-    call <SID>UpdateBufferPathDict(a:bufNum)
-    call <SID>BuildBufferFinalDict(a:bufNum)
+    call <SID>UpdateBufferNameDict(a:bufNum,a:deleted)
+    call <SID>UpdateBufferPathDict(a:bufNum,a:deleted)
+    call <SID>BuildBufferFinalDict(a:bufNum,a:deleted)
 
     call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
 endfunction
