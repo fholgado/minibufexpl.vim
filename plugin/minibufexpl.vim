@@ -1427,14 +1427,6 @@ function! <SID>BuildBufferFinalDict(arg,deleted)
         let l:bufNum = 0 + a:arg
         let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
-        " Remove a deleted buffer from the buffer unique name dictionary
-        if a:deleted
-            call <SID>UpdateBufferPathSignDict(l:bufNum, a:deleted)
-            call <SID>UpdateBufferUniqNameDict(l:bufNum, a:deleted)
-            call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
-            return
-        endif
-
         if(!has_key(s:bufNameDict, l:bufName))
             call <SID>DEBUG(l:bufName . ' is not in s:bufNameDict, which should not happen.',5)
             call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
@@ -1442,6 +1434,12 @@ function! <SID>BuildBufferFinalDict(arg,deleted)
         endif
 
         let l:bufnrs = s:bufNameDict[l:bufName]
+
+        " Remove a deleted buffer from the buffer unique name dictionary
+        if a:deleted
+            call <SID>UpdateBufferPathSignDict(l:bufNum, a:deleted)
+            call <SID>UpdateBufferUniqNameDict(l:bufNum, a:deleted)
+        endif
     endif
 
     call <SID>BuildBufferPathSignDict(l:bufnrs)
