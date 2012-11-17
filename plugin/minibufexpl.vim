@@ -1289,10 +1289,15 @@ endfunction
 " the path. We could then construct a string with these locaitons using as
 " less characters as possible.
 "
-function! <SID>BuildBufferPathSignDict(bufnrs,index)
-    call <SID>DEBUG('Entering BuildBufferPathSignDict() '.a:index,5)
+function! <SID>BuildBufferPathSignDict(bufnrs, ...)
+    if a:0 == 0
+        let index = 0
+    else
+        let index = a:1
+    endif
 
-    let index = a:index
+    call <SID>DEBUG('Entering BuildBufferPathSignDict() '.index,5)
+
     let bufnrs = a:bufnrs
 
     " Temporary dictionary to see if there is any different part
@@ -1329,7 +1334,7 @@ function! <SID>BuildBufferPathSignDict(bufnrs,index)
 
     " All the paths have been walked to the end
     if !moreParts
-        call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.a:index,5)
+        call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.index,5)
         return
     endif
 
@@ -1345,23 +1350,21 @@ function! <SID>BuildBufferPathSignDict(bufnrs,index)
             call add(s:bufPathSignDict[bufnr],index)
         endfor
         " For all buffer subsets, increase the index by one, run again.
-        let index = index + 1
         for subset in subsets
             " If we only have one buffer left in the subset, it means there are
             " already enough signature index sufficient to identify the buffer
             if len(subset) <= 1
                 continue
             endif
-            call <SID>BuildBufferPathSignDict(subset, index)
+            call <SID>BuildBufferPathSignDict(subset, index + 1)
         endfor
     " If all the buffers are in the same subset, then this index is not a
     " signature index, increase the index by one, run again.
     else
-        let index = index + 1
-        call <SID>BuildBufferPathSignDict(bufnrs, index)
+        call <SID>BuildBufferPathSignDict(bufnrs, index + 1)
     endif
 
-    call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.a:index,5)
+    call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.index,5)
 endfunction
 
 " }}}
@@ -1385,7 +1388,7 @@ function! <SID>BuildBufferUniqNameDict(arg)
         let l:bufnrs = s:bufNameDict[l:bufName]
     endif
 
-    call <SID>BuildBufferPathSignDict(l:bufnrs, 0)
+    call <SID>BuildBufferPathSignDict(l:bufnrs)
 
     for bufnr in l:bufnrs
         call <SID>UpdateBufferUniqNameDict(bufnr)
