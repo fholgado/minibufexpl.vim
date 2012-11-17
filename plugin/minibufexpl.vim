@@ -1444,11 +1444,6 @@ function! <SID>BuildAllBufferDicts()
             continue
         endif
 
-        if (<SID>IgnoreBuffer(l:i))
-            let l:i = l:i + 1
-            continue
-        endif
-
         call <SID>UpdateBufferNameDict(l:i)
         call <SID>UpdateBufferPathDict(l:i)
 
@@ -1467,11 +1462,6 @@ endfunction
 "
 function! <SID>UpdateAllBufferDicts(bufNum)
     call <SID>DEBUG('Entering UpdateAllBuffersDicts('.a:bufNum.')',5)
-
-    if (<SID>IgnoreBuffer(a:bufNum))
-        call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
-        return
-    endif
 
     call <SID>UpdateBufferNameDict(a:bufNum)
     call <SID>UpdateBufferPathDict(a:bufNum)
