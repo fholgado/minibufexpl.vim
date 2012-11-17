@@ -381,9 +381,7 @@ if !exists('g:miniBufExplInAutoUpdate')
 endif
 
 " In debug mode 3 this variable will hold the debug output
-if !exists('g:miniBufExplorerDebugOutput')
-  let g:miniBufExplorerDebugOutput = ''
-endif
+let g:miniBufExplorerDebugOutput = ''
 
 " In debug mode 3 this variable will hold the debug output
 if !exists('g:miniBufExplForceDisplay')
