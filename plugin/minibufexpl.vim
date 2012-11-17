@@ -91,6 +91,15 @@ endif " }}}
 if exists('g:miniBufExplSplitBelow') "Depreciated
   let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
 endif
+
+" MaxHeight (depreciated)
+" When sizing the -MiniBufExplorer- window, assign a maximum window height.
+" 0 = size to fit all buffers, otherwise the value is number of lines for
+" buffer. [Depreciated use g:miniBufExplMaxSize]
+"
+if exists('g:miniBufExplMaxHeight')
+  let g:miniBufExplMaxSize = g:miniBufExplMaxHeight
+endif
 " }}}
 
 " Global Configuration Variables
@@ -170,23 +179,13 @@ if !exists('g:miniBufExplSplitToEdge')
 endif
 
 " }}}
-" MaxHeight (depreciated) {{{
-" When sizing the -MiniBufExplorer- window, assign a maximum window height.
-" 0 = size to fit all buffers, otherwise the value is number of lines for
-" buffer. [Depreciated use g:miniBufExplMaxSize]
-"
-if !exists('g:miniBufExplMaxHeight')
-  let g:miniBufExplMaxHeight = 0
-endif
-
-" }}}
 " MaxSize {{{
 " Same as MaxHeight but also works for vertical splits if specified with a
 " vertical split then vertical resizing will be performed. If left at 0
 " then the number of columns in g:miniBufExplVSplit will be used as a
 " static window width.
 if !exists('g:miniBufExplMaxSize')
-  let g:miniBufExplMaxSize = g:miniBufExplMaxHeight
+  let g:miniBufExplMaxSize = 0
 endif
 
 " }}}
