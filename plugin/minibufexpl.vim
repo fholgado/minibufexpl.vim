@@ -327,14 +327,18 @@ if g:miniBufExplUseSingleClick == 1
     let  s:m = s:m . s:clickmap
     exec s:m
   endif
-endif " }}}
+endif
+
+" }}}
 " Close on Select? {{{
 " Flag that can be set to 1 in a users .vimrc to hide
 " the explorer when a user selects a buffer.
 "
 if !exists('g:miniBufExplCloseOnSelect')
   let g:miniBufExplCloseOnSelect = 0
-endif " }}}
+endif
+
+" }}}
 " Check for duplicate buffer names? {{{
 " Flag that can be set to 0 in a users .vimrc to turn off
 " the explorer's feature that differentiates similar buffer names by
@@ -343,7 +347,9 @@ endif " }}}
 "
 if !exists('g:miniBufExplCheckDupeBufs')
   let g:miniBufExplCheckDupeBufs = 1
-endif " }}}
+endif
+
+" }}}
 
 " Variables used internally
 "
@@ -2000,7 +2006,7 @@ function! s:MBEClick()
 endfunction
 
 "
-" MBEDoubleClick - Double click with the mouse.
+" MBEDoubleClick - Double click with the mouse. {{{
 "
 function! s:MBEDoubleClick()
   call <SID>DEBUG('Entering MBEDoubleClick()',10)
