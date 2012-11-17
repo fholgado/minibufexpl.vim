@@ -85,6 +85,34 @@ if !exists(':MBEbp')
   command! MBEbp call <SID>CycleBuffer(0)
 endif " }}}
 
+" Global Configuration Variables - Depreciated
+"
+" Depreciated variables {{{
+if exists('g:miniBufExplSplitBelow') "Depreciated
+  let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
+endif
+
+" MaxHeight (depreciated)
+" When sizing the -MiniBufExplorer- window, assign a maximum window height.
+" 0 = size to fit all buffers, otherwise the value is number of lines for
+" buffer. [Depreciated use g:miniBufExplMaxSize]
+"
+if exists('g:miniBufExplMaxHeight')
+  let g:miniBufExplMaxSize = g:miniBufExplMaxHeight
+endif
+
+" MinHeight (depreciated)
+" When sizing the -MiniBufExplorer- window, assign a minumum window height.
+" the value is minimum number of lines for buffer. Setting this to zero can
+" cause strange height behavior. The default value is 1 [Depreciated use
+" g:miniBufExplMinSize]
+"
+if exists('g:miniBufExplMinHeight')
+  let g:miniBufExplMinSize = g:miniBufExplMinHeight
+endif
+
+" }}}
+
 " Global Configuration Variables
 "
 " Start MBE automatically ? {{{
@@ -148,10 +176,6 @@ endif
 " When opening a new -MiniBufExplorer- window, split the new windows below or
 " above the current window?  1 = below, 0 = above.
 "
-if exists('g:miniBufExplSplitBelow') "Depreciated
-  let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
-endif
-
 if !exists('g:miniBufExplBRSplit')
   let g:miniBufExplBRSplit = g:miniBufExplVSplit ? &splitright : &splitbelow
 endif
@@ -166,34 +190,13 @@ if !exists('g:miniBufExplSplitToEdge')
 endif
 
 " }}}
-" MaxHeight (depreciated) {{{
-" When sizing the -MiniBufExplorer- window, assign a maximum window height.
-" 0 = size to fit all buffers, otherwise the value is number of lines for
-" buffer. [Depreciated use g:miniBufExplMaxSize]
-"
-if !exists('g:miniBufExplMaxHeight')
-  let g:miniBufExplMaxHeight = 0
-endif
-
-" }}}
 " MaxSize {{{
 " Same as MaxHeight but also works for vertical splits if specified with a
 " vertical split then vertical resizing will be performed. If left at 0
 " then the number of columns in g:miniBufExplVSplit will be used as a
 " static window width.
 if !exists('g:miniBufExplMaxSize')
-  let g:miniBufExplMaxSize = g:miniBufExplMaxHeight
-endif
-
-" }}}
-" MinHeight (depreciated) {{{
-" When sizing the -MiniBufExplorer- window, assign a minumum window height.
-" the value is minimum number of lines for buffer. Setting this to zero can
-" cause strange height behavior. The default value is 1 [Depreciated use
-" g:miniBufExplMinSize]
-"
-if !exists('g:miniBufExplMinHeight')
-  let g:miniBufExplMinHeight = 1
+  let g:miniBufExplMaxSize = 0
 endif
 
 " }}}
@@ -201,7 +204,7 @@ endif
 " Same as MinHeight but also works for vertical splits. For vertical splits,
 " this is ignored unless g:miniBufExplMax(Size|Height) are specified.
 if !exists('g:miniBufExplMinSize')
-  let g:miniBufExplMinSize = g:miniBufExplMinHeight
+  let g:miniBufExplMinSize = 1
 endif
 
 " }}}
@@ -350,39 +353,26 @@ if !exists('g:miniBufExplCheckDupeBufs')
 endif
 
 " }}}
-
-" Variables used internally
+" Status Line Text for MBE window {{{
 "
-" Script/Global variables {{{
-" Global used to store the buffer list so we don't update the
-" UI unless the list has changed.
-if !exists('g:miniBufExplBufList')
-  let g:miniBufExplBufList = ''
+if !exists('g:statusLineText')
+  let g:statusLineText = "-MiniBufExplorer-"
 endif
 
-" Variable used as a mutex so that we don't do lots
-" of AutoUpdates at the same time.
-if !exists('g:miniBufExplInAutoUpdate')
-  let g:miniBufExplInAutoUpdate = 0
-endif
-
-" In debug mode 3 this variable will hold the debug output
-if !exists('g:miniBufExplorerDebugOutput')
-  let g:miniBufExplorerDebugOutput = ''
-endif
-
-" In debug mode 3 this variable will hold the debug output
-if !exists('g:miniBufExplForceDisplay')
-  let g:miniBufExplForceDisplay = 0
-endif
-
+" }}}
+" How to sort the buffers in MBE window {{{
+"
 if !exists('g:miniBufExplSortBy')
   let g:miniBufExplSortBy = "number"
 endif
 
-if !exists('g:statusLineText')
-  let g:statusLineText = "-MiniBufExplorer-"
-endif
+" }}}
+
+" Variables used internally
+"
+" Script/Global variables {{{
+" In debug mode 3 this variable will hold the debug output
+let g:miniBufExplorerDebugOutput = ''
 
 " check to see what platform we are in
 if (has('unix'))
@@ -401,10 +391,20 @@ let s:debugIndex = 0
 " command line are picked up correctly.
 let s:MRUList = range(1, bufnr('$'))
 
+" Global used to store the buffer list so that we don't update the MBE
+" unless the list has changed.
+let s:miniBufExplBufList = ''
+
 " We start out with this off for startup, but once vim is running we
 " turn this on. This prevent any BufEnter event from being triggered
 " before VimEnter event.
 let s:miniBufExplAutoUpdate = 0
+
+" Variable used as a mutex so that AutoUpdates would not get nested.
+let s:miniBufExplInAutoUpdate = 0
+
+" In debug mode 3 this variable will hold the debug output
+let s:miniBufExplForceDisplay = 0
 
 " If MBE was opened manually, then we should skip eligible buffers checking,
 " open MBE window no matter what value 'g:miniBufExplorerMoreThanOne' is set.
@@ -488,7 +488,7 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
     return
   endif
 
-  let g:miniBufExplForceDisplay = 1
+  let s:miniBufExplForceDisplay = 1
 
   " !!! We may want to make the following optional -- Bindu
   " New windows don't cause all windows to be resized to equal sizes
@@ -977,7 +977,7 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
 
   let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 1, a:curBufNum)
 
-  if (l:ListChanged == 1 || g:miniBufExplForceDisplay)
+  if (l:ListChanged == 1 || s:miniBufExplForceDisplay)
     let l:save_rep = &report
     let l:save_sc = &showcmd
     let &report = 10000
@@ -992,13 +992,13 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     " Goto the end of the buffer put the buffer list
     " and then delete the extra trailing blank line
     $
-    put! =g:miniBufExplBufList
+    put! =s:miniBufExplBufList
     silent $ d _
 
     " Prevent the buffer from being modified.
     setlocal nomodifiable
 
-    let g:miniBufExplForceDisplay = 0
+    let s:miniBufExplForceDisplay = 0
 
     let &report  = l:save_rep
     let &showcmd = l:save_sc
@@ -1169,9 +1169,9 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
         endif
     endfor
 
-    if (g:miniBufExplBufList != l:fileNames)
+    if (s:miniBufExplBufList != l:fileNames)
         if (a:updateBufList)
-            let g:miniBufExplBufList = l:fileNames
+            let s:miniBufExplBufList = l:fileNames
             let s:maxTabWidth = l:maxTabWidth
         endif
         call <SID>DEBUG('Leaving BuildBufferList()',10)
@@ -1700,12 +1700,12 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 
   call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
 
-  if (g:miniBufExplInAutoUpdate == 1)
+  if (s:miniBufExplInAutoUpdate == 1)
     call <SID>DEBUG('AutoUpdate recursion stopped',9)
     call <SID>DEBUG('Leaving AutoUpdate()',10)
     return
   else
-    let g:miniBufExplInAutoUpdate = 1
+    let s:miniBufExplInAutoUpdate = 1
   endif
 
   " Quit MBE if no more mormal window left
@@ -1718,7 +1718,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   if <SID>IgnoreBuffer(bufnr('%')) == 1
     call <SID>DEBUG('Leaving AutoUpdate()',10)
 
-    let g:miniBufExplInAutoUpdate = 0
+    let s:miniBufExplInAutoUpdate = 0
     return
   endif
 
@@ -1745,7 +1745,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
           else
             call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
             call <SID>DEBUG('Leaving AutoUpdate()',10)
-            let g:miniBufExplInAutoUpdate = 0
+            let s:miniBufExplInAutoUpdate = 0
             return
           endif
         else
@@ -1788,7 +1788,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 
   call <SID>DEBUG('Leaving AutoUpdate()',10)
 
-  let g:miniBufExplInAutoUpdate = 0
+  let s:miniBufExplInAutoUpdate = 0
 endfunction
 
 " }}}
