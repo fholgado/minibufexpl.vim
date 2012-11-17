@@ -1048,12 +1048,6 @@ function! <SID>IgnoreBuffer(buf)
     return 1
   endif
 
-  " Skip buffers with no name.
-  if empty(bufname(a:buf)) == 1
-    call <SID>DEBUG('Buffer '.a:buf.' is unnamed yet, ignoring...',5)
-    return 1
-  endif
-
   " Only show modifiable buffers.
   if getbufvar(a:buf, '&modifiable') != 1
     call <SID>DEBUG('Buffer '.a:buf.' is unmodifiable, ignoring...',5)
@@ -1104,6 +1098,11 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
         endif
 
         let l:BufName = expand( "#" . l:i . ":p:t")
+
+        " Identify buffers with no name
+        if empty(l:BufName)
+            let l:BufName = 'No Name'
+        endif
 
         " Establish the tab's content, including the differentiating root
         " dir if neccessary
@@ -1238,6 +1237,9 @@ function! <SID>UpdateBufferNameDict(bufNum)
     let l:bufNum = 0 + a:bufNum
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
+    " Skip buffers with no name, because we will use buffer name as key
+    " for 's:bufNameDict' in which empty string is invalid. Also, it does
+    " not make sense to check duplicate names for buffers with no name.
     if l:bufName == ''
         call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
         return
@@ -1261,6 +1263,15 @@ function! <SID>UpdateBufferPathDict(bufNum)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufPath = expand( "#" . l:bufNum . ":p:h")
+    let l:bufName = expand( "#" . l:bufNum . ":p:t")
+
+    " Skip buffers with no name, it is not really necessary here,
+    " we just want make sure entries in 's:bufPathDict' are synced
+    " with 's:bufNameDict'.
+    if l:bufName == ''
+        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        return
+    endif
 
     let s:bufPathDict[l:bufNum] = split(l:bufPath,s:PathSeparator,0)
 
