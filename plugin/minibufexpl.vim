@@ -374,12 +374,6 @@ if !exists('g:miniBufExplBufList')
   let g:miniBufExplBufList = ''
 endif
 
-" Variable used as a mutex so that we don't do lots
-" of AutoUpdates at the same time.
-if !exists('g:miniBufExplInAutoUpdate')
-  let g:miniBufExplInAutoUpdate = 0
-endif
-
 " In debug mode 3 this variable will hold the debug output
 let g:miniBufExplorerDebugOutput = ''
 
@@ -409,6 +403,9 @@ let s:MRUList = range(1, bufnr('$'))
 " turn this on. This prevent any BufEnter event from being triggered
 " before VimEnter event.
 let s:miniBufExplAutoUpdate = 0
+
+" Variable used as a mutex so that AutoUpdates would not get nested.
+let s:miniBufExplInAutoUpdate = 0
 
 " If MBE was opened manually, then we should skip eligible buffers checking,
 " open MBE window no matter what value 'g:miniBufExplorerMoreThanOne' is set.
@@ -1704,12 +1701,12 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 
   call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
 
-  if (g:miniBufExplInAutoUpdate == 1)
+  if (s:miniBufExplInAutoUpdate == 1)
     call <SID>DEBUG('AutoUpdate recursion stopped',9)
     call <SID>DEBUG('Leaving AutoUpdate()',10)
     return
   else
-    let g:miniBufExplInAutoUpdate = 1
+    let s:miniBufExplInAutoUpdate = 1
   endif
 
   " Quit MBE if no more mormal window left
@@ -1722,7 +1719,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   if <SID>IgnoreBuffer(bufnr('%')) == 1
     call <SID>DEBUG('Leaving AutoUpdate()',10)
 
-    let g:miniBufExplInAutoUpdate = 0
+    let s:miniBufExplInAutoUpdate = 0
     return
   endif
 
@@ -1749,7 +1746,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
           else
             call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
             call <SID>DEBUG('Leaving AutoUpdate()',10)
-            let g:miniBufExplInAutoUpdate = 0
+            let s:miniBufExplInAutoUpdate = 0
             return
           endif
         else
@@ -1792,7 +1789,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 
   call <SID>DEBUG('Leaving AutoUpdate()',10)
 
-  let g:miniBufExplInAutoUpdate = 0
+  let s:miniBufExplInAutoUpdate = 0
 endfunction
 
 " }}}
