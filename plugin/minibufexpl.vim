@@ -1047,14 +1047,12 @@ function! <SID>IgnoreBuffer(buf)
   endif
 
   " Skip buffers with no name.
-  let l:BufName = bufname(a:buf)
-  if empty(l:BufName) == 1
+  if empty(bufname(a:buf)) == 1
     return 1
   endif
 
-  " Only show modifiable buffers (The idea is that we don't
-  " want to show Explorers)
-  if (getbufvar(a:buf, '&modifiable') != 1 || l:BufName == '-MiniBufExplorer-')
+  " Only show modifiable buffers.
+  if getbufvar(a:buf, '&modifiable') != 1
     return 1
   endif
 
