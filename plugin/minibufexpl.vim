@@ -100,6 +100,17 @@ endif
 if exists('g:miniBufExplMaxHeight')
   let g:miniBufExplMaxSize = g:miniBufExplMaxHeight
 endif
+
+" MinHeight (depreciated)
+" When sizing the -MiniBufExplorer- window, assign a minumum window height.
+" the value is minimum number of lines for buffer. Setting this to zero can
+" cause strange height behavior. The default value is 1 [Depreciated use
+" g:miniBufExplMinSize]
+"
+if exists('g:miniBufExplMinHeight')
+  let g:miniBufExplMinSize = g:miniBufExplMinHeight
+endif
+
 " }}}
 
 " Global Configuration Variables
@@ -189,22 +200,11 @@ if !exists('g:miniBufExplMaxSize')
 endif
 
 " }}}
-" MinHeight (depreciated) {{{
-" When sizing the -MiniBufExplorer- window, assign a minumum window height.
-" the value is minimum number of lines for buffer. Setting this to zero can
-" cause strange height behavior. The default value is 1 [Depreciated use
-" g:miniBufExplMinSize]
-"
-if !exists('g:miniBufExplMinHeight')
-  let g:miniBufExplMinHeight = 1
-endif
-
-" }}}
 " MinSize {{{
 " Same as MinHeight but also works for vertical splits. For vertical splits,
 " this is ignored unless g:miniBufExplMax(Size|Height) are specified.
 if !exists('g:miniBufExplMinSize')
-  let g:miniBufExplMinSize = g:miniBufExplMinHeight
+  let g:miniBufExplMinSize = 1
 endif
 
 " }}}
