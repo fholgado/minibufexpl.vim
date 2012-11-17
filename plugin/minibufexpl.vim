@@ -1368,10 +1368,10 @@ function! <SID>BuildBufferPathSignDict(bufnrs, ...)
 endfunction
 
 " }}}
-" BuildBufferUniqNameDict {{{
+" BuildBufferFinalDict {{{
 "
-function! <SID>BuildBufferUniqNameDict(arg)
-    call <SID>DEBUG('Entering BuildBufferUniqNameDict()',5)
+function! <SID>BuildBufferFinalDict(arg)
+    call <SID>DEBUG('Entering BuildBufferFinalDict()',5)
 
     if type(a:arg) == 3
         let l:bufnrs = a:arg
@@ -1381,7 +1381,7 @@ function! <SID>BuildBufferUniqNameDict(arg)
 
         if(!has_key(s:bufNameDict, l:bufName))
             call <SID>DEBUG(l:bufName . ' is not in s:bufNameDict, which should not happen.',5)
-            call <SID>DEBUG('Leaving BuildBufferUniqNameDict()',5)
+            call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
             return
         endif
 
@@ -1389,6 +1389,19 @@ function! <SID>BuildBufferUniqNameDict(arg)
     endif
 
     call <SID>BuildBufferPathSignDict(l:bufnrs)
+
+    call <SID>BuildBufferUniqNameDict(l:bufnrs)
+
+    call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
+endfunction
+
+" }}}
+" BuildBufferUniqNameDict {{{
+"
+function! <SID>BuildBufferUniqNameDict(bufnrs)
+    call <SID>DEBUG('Entering BuildBufferUniqNameDict()',5)
+
+    let l:bufnrs = a:bufnrs
 
     for bufnr in l:bufnrs
         call <SID>UpdateBufferUniqNameDict(bufnr)
@@ -1443,7 +1456,7 @@ function! <SID>BuildAllBufferDicts()
     endwhile
 
     for bufnrs in values(s:bufNameDict)
-        call <SID>BuildBufferUniqNameDict(bufnrs)
+        call <SID>BuildBufferFinalDict(bufnrs)
     endfor
 
     call <SID>DEBUG('Leaving BuildAllBuffersDicts()',5)
@@ -1462,7 +1475,7 @@ function! <SID>UpdateAllBufferDicts(bufNum)
 
     call <SID>UpdateBufferNameDict(a:bufNum)
     call <SID>UpdateBufferPathDict(a:bufNum)
-    call <SID>BuildBufferUniqNameDict(a:bufNum)
+    call <SID>BuildBufferFinalDict(a:bufNum)
 
     call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
 endfunction
