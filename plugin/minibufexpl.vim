@@ -85,6 +85,14 @@ if !exists(':MBEbp')
   command! MBEbp call <SID>CycleBuffer(0)
 endif " }}}
 
+" Global Configuration Variables - Depreciated
+"
+" Depreciated variables {{{
+if exists('g:miniBufExplSplitBelow') "Depreciated
+  let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
+endif
+" }}}
+
 " Global Configuration Variables
 "
 " Start MBE automatically ? {{{
@@ -148,10 +156,6 @@ endif
 " When opening a new -MiniBufExplorer- window, split the new windows below or
 " above the current window?  1 = below, 0 = above.
 "
-if exists('g:miniBufExplSplitBelow') "Depreciated
-  let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
-endif
-
 if !exists('g:miniBufExplBRSplit')
   let g:miniBufExplBRSplit = g:miniBufExplVSplit ? &splitright : &splitbelow
 endif
