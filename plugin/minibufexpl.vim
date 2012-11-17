@@ -1235,6 +1235,7 @@ function! <SID>UpdateBufferNameDict(bufNum)
     call <SID>DEBUG('Entering UpdateBufferNameDict('.a:bufNum.')',5)
 
     let l:bufNum = 0 + a:bufNum
+
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
     " Skip buffers with no name, because we will use buffer name as key
@@ -1347,12 +1348,12 @@ function! <SID>BuildBufferPathSignDict(index,bufnrs)
         " For all buffer subsets, increase the index by one, run again.
         let index = index + 1
         for subset in subsets
-          " If we only have one buffer left in the subset, it means there are
-          " already enough signature index sufficient to identify the buffer
-          if len(subset) <= 1
-              continue
-          endif
-          call <SID>BuildBufferPathSignDict(index, subset)
+            " If we only have one buffer left in the subset, it means there are
+            " already enough signature index sufficient to identify the buffer
+            if len(subset) <= 1
+                continue
+            endif
+            call <SID>BuildBufferPathSignDict(index, subset)
         endfor
     " If all the buffers are in the same subset, then this index is not a
     " signature index, increase the index by one, run again.
@@ -1429,7 +1430,7 @@ function! <SID>BuildAllBufferDicts()
         endif
 
         if (<SID>IgnoreBuffer(l:i))
-             let l:i = l:i + 1
+            let l:i = l:i + 1
             continue
         endif
 
@@ -1453,8 +1454,8 @@ function! <SID>UpdateAllBufferDicts(newBufNum)
     call <SID>DEBUG('Entering UpdateAllBuffersDicts('.a:newBufNum.')',5)
 
     if (<SID>IgnoreBuffer(a:newBufNum))
-       call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
-       return
+        call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
+        return
     endif
 
     call <SID>UpdateBufferNameDict(a:newBufNum)
