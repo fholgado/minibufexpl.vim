@@ -1189,7 +1189,7 @@ function! <SID>CreateBufferUniqName(bufNum)
     let l:bufPathPrefix = ""
 
     if(!has_key(s:bufPathSignDict, l:bufNum))
-        call <SID>DEBUG(l:bufNum . 'is not in s:bufPathSignDict, which should not happen.',5)
+        call <SID>DEBUG(l:bufNum . ' is not in s:bufPathSignDict, which should not happen.',5)
         call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
         return l:bufName
     endif
@@ -1377,7 +1377,7 @@ function! <SID>BuildBufferUniqNameDict(arg)
         let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
         if(!has_key(s:bufNameDict, l:bufName))
-            call <SID>DEBUG(l:bufName . 'is not in s:bufNameDict, which should not happen.',5)
+            call <SID>DEBUG(l:bufName . ' is not in s:bufNameDict, which should not happen.',5)
             call <SID>DEBUG('Leaving BuildBufferUniqNameDict()',5)
             return
         endif
