@@ -350,6 +350,20 @@ if !exists('g:miniBufExplCheckDupeBufs')
 endif
 
 " }}}
+" Status Line Text for MBE window {{{
+"
+if !exists('g:statusLineText')
+  let g:statusLineText = "-MiniBufExplorer-"
+endif
+
+" }}}
+" How to sort the buffers in MBE window {{{
+"
+if !exists('g:miniBufExplSortBy')
+  let g:miniBufExplSortBy = "number"
+endif
+
+" }}}
 
 " Variables used internally
 "
@@ -374,14 +388,6 @@ endif
 " In debug mode 3 this variable will hold the debug output
 if !exists('g:miniBufExplForceDisplay')
   let g:miniBufExplForceDisplay = 0
-endif
-
-if !exists('g:miniBufExplSortBy')
-  let g:miniBufExplSortBy = "number"
-endif
-
-if !exists('g:statusLineText')
-  let g:statusLineText = "-MiniBufExplorer-"
 endif
 
 " check to see what platform we are in
