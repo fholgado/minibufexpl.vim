@@ -371,11 +371,6 @@ endif
 " In debug mode 3 this variable will hold the debug output
 let g:miniBufExplorerDebugOutput = ''
 
-" In debug mode 3 this variable will hold the debug output
-if !exists('g:miniBufExplForceDisplay')
-  let g:miniBufExplForceDisplay = 0
-endif
-
 " check to see what platform we are in
 if (has('unix'))
     let s:PathSeparator = '/'
@@ -404,6 +399,9 @@ let s:miniBufExplAutoUpdate = 0
 
 " Variable used as a mutex so that AutoUpdates would not get nested.
 let s:miniBufExplInAutoUpdate = 0
+
+" In debug mode 3 this variable will hold the debug output
+let s:miniBufExplForceDisplay = 0
 
 " If MBE was opened manually, then we should skip eligible buffers checking,
 " open MBE window no matter what value 'g:miniBufExplorerMoreThanOne' is set.
@@ -487,7 +485,7 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
     return
   endif
 
-  let g:miniBufExplForceDisplay = 1
+  let s:miniBufExplForceDisplay = 1
 
   " !!! We may want to make the following optional -- Bindu
   " New windows don't cause all windows to be resized to equal sizes
@@ -976,7 +974,7 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
 
   let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 1, a:curBufNum)
 
-  if (l:ListChanged == 1 || g:miniBufExplForceDisplay)
+  if (l:ListChanged == 1 || s:miniBufExplForceDisplay)
     let l:save_rep = &report
     let l:save_sc = &showcmd
     let &report = 10000
@@ -997,7 +995,7 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     " Prevent the buffer from being modified.
     setlocal nomodifiable
 
-    let g:miniBufExplForceDisplay = 0
+    let s:miniBufExplForceDisplay = 0
 
     let &report  = l:save_rep
     let &showcmd = l:save_sc
