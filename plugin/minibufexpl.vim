@@ -1741,7 +1741,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
         if (l:winnr == -1)
           if g:miniBufExplorerAutoStart == 1
             call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
-            call <SID>StartExplorer(a:delBufNum, bufname("%"))
+            call <SID>StartExplorer(a:delBufNum, a:curBufNum)
           else
             call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
             call <SID>DEBUG('Leaving AutoUpdate()',10)
