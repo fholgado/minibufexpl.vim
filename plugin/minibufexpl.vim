@@ -1185,7 +1185,6 @@ function! <SID>CreateBufferUniqName(bufNum)
     call <SID>DEBUG('Entering CreateBufferUniqName()',5)
 
     let l:bufNum = 0 + a:bufNum
-    let l:bufPath = expand( "#" . l:bufNum . ":p")
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
     let l:bufPathPrefix = ""
 
