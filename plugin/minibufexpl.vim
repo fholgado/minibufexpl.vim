@@ -1038,21 +1038,25 @@ endfunction
 function! <SID>IgnoreBuffer(buf)
   " Skip temporary buffers with buftype set.
   if empty(getbufvar(a:buf, "&buftype")) == 0
+    call <SID>DEBUG('Buffer '.a:buf.' is special, ignoring...',5)
     return 1
   endif
 
   " Skip unlisted buffers.
   if buflisted(a:buf) == 0
+    call <SID>DEBUG('Buffer '.a:buf.' is unlisted, ignoring...',5)
     return 1
   endif
 
   " Skip buffers with no name.
   if empty(bufname(a:buf)) == 1
+    call <SID>DEBUG('Buffer '.a:buf.' is unnamed yet, ignoring...',5)
     return 1
   endif
 
   " Only show modifiable buffers.
   if getbufvar(a:buf, '&modifiable') != 1
+    call <SID>DEBUG('Buffer '.a:buf.' is unmodifiable, ignoring...',5)
     return 1
   endif
 
