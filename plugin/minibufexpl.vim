@@ -1761,7 +1761,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
         if (l:winnr == -1)
           call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
           call <SID>DEBUG('Leaving AutoUpdate()',10)
-          let g:miniBufExplInAutoUpdate = 0
+          let s:miniBufExplInAutoUpdate = 0
           return
         else
           call <SID>DEBUG('Failed in eligible check', 9)
