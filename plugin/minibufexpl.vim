@@ -1715,7 +1715,8 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   endif
 
   " Skip windows holding ignored buffer
-  if <SID>IgnoreBuffer(a:curBufNum) == 1
+  if a:delBufNum == -1 && <SID>IgnoreBuffer(a:curBufNum) == 1
+        \ || a:delBufNum != -1 && <SID>IgnoreBuffer(a:delBufNum) == 1
     call <SID>DEBUG('Leaving AutoUpdate()',10)
 
     let s:miniBufExplInAutoUpdate = 0
