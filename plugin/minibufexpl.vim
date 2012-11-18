@@ -1045,7 +1045,7 @@ function! <SID>IgnoreBuffer(buf)
   endif
 
   " Skip non normal buffers.
-  if getbufvar(a:buf, "&buftype") == ''
+  if getbufvar(a:buf, "&buftype") != ''
     call <SID>DEBUG('Buffer '.a:buf.' is not normal, ignoring...',5)
     return 1
   endif
