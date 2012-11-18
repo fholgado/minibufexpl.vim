@@ -638,7 +638,6 @@ function! <SID>ToggleExplorer()
     call <SID>StopExplorer()
   else
     call <SID>StartExplorer(-1, bufnr("%"))
-    wincmd p
   endif
 
   call <SID>DEBUG('Leaving ToggleExplorer()',10)
