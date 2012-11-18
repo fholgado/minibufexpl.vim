@@ -1043,15 +1043,15 @@ endfunction
 " Returns 0 if this buffer should be displayed in the list, 1 otherwise.
 "
 function! <SID>IgnoreBuffer(buf)
-  " Skip temporary buffers with buftype set.
-  if empty(getbufvar(a:buf, "&buftype")) == 0
-    call <SID>DEBUG('Buffer '.a:buf.' is special, ignoring...',5)
-    return 1
-  endif
-
   " Skip unlisted buffers.
   if buflisted(a:buf) == 0
     call <SID>DEBUG('Buffer '.a:buf.' is unlisted, ignoring...',5)
+    return 1
+  endif
+
+  " Skip non normal buffers.
+  if getbufvar(a:buf, "&buftype") == ''
+    call <SID>DEBUG('Buffer '.a:buf.' is not normal, ignoring...',5)
     return 1
   endif
 
