@@ -403,9 +403,6 @@ let s:miniBufExplAutoUpdate = 0
 " Variable used as a mutex so that AutoUpdates would not get nested.
 let s:miniBufExplInAutoUpdate = 0
 
-" In debug mode 3 this variable will hold the debug output
-let s:miniBufExplForceDisplay = 0
-
 " If MBE was opened manually, then we should skip eligible buffers checking,
 " open MBE window no matter what value 'g:miniBufExplorerMoreThanOne' is set.
 let s:skipEligibleBuffersCheck = 0
@@ -487,8 +484,6 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
     call <SID>DEBUG('Leaving StartExplorer()',10)
     return
   endif
-
-  let s:miniBufExplForceDisplay = 1
 
   " !!! We may want to make the following optional -- Bindu
   " New windows don't cause all windows to be resized to equal sizes
@@ -596,6 +591,8 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
   nnoremap <buffer> l   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
   nnoremap <buffer> h :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
 
+  call <SID>BuildBufferList(a:delBufNum,a:curBufNum)
+
   call <SID>DisplayBuffers(a:delBufNum,a:curBufNum)
 
   wincmd p
@@ -654,6 +651,12 @@ function! <SID>UpdateExplorer(delBufNum,curBufNum)
   call <SID>DEBUG('Entering UpdateExplorer('.a:delBufNum.','.a:curBufNum.')',10)
 
   call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
+
+  if !<SID>BuildBufferList(a:delBufNum, a:curBufNum)
+    call <SID>DEBUG('Buffer List have not changed, aborting...',10)
+    call <SID>DEBUG('Leaving UpdateExplorer()',10)
+    return
+  endif
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
@@ -975,9 +978,6 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     return
   endif
 
-  let l:ListChanged = <SID>BuildBufferList(a:delBufNum, a:curBufNum)
-
-  if (l:ListChanged == 1 || s:miniBufExplForceDisplay)
     let l:save_rep = &report
     let l:save_sc = &showcmd
     let &report = 10000
@@ -998,13 +998,8 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     " Prevent the buffer from being modified.
     setlocal nomodifiable
 
-    let s:miniBufExplForceDisplay = 0
-
     let &report  = l:save_rep
     let &showcmd = l:save_sc
-  else
-    call <SID>DEBUG('Buffer list not update since there was no change',9)
-  endif
 
   call <SID>DEBUG('Leaving ShowBuffers()',10)
 endfunction
@@ -1748,13 +1743,8 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
           return
         endif
       else
-        " otherwise only update the window if the contents have
-        " changed
-        let l:ListChanged = <SID>BuildBufferList(a:delBufNum, a:curBufNum)
-        if (l:ListChanged)
-          call <SID>DEBUG('Updating MiniBufExplorer...', 9)
-          call <SID>UpdateExplorer(a:delBufNum, a:curBufNum)
-        endif
+        call <SID>DEBUG('Updating MiniBufExplorer...', 9)
+        call <SID>UpdateExplorer(a:delBufNum, a:curBufNum)
       endif
     else
       if (l:winnr == -1)
