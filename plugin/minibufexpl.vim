@@ -1709,20 +1709,20 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   endif
 
   " Quit MBE if no more mormal window left
-  if (bufname('%') == '-MiniBufExplorer-') && (<SID>NextNormalWindow() == -1)
+  if (bufname(a:curBufNum) == '-MiniBufExplorer-') && (<SID>NextNormalWindow() == -1)
     call <SID>DEBUG('MBE is the last open window, quit it', 9)
     quit
   endif
 
   " Skip windows holding ignored buffer
-  if <SID>IgnoreBuffer(bufnr('%')) == 1
+  if <SID>IgnoreBuffer(a:curBufNum) == 1
     call <SID>DEBUG('Leaving AutoUpdate()',10)
 
     let s:miniBufExplInAutoUpdate = 0
     return
   endif
 
-  call <SID>MRUPush(bufnr("%"))
+  call <SID>MRUPush(a:curBufNum)
 
   if (a:delBufNum != -1)
     call <SID>DEBUG('AutoUpdate will make sure that buffer '.a:delBufNum.' is not included in the buffer list.', 5)
