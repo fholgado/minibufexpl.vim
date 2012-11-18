@@ -1733,7 +1733,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   " this allows us to stop updates on startup.
   if s:miniBufExplAutoUpdate == 1
     " if we don't have a window then create one
-    let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
+    let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 1)
 
     if <SID>HasEligibleBuffers(a:delBufNum) == 1
       if (l:winnr == -1)
