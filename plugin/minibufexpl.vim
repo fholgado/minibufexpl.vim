@@ -1154,24 +1154,24 @@ function! <SID>BuildBufferList(delBufNum, curBufNum, updateBufList)
         call sort(l:tabList, "<SID>MRUCmp")
     endif
 
-    let l:fileNames = ''
+    let l:miniBufExplBufList = ''
     for l:tab in l:tabList
-        let l:fileNames = l:fileNames.l:tab
+        let l:miniBufExplBufList = l:miniBufExplBufList.l:tab
 
         " If horizontal and tab wrap is turned on we need to add spaces
         if g:miniBufExplVSplit == 0
             if g:miniBufExplTabWrap != 0
-                let l:fileNames = l:fileNames.' '
+                let l:miniBufExplBufList = l:miniBufExplBufList.' '
             endif
         " If not horizontal we need a newline
         else
-            let l:fileNames = l:fileNames . "\n"
+            let l:miniBufExplBufList = l:miniBufExplBufList . "\n"
         endif
     endfor
 
-    if (s:miniBufExplBufList != l:fileNames)
+    if (s:miniBufExplBufList != l:miniBufExplBufList)
         if (a:updateBufList)
-            let s:miniBufExplBufList = l:fileNames
+            let s:miniBufExplBufList = l:miniBufExplBufList
             let s:maxTabWidth = l:maxTabWidth
         endif
         call <SID>DEBUG('Leaving BuildBufferList()',10)
