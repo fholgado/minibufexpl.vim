@@ -593,7 +593,7 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
 
   call <SID>BuildBufferList(a:delBufNum,a:curBufNum)
 
-  call <SID>DisplayBuffers(a:delBufNum,a:curBufNum)
+  call <SID>DisplayBuffers(a:curBufNum)
 
   wincmd p
 
@@ -671,7 +671,7 @@ function! <SID>UpdateExplorer(delBufNum,curBufNum)
     exec l:winNum.' wincmd w'
   endif
 
-  call <SID>DisplayBuffers(a:delBufNum,a:curBufNum)
+  call <SID>DisplayBuffers(a:curBufNum)
 
   if exists('l:winChanged')
     wincmd p
@@ -851,8 +851,8 @@ endfunction
 " Makes sure we are in our explorer, then erases the current buffer and turns
 " it into a mini buffer explorer window.
 "
-function! <SID>DisplayBuffers(delBufNum,curBufNum)
-  call <SID>DEBUG('Entering DisplayExplorer('.a:delBufNum.','.a:curBufNum.')',10)
+function! <SID>DisplayBuffers(curBufNum)
+  call <SID>DEBUG('Entering DisplayExplorer('.a:curBufNum.')',10)
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
@@ -860,7 +860,7 @@ function! <SID>DisplayBuffers(delBufNum,curBufNum)
     return
   endif
 
-  call <SID>ShowBuffers(a:delBufNum,a:curBufNum)
+  call <SID>ShowBuffers()
   call <SID>ResizeWindow()
   call <SID>FocusCurrentBuffer(a:curBufNum)
 
@@ -968,8 +968,8 @@ endfunction
 " buffers to the current buffer. Special marks are added for buffers that
 " are in one or more windows (*) and buffers that have been modified (+)
 "
-function! <SID>ShowBuffers(delBufNum,curBufNum)
-  call <SID>DEBUG('Entering ShowExplorer('.a:delBufNum.','.a:curBufNum.')',10)
+function! <SID>ShowBuffers()
+  call <SID>DEBUG('Entering ShowExplorer()',10)
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
