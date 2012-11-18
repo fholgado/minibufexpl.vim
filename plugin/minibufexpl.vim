@@ -85,6 +85,34 @@ if !exists(':MBEbp')
   command! MBEbp call <SID>CycleBuffer(0)
 endif " }}}
 
+" Global Configuration Variables - Depreciated
+"
+" Depreciated variables {{{
+if exists('g:miniBufExplSplitBelow') "Depreciated
+  let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
+endif
+
+" MaxHeight (depreciated)
+" When sizing the -MiniBufExplorer- window, assign a maximum window height.
+" 0 = size to fit all buffers, otherwise the value is number of lines for
+" buffer. [Depreciated use g:miniBufExplMaxSize]
+"
+if exists('g:miniBufExplMaxHeight')
+  let g:miniBufExplMaxSize = g:miniBufExplMaxHeight
+endif
+
+" MinHeight (depreciated)
+" When sizing the -MiniBufExplorer- window, assign a minumum window height.
+" the value is minimum number of lines for buffer. Setting this to zero can
+" cause strange height behavior. The default value is 1 [Depreciated use
+" g:miniBufExplMinSize]
+"
+if exists('g:miniBufExplMinHeight')
+  let g:miniBufExplMinSize = g:miniBufExplMinHeight
+endif
+
+" }}}
+
 " Global Configuration Variables
 "
 " Start MBE automatically ? {{{
@@ -148,10 +176,6 @@ endif
 " When opening a new -MiniBufExplorer- window, split the new windows below or
 " above the current window?  1 = below, 0 = above.
 "
-if exists('g:miniBufExplSplitBelow') "Depreciated
-  let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
-endif
-
 if !exists('g:miniBufExplBRSplit')
   let g:miniBufExplBRSplit = g:miniBufExplVSplit ? &splitright : &splitbelow
 endif
@@ -166,34 +190,13 @@ if !exists('g:miniBufExplSplitToEdge')
 endif
 
 " }}}
-" MaxHeight (depreciated) {{{
-" When sizing the -MiniBufExplorer- window, assign a maximum window height.
-" 0 = size to fit all buffers, otherwise the value is number of lines for
-" buffer. [Depreciated use g:miniBufExplMaxSize]
-"
-if !exists('g:miniBufExplMaxHeight')
-  let g:miniBufExplMaxHeight = 0
-endif
-
-" }}}
 " MaxSize {{{
 " Same as MaxHeight but also works for vertical splits if specified with a
 " vertical split then vertical resizing will be performed. If left at 0
 " then the number of columns in g:miniBufExplVSplit will be used as a
 " static window width.
 if !exists('g:miniBufExplMaxSize')
-  let g:miniBufExplMaxSize = g:miniBufExplMaxHeight
-endif
-
-" }}}
-" MinHeight (depreciated) {{{
-" When sizing the -MiniBufExplorer- window, assign a minumum window height.
-" the value is minimum number of lines for buffer. Setting this to zero can
-" cause strange height behavior. The default value is 1 [Depreciated use
-" g:miniBufExplMinSize]
-"
-if !exists('g:miniBufExplMinHeight')
-  let g:miniBufExplMinHeight = 1
+  let g:miniBufExplMaxSize = 0
 endif
 
 " }}}
@@ -201,7 +204,7 @@ endif
 " Same as MinHeight but also works for vertical splits. For vertical splits,
 " this is ignored unless g:miniBufExplMax(Size|Height) are specified.
 if !exists('g:miniBufExplMinSize')
-  let g:miniBufExplMinSize = g:miniBufExplMinHeight
+  let g:miniBufExplMinSize = 1
 endif
 
 " }}}
@@ -291,13 +294,6 @@ if g:miniBufExplMapCTabSwitchWindows
   noremap <C-S-TAB> <C-W>W
 endif
 
-" }}}
-" Modifiable Select Target {{{
-"
-if !exists('g:miniBufExplModSelTarget')
-  let g:miniBufExplModSelTarget = 0
-endif
-
 "}}}
 " Force Syntax Enable {{{
 "
@@ -334,14 +330,18 @@ if g:miniBufExplUseSingleClick == 1
     let  s:m = s:m . s:clickmap
     exec s:m
   endif
-endif " }}}
+endif
+
+" }}}
 " Close on Select? {{{
 " Flag that can be set to 1 in a users .vimrc to hide
 " the explorer when a user selects a buffer.
 "
 if !exists('g:miniBufExplCloseOnSelect')
   let g:miniBufExplCloseOnSelect = 0
-endif " }}}
+endif
+
+" }}}
 " Check for duplicate buffer names? {{{
 " Flag that can be set to 0 in a users .vimrc to turn off
 " the explorer's feature that differentiates similar buffer names by
@@ -350,39 +350,35 @@ endif " }}}
 "
 if !exists('g:miniBufExplCheckDupeBufs')
   let g:miniBufExplCheckDupeBufs = 1
-endif " }}}
+endif
 
-" Variables used internally
+" }}}
+" Status Line Text for MBE window {{{
 "
-" Script/Global variables {{{
-" Global used to store the buffer list so we don't update the
-" UI unless the list has changed.
-if !exists('g:miniBufExplBufList')
-  let g:miniBufExplBufList = ''
+if !exists('g:statusLineText')
+  let g:statusLineText = "-MiniBufExplorer-"
 endif
 
-" Variable used as a mutex so that we don't do lots
-" of AutoUpdates at the same time.
-if !exists('g:miniBufExplInAutoUpdate')
-  let g:miniBufExplInAutoUpdate = 0
-endif
-
-" In debug mode 3 this variable will hold the debug output
-if !exists('g:miniBufExplorerDebugOutput')
-  let g:miniBufExplorerDebugOutput = ''
-endif
-
-" In debug mode 3 this variable will hold the debug output
-if !exists('g:miniBufExplForceDisplay')
-  let g:miniBufExplForceDisplay = 0
-endif
-
+" }}}
+" How to sort the buffers in MBE window {{{
+"
 if !exists('g:miniBufExplSortBy')
   let g:miniBufExplSortBy = "number"
 endif
 
-if !exists('g:statusLineText')
-  let g:statusLineText = "-MiniBufExplorer-"
+" }}}
+
+" Variables used internally
+"
+" Script/Global variables {{{
+" In debug mode 3 this variable will hold the debug output
+let g:miniBufExplorerDebugOutput = ''
+
+" check to see what platform we are in
+if (has('unix'))
+    let s:PathSeparator = '/'
+else
+    let s:PathSeparator = '\'
 endif
 
 " Variable used to pass maxTabWidth info between functions
@@ -395,14 +391,37 @@ let s:debugIndex = 0
 " command line are picked up correctly.
 let s:MRUList = range(1, bufnr('$'))
 
+" Global used to store the buffer list so that we don't update the MBE
+" unless the list has changed.
+let s:miniBufExplBufList = ''
+
 " We start out with this off for startup, but once vim is running we
 " turn this on. This prevent any BufEnter event from being triggered
 " before VimEnter event.
 let s:miniBufExplAutoUpdate = 0
 
+" Variable used as a mutex so that AutoUpdates would not get nested.
+let s:miniBufExplInAutoUpdate = 0
+
+" In debug mode 3 this variable will hold the debug output
+let s:miniBufExplForceDisplay = 0
+
 " If MBE was opened manually, then we should skip eligible buffers checking,
 " open MBE window no matter what value 'g:miniBufExplorerMoreThanOne' is set.
 let s:skipEligibleBuffersCheck = 0
+
+" Dictionary used to keep track of the names we have seen.
+let s:bufNameDict = {}
+
+" Dictionary used to map buffer numbers to names when the buffer
+" names are not unique.
+let s:bufUniqNameDict = {}
+
+" Dictionary used to hold the path parts for each buffer
+let s:bufPathDict = {}
+
+" Dictionary used to hold the path signature index for each buffer
+let s:bufPathSignDict = {}
 
 " }}}
 
@@ -417,13 +436,16 @@ let s:skipEligibleBuffersCheck = 0
 setlocal updatetime=300
 
 augroup MiniBufExplorer
+autocmd MiniBufExplorer BufNew         * call <SID>DEBUG('-=> BufNew Updating All Buffer Dicts', 5) |call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
+autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete Updating All Buffer Dicts', 10) |call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete ModTrackingListClean AutoCmd for buffer '.bufnr("%"), 10) |call <SID>CleanModTrackingList(bufnr("%"))
 autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
 autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
 autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
-autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter AutoCmd', 10) |
+autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Building All Buffer Dicts', 5) |call <SID>BuildAllBufferDicts()
+autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Enable AutoUpdate', 10) |
             \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let s:miniBufExplAutoUpdate = 1 |endif
 augroup END
 " }}}
@@ -433,9 +455,9 @@ augroup END
 " StartExplorer - Sets up our explorer and causes it to be displayed {{{
 "
 function! <SID>StartExplorer(delBufNum,curBufNum)
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Entering StartExplorer()'   ,10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Entering StartExplorer('.a:delBufNum.','.a:curBufNum.')',10)
+
+  call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
 
   let s:miniBufExplAutoUpdate = 1
 
@@ -448,16 +470,12 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
 
     if l:winNum == -1
       call <SID>DEBUG('Failed to create the MBE window, aborting...',1)
-      call <SID>DEBUG('===========================',10)
-      call <SID>DEBUG('Terminated StartExplorer()' ,10)
-      call <SID>DEBUG('===========================',10)
+      call <SID>DEBUG('Leaving StartExplorer()',10)
       return
     endif
   else
     call <SID>DEBUG('There is already a MBE window, aborting...',1)
-    call <SID>DEBUG('===========================',10)
-    call <SID>DEBUG('Terminated StartExplorer()' ,10)
-    call <SID>DEBUG('===========================',10)
+    call <SID>DEBUG('Leaving StartExplorer()',10)
     return
   endif
 
@@ -466,10 +484,11 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('StartExplorer called in invalid window',1)
+    call <SID>DEBUG('Leaving StartExplorer()',10)
     return
   endif
 
-  let g:miniBufExplForceDisplay = 1
+  let s:miniBufExplForceDisplay = 1
 
   " !!! We may want to make the following optional -- Bindu
   " New windows don't cause all windows to be resized to equal sizes
@@ -581,18 +600,14 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
 
   wincmd p
 
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Completed StartExplorer()'  ,10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Leaving StartExplorer()',10)
 endfunction
 
 " }}}
 " StopExplorer - Looks for our explorer and closes the window if it is open {{{
 "
 function! <SID>StopExplorer()
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Entering StopExplorer()'    ,10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Entering StopExplorer()',10)
 
   let s:miniBufExplAutoUpdate = 0
 
@@ -609,18 +624,14 @@ function! <SID>StopExplorer()
     endif
   endif
 
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Completed StopExplorer()'   ,10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Leaving StopExplorer()',10)
 endfunction
 
 " }}}
 " ToggleExplorer - Looks for our explorer and opens/closes the window {{{
 "
 function! <SID>ToggleExplorer()
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Entering ToggleExplorer()'  ,10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Entering ToggleExplorer()',10)
 
   let s:skipEligibleBuffersCheck = 1
 
@@ -633,26 +644,22 @@ function! <SID>ToggleExplorer()
     wincmd p
   endif
 
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Completed ToggleExplorer()' ,10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Leaving ToggleExplorer()',10)
 endfunction
 
 " }}}
 " UpdateExplorer {{{
 "
 function! <SID>UpdateExplorer(delBufNum,curBufNum)
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Entering UpdateExplorer()'  ,10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Entering UpdateExplorer('.a:delBufNum.','.a:curBufNum.')',10)
+
+  call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
   if l:winNum == -1
     call <SID>DEBUG('Found no MBE window, aborting...',1)
-    call <SID>DEBUG('===========================',10)
-    call <SID>DEBUG('Terminated UpdateExplorer()',10)
-    call <SID>DEBUG('===========================',10)
+    call <SID>DEBUG('Leaving UpdateExplorer()',10)
     return
   endif
 
@@ -667,9 +674,7 @@ function! <SID>UpdateExplorer(delBufNum,curBufNum)
     wincmd p
   endif
 
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Completed UpdateExplorer()' ,10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Leaving UpdateExplorer()',10)
 endfunction
 
 " }}}
@@ -678,7 +683,7 @@ endfunction
 "
 function! <SID>FindWindow(bufName, doDebug)
   if a:doDebug
-    call <SID>DEBUG('Entering FindWindow()',10)
+    call <SID>DEBUG('Entering FindWindow('.a:bufName.','.a:doDebug.')',10)
   endif
 
   " Try to find an existing window that contains
@@ -693,6 +698,10 @@ function! <SID>FindWindow(bufName, doDebug)
     if a:doDebug
       call <SID>DEBUG('Can not find window with buffer ('.a:bufName.')',9)
     endif
+  endif
+
+  if a:doDebug
+    call <SID>DEBUG('Leaving FindWindow()',10)
   endif
 
   return l:winnr
@@ -714,7 +723,7 @@ endfunction
 "
 function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow, doDebug)
   if a:doDebug
-    call <SID>DEBUG('Entering CreateWindow()',10)
+    call <SID>DEBUG('Entering CreateWindow('.a:bufName.','.a:vSplit.','.a:brSplit.','.a:forceEdge.','.a:isPluginWindow.','.a:doDebug.')',10)
   endif
 
   " Save the user's split setting.
@@ -772,6 +781,10 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
 
   " Return to the previous window.
   wincmd p
+
+  if a:doDebug
+    call <SID>DEBUG('Leaving CreateWindow()',10)
+  endif
 endfunction
 
 " }}}
@@ -793,7 +806,7 @@ endfunction
 "
 function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow, doDebug)
   if a:doDebug
-    call <SID>DEBUG('Entering FindCreateWindow('.a:bufName.')',10)
+    call <SID>DEBUG('Entering FindCreateWindow('.a:bufName.','.a:vSplit.','.a:brSplit.','.a:forceEdge.','.a:isPluginWindow.','.a:doDebug.')',10)
   endif
 
   " Try to find an existing explorer window
@@ -821,6 +834,11 @@ function! <SID>FindCreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWin
       endif
     endif
   endif
+
+  if a:doDebug
+    call <SID>DEBUG('Leaving FindCreateWindow()',10)
+  endif
+
   return l:winNum
 endfunction
 
@@ -831,7 +849,7 @@ endfunction
 " it into a mini buffer explorer window.
 "
 function! <SID>DisplayBuffers(delBufNum,curBufNum)
-  call <SID>DEBUG('Entering DisplayBuffers()',10)
+  call <SID>DEBUG('Entering DisplayExplorer('.a:delBufNum.','.a:curBufNum.')',10)
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
@@ -842,6 +860,8 @@ function! <SID>DisplayBuffers(delBufNum,curBufNum)
   call <SID>ShowBuffers(a:delBufNum,a:curBufNum)
   call <SID>ResizeWindow()
   call <SID>FocusCurrentBuffer(a:curBufNum)
+
+  call <SID>DEBUG('Leaving DisplayExplorer()',10)
 endfunction
 
 " }}}
@@ -856,6 +876,7 @@ function! <SID>ResizeWindow()
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('ResizeWindow called in invalid window',1)
+    call <SID>DEBUG('Leaving ResizeWindow()',10)
     return
   endif
 
@@ -933,6 +954,8 @@ function! <SID>ResizeWindow()
 
   let &report  = l:save_rep
   let &showcmd = l:save_sc
+
+  call <SID>DEBUG('Leaving ResizeWindow()',10)
 endfunction
 
 " }}}
@@ -943,17 +966,18 @@ endfunction
 " are in one or more windows (*) and buffers that have been modified (+)
 "
 function! <SID>ShowBuffers(delBufNum,curBufNum)
-  call <SID>DEBUG('Entering ShowBuffers()',10)
+  call <SID>DEBUG('Entering ShowExplorer('.a:delBufNum.','.a:curBufNum.')',10)
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('ShowBuffers called in invalid window',1)
+    call <SID>DEBUG('Leaving ShowBuffers()',10)
     return
   endif
 
   let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 1, a:curBufNum)
 
-  if (l:ListChanged == 1 || g:miniBufExplForceDisplay)
+  if (l:ListChanged == 1 || s:miniBufExplForceDisplay)
     let l:save_rep = &report
     let l:save_sc = &showcmd
     let &report = 10000
@@ -968,19 +992,21 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     " Goto the end of the buffer put the buffer list
     " and then delete the extra trailing blank line
     $
-    put! =g:miniBufExplBufList
+    put! =s:miniBufExplBufList
     silent $ d _
 
     " Prevent the buffer from being modified.
     setlocal nomodifiable
 
-    let g:miniBufExplForceDisplay = 0
+    let s:miniBufExplForceDisplay = 0
 
     let &report  = l:save_rep
     let &showcmd = l:save_sc
   else
     call <SID>DEBUG('Buffer list not update since there was no change',9)
   endif
+
+  call <SID>DEBUG('Leaving ShowBuffers()',10)
 endfunction
 
 " }}}
@@ -988,7 +1014,7 @@ endfunction
 function! <SID>FocusCurrentBuffer(bufnr)
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
-    call <SID>DEBUG('UpdateExplorer called in invalid window',1)
+    call <SID>DEBUG('FocuCurrentBuffer called in invalid window',1)
     return
   endif
 
@@ -1012,54 +1038,26 @@ function! <SID>Max(argOne, argTwo)
 endfunction
 
 " }}}
-" CheckRootDirForDupes - Checks if the buffer parent dirs are the same {{{
-"
-" Compares 2 buffers with the same filename and returns the directory of
-" buffer 1's path at the point where it is different from buffer 2's path
-"
-function! CheckRootDirForDupes(level,path1,path2)
-    call <SID>DEBUG('Entering Dupe Dir Checking Function for at level '.a:level.' for '.join(a:path1).' vs '.join(a:path2),10)
-    if(len(a:path1) >= abs(a:level))
-        call <SID>DEBUG('Path level1 is '.get(a:path1,a:level),10)
-        call <SID>DEBUG('Path level2 is '.get(a:path2,a:level),10)
-        if(get(a:path1,a:level) == get(a:path2,a:level))
-            let s:bufPathPosition = a:level - 1
-            call CheckRootDirForDupes(s:bufPathPosition,a:path1,a:path2)
-            call <SID>DEBUG('Match in directory name at level '.a:level,10)
-            call <SID>DEBUG('Calling CheckRootForDupes again',10)
-        else
-            call <SID>DEBUG('Final path Position is '.s:bufPathPosition,10)
-            let s:bufPathPrefix = a:path1[s:bufPathPosition].'/'
-            call <SID>DEBUG('Found non-matching root dir and it is '.s:bufPathPrefix,10)
-        endif
-    endif
-endfunction
-
-" }}}
 " IgnoreBuffer - check to see if buffer should be ignored {{{
 "
 " Returns 0 if this buffer should be displayed in the list, 1 otherwise.
 "
 function! <SID>IgnoreBuffer(buf)
-  " Skip temporary buffers with buftype set.
-  if empty(getbufvar(a:buf, "&buftype")) == 0
-    return 1
-  endif
-
   " Skip unlisted buffers.
   if buflisted(a:buf) == 0
+    call <SID>DEBUG('Buffer '.a:buf.' is unlisted, ignoring...',5)
     return 1
   endif
 
-  " Skip buffers with no name.
-  let l:BufName = bufname(a:buf)
-  if empty(l:BufName) == 1
+  " Skip non normal buffers.
+  if getbufvar(a:buf, "&buftype") == ''
+    call <SID>DEBUG('Buffer '.a:buf.' is not normal, ignoring...',5)
     return 1
   endif
 
-  " Only show modifiable buffers (The idea is that we don't
-  " want to show Explorers)
-  if (getbufvar(a:buf, '&modifiable') != 1 || l:BufName == '-MiniBufExplorer-')
+  " Only show modifiable buffers.
+  if getbufvar(a:buf, '&modifiable') != 1
+    call <SID>DEBUG('Buffer '.a:buf.' is unmodifiable, ignoring...',5)
     return 1
   endif
 
@@ -1073,41 +1071,25 @@ endfunction
 " last time this was called and 0 otherwise.
 "
 function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
-    call <SID>DEBUG('Entering BuildBufferList()',10)
+    call <SID>DEBUG('Entering BuildBufferList('.a:delBufNum.','.a:updateBufList.','.a:curBufNum.')',10)
 
     let l:CurBufNum = a:curBufNum
-    let l:NBuffers = bufnr('$')     " Get the number of the last buffer.
-    let l:i = 0                     " Set the buffer index to zero.
 
-    let l:fileNames = ''
+    " Get the number of the last buffer.
+    let l:NBuffers = bufnr('$')
+
     let l:tabList = []
     let l:maxTabWidth = 0
-    " default separator for *nix file systems
-    let s:PathSeparator = '/'
-    " counter to see what platform we may be in
-    let l:nixPlatform = 0
-    let l:winPlatform = 0
 
     " Loop through every buffer less than the total number of buffers.
+    let l:i = 0
     while(l:i <= l:NBuffers)
         let l:i = l:i + 1
 
         " If we have a delBufNum and it is the current
         " buffer then ignore the current buffer.
         " Otherwise, continue.
-
         if (a:delBufNum == l:i)
-            " check to see what platform we are in
-            if (has('unix'))
-                let s:PathSeparator = '/'
-                call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
-            else
-                let s:PathSeparator = '\'
-                call <SID>DEBUG('separator set to  '.s:PathSeparator,10)
-            endif
-
-            call <SID>DEBUG('Separator is '.s:PathSeparator,10)
-
             continue
         endif
 
@@ -1124,79 +1106,9 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
 
         let l:BufName = expand( "#" . l:i . ":p:t")
 
-        " See if buffer names are duplicate
-        let l:dupeBufName = 0
-        let l:i2 = 0
-        " Establish initial parent directory position
-        let s:bufPathPosition = -2
-        let s:bufPathPrefix = ""
-        let l:pathList = []
-
-        " While in current buffer from first loop, loop through all buffers
-        " again!
-        if (g:miniBufExplCheckDupeBufs == 1)
-            while(l:i2 <= l:NBuffers)
-                " Get the full path of the current buffer in the loop and the
-                " current buffer in the new loop
-                let l:i2 = l:i2 + 1
-                let l:bufPath = expand( "#" . l:i . ":p")
-                let l:bufPath2 = expand( "#" . l:i2 . ":p")
-                let l:BufName2 = expand( "#" . l:i2 . ":p:t")
-
-                call <SID>DEBUG('BUFFER PATHS ---> bufPath is '.l:bufPath.' and bufPath2 is '.l:bufPath2,10)
-                call <SID>DEBUG('BUFFER NAMES ---> bufName is '.l:BufName.' and BufName2 is '.l:BufName2,10)
-
-                " Split the path string by delimiters
-                let l:bufSplitPath = split(l:bufPath,s:PathSeparator,0)
-                let l:bufSplitPath2 = split(l:bufPath2,s:PathSeparator,0)
-
-                if((l:BufName2 != '') && (l:bufPath != l:bufPath2))
-                    call <SID>DEBUG('bufPath2 is not empty and not comparing the same file, going to check for dupes!',10)
-
-                    " Get the filename from each buffer to compare them
-                    let l:bufFileNameFromPath = 'No Name'
-                    if(strlen(l:BufName))
-                        let l:bufFileNameFromPath = l:bufSplitPath[-1]
-                        call <SID>DEBUG('Setting bufFileNameFromPath as '.l:bufSplitPath[-1],10)
-                    endif
-
-                    " Make sure to take into account empty buffers
-                    let l:bufFileNameFromPath2 = 'No Name'
-                    if(strlen(l:BufName2))
-                        let l:bufFileNameFromPath2 = l:bufSplitPath2[-1]
-                        call <SID>DEBUG('Setting bufFileNameFromPath2 as '.l:bufSplitPath2[-1],10)
-                    endif
-
-                    call <SID>DEBUG('Comparing '.l:bufPath.' vs '.l:bufPath2,10)
-
-                    " If there is a match for buffer names, increase a variable
-                    " that we'll check later
-
-                    if (l:bufFileNameFromPath == l:bufFileNameFromPath2)
-                        let l:dupeBufName = l:dupeBufName + 1
-                        call <SID>DEBUG('dupeBufName equals '.l:dupeBufName,10)
-                        " Now check to see if the parent directory matches if there
-                        " are 2 or more buffers with the same name
-                        if (l:bufPath2 != 'No Name')
-                            let l:bufPathToCompare2 = l:bufPath2
-                            let l:pathList = add(l:pathList,l:bufPath2)
-                            call <SID>DEBUG('Adding '.l:bufPath2.' to pathList',10)
-                        endif
-                    endif
-                endif
-            endwhile
-
-            " If there are 2 or more buffers with the same name, let's call a
-            " function that show a differentiating parent directory so that the name is unique.
-            if l:dupeBufName >= 1
-                for item in l:pathList
-                    call <SID>DEBUG('Item in pathList loop is '.item,10)
-                    if ((!empty(item)) && (item != l:bufPath))
-                        call <SID>DEBUG('2 or more duplicate buffer names, calling dir check function with '.l:bufPath.' vs '.item,10)
-                        call CheckRootDirForDupes(s:bufPathPosition,split(l:bufPath,s:PathSeparator,0),split(item,s:PathSeparator,0))
-                    endif
-                endfor
-            endif
+        " Identify buffers with no name
+        if empty(l:BufName)
+            let l:BufName = 'No Name'
         endif
 
         " Establish the tab's content, including the differentiating root
@@ -1206,14 +1118,13 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
             let l:tab .= l:i.':'
         endif
 
-        if (g:miniBufExplCheckDupeBufs == 0)
+        if (empty(s:bufUniqNameDict) || !has_key(s:bufUniqNameDict, l:i) || g:miniBufExplCheckDupeBufs == 0)
             " Get filename & Remove []'s & ()'s
             let l:shortBufName = fnamemodify(l:BufName, ":t")
             let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g')
             let l:tab .= l:shortBufName.']'
         else
-
-            let l:tab .= s:bufPathPrefix.l:bufSplitPath[-1].']'
+            let l:tab .= s:bufUniqNameDict[l:i].']'
         endif
 
         " If the buffer is open in a window mark it
@@ -1233,39 +1144,401 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
         endif
 
         let l:maxTabWidth = <SID>Max(strlen(l:tab), l:maxTabWidth)
+
         call add(l:tabList, l:tab)
-
-        if g:miniBufExplSortBy == "name"
-            call sort(l:tabList, "<SID>NameCmp")
-        elseif g:miniBufExplSortBy == "mru"
-            call sort(l:tabList, "<SID>MRUCmp")
-        endif
-
-        let l:fileNames = ''
-        for l:tab in l:tabList
-            let l:fileNames = l:fileNames.l:tab
-
-            " If horizontal and tab wrap is turned on we need to add spaces
-            if g:miniBufExplVSplit == 0
-                if g:miniBufExplTabWrap != 0
-                    let l:fileNames = l:fileNames.' '
-                endif
-                " If not horizontal we need a newline
-            else
-                let l:fileNames = l:fileNames . "\n"
-            endif
-        endfor
     endwhile
 
-    if (g:miniBufExplBufList != l:fileNames)
+    if g:miniBufExplSortBy == "name"
+        call sort(l:tabList, "<SID>NameCmp")
+    elseif g:miniBufExplSortBy == "mru"
+        call sort(l:tabList, "<SID>MRUCmp")
+    endif
+
+    let l:fileNames = ''
+    for l:tab in l:tabList
+        let l:fileNames = l:fileNames.l:tab
+
+        " If horizontal and tab wrap is turned on we need to add spaces
+        if g:miniBufExplVSplit == 0
+            if g:miniBufExplTabWrap != 0
+                let l:fileNames = l:fileNames.' '
+            endif
+        " If not horizontal we need a newline
+        else
+            let l:fileNames = l:fileNames . "\n"
+        endif
+    endfor
+
+    if (s:miniBufExplBufList != l:fileNames)
         if (a:updateBufList)
-            let g:miniBufExplBufList = l:fileNames
+            let s:miniBufExplBufList = l:fileNames
             let s:maxTabWidth = l:maxTabWidth
         endif
+        call <SID>DEBUG('Leaving BuildBufferList()',10)
         return 1
     else
+        call <SID>DEBUG('Leaving BuildBufferList()',10)
         return 0
     endif
+endfunction
+
+" }}}
+" CreateBufferUniqName {{{
+"
+" Construct a unique buffer name using the parts from the signature index of
+" the path.
+"
+function! <SID>CreateBufferUniqName(bufNum)
+    call <SID>DEBUG('Entering CreateBufferUniqName()',5)
+
+    let l:bufNum = 0 + a:bufNum
+    let l:bufName = expand( "#" . l:bufNum . ":p:t")
+    let l:bufPathPrefix = ""
+
+    if(!has_key(s:bufPathSignDict, l:bufNum))
+        call <SID>DEBUG(l:bufNum . ' is not in s:bufPathSignDict, which should not happen.',5)
+        call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
+        return l:bufName
+    endif
+
+    let l:signs = s:bufPathSignDict[l:bufNum]
+    if(empty(l:signs))
+        call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
+        return l:bufName
+    endif
+
+    for l:sign in l:signs
+        call <SID>DEBUG('l:sign is ' . l:sign,5)
+        if empty(get(s:bufPathDict[l:bufNum],l:sign))
+            continue
+        endif
+        let l:bufPathSignPart = get(s:bufPathDict[l:bufNum],l:sign).'/'
+        " If the index is not right after the previous one and it is also not the
+        " last one, then put a '-' before it
+        if exists('l:last') && l:last + 1 != l:sign
+            let l:bufPathSignPart = '-/'.l:bufPathSignPart
+        endif
+        let l:bufPathPrefix = l:bufPathPrefix.l:bufPathSignPart
+        let l:last = l:sign
+    endfor
+    " If the last signature index is not the last index of the path, then put
+    " a '-' after it
+    if l:sign < len(s:bufPathDict[l:bufNum]) - 1
+        let l:bufPathPrefix = l:bufPathPrefix.'-/'
+    endif
+
+    call <SID>DEBUG('Uniq name for ' . l:bufNum . ' is ' .  l:bufPathPrefix.l:bufName,5)
+
+    call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
+
+    return l:bufPathPrefix.l:bufName
+endfunction
+
+" }}}
+" UpdateBufferNameDict {{{
+"
+function! <SID>UpdateBufferNameDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferNameDict('.a:bufNum.','.a:deleted.')',5)
+
+    let l:bufNum = 0 + a:bufNum
+
+    let l:bufName = expand( "#" . l:bufNum . ":p:t")
+
+    " Skip buffers with no name, because we will use buffer name as key
+    " for 's:bufNameDict' in which empty string is invalid. Also, it does
+    " not make sense to check duplicate names for buffers with no name.
+    if l:bufName == ''
+        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        return
+    endif
+
+    " Remove a deleted buffer from the buffer name dictionary
+    if a:deleted
+        if has_key(s:bufNameDict, l:bufName)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            let l:bufnrs = s:bufNameDict[l:bufName]
+            call filter(l:bufnrs, 'v:val != '.l:bufNum)
+            let s:bufNameDict[l:bufName] = l:bufnrs
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
+        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        return
+    endif
+
+    if(!has_key(s:bufNameDict, l:bufName))
+        call <SID>DEBUG('Adding empty list for ' . l:bufName,5)
+        let s:bufNameDict[l:bufName] = []
+    endif
+
+    call add(s:bufNameDict[l:bufName], l:bufNum)
+
+    call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+endfunction
+
+" }}}
+" UpdateBufferPathDict {{{
+"
+function! <SID>UpdateBufferPathDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferPathDict('.a:bufNum.','.a:deleted.')',5)
+
+    let l:bufNum = 0 + a:bufNum
+    let l:bufPath = expand( "#" . l:bufNum . ":p:h")
+    let l:bufName = expand( "#" . l:bufNum . ":p:t")
+
+    " Skip buffers with no name, it is not really necessary here,
+    " we just want make sure entries in 's:bufPathDict' are synced
+    " with 's:bufNameDict'.
+    if l:bufName == ''
+        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        return
+    endif
+
+    " Remove a deleted buffer from the buffer path dictionary
+    if a:deleted
+        if has_key(s:bufNameDict, l:bufName)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            let l:bufnrs = s:bufNameDict[l:bufName]
+            call filter(s:bufPathDict, 'v:key != '.l:bufNum)
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
+        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        return
+    endif
+
+    let s:bufPathDict[l:bufNum] = split(l:bufPath,s:PathSeparator,0)
+
+    call <SID>DEBUG('Leaving UpdateBufferPathDict()',5)
+endfunction
+
+" }}}
+" BuildBufferPathSignDict {{{
+"
+" Compare the parts from the same index of all the buffer's paths, if there
+" are differences, it means this index is a signature index for all the
+" buffer's paths, mark it. At this point, the buffers are splited into several
+" subsets. Then, doing the same check for each subset on the next index. We
+" should finally get a set of signature locations which will uniquely identify
+" the path. We could then construct a string with these locaitons using as
+" less characters as possible.
+"
+function! <SID>BuildBufferPathSignDict(bufnrs, ...)
+    if a:0 == 0
+        let index = 0
+    else
+        let index = a:1
+    endif
+
+    call <SID>DEBUG('Entering BuildBufferPathSignDict() '.index,5)
+
+    let bufnrs = a:bufnrs
+
+    " Temporary dictionary to see if there is any different part
+    let partDict = {}
+
+    " Marker to see if there are more avaliable parts
+    let moreParts = 0
+
+    " Group the buffers by this part of the buffer's path
+    for bufnr in bufnrs
+        " Make sure each buffer has an entry in 's:bufPathSignDict'
+        " If index is zero, we force re-initialize the entry
+        if index == 0 || !has_key(s:bufPathSignDict, bufnr)
+            let s:bufPathSignDict[bufnr] = []
+        endif
+
+        " If some buffers' path does not have this index, we skip it
+        if empty(get(s:bufPathDict[bufnr],index))
+            continue
+        endif
+
+        " Mark that there are still available paths
+        let moreParts = 1
+
+        " Get requested part of the path
+        let part = get(s:bufPathDict[bufnr],index)
+
+        " Group the buffers using dictionary by this part
+        if(!has_key(partDict, part))
+            let partDict[part] = []
+        endif
+        call add(partDict[part],bufnr)
+    endfor
+
+    " All the paths have been walked to the end
+    if !moreParts
+        call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.index,5)
+        return
+    endif
+
+    " We only need the buffer subsets from now on
+    let subsets = values(partDict)
+
+    " If the buffers have been splited into more than one subset, or all the
+    " remaining buffers are still in the same subset but some buffers' path
+    " have hit the end, then mark this index as signature index.
+    if len(partDict) > 1 || ( len(partDict) == 1 && len(subsets[0]) < len(bufnrs) )
+        " Store the signature index in the 's:bufPathSignDict' variable
+        for bufnr in bufnrs
+            call add(s:bufPathSignDict[bufnr],index)
+        endfor
+        " For all buffer subsets, increase the index by one, run again.
+        for subset in subsets
+            " If we only have one buffer left in the subset, it means there are
+            " already enough signature index sufficient to identify the buffer
+            if len(subset) <= 1
+                continue
+            endif
+            call <SID>BuildBufferPathSignDict(subset, index + 1)
+        endfor
+    " If all the buffers are in the same subset, then this index is not a
+    " signature index, increase the index by one, run again.
+    else
+        call <SID>BuildBufferPathSignDict(bufnrs, index + 1)
+    endif
+
+    call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.index,5)
+endfunction
+
+" }}}
+" UpdateBufferPathSignDict {{{
+"
+function! <SID>UpdateBufferPathSignDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferPathSignDict()',5)
+
+    let l:bufNum = 0 + a:bufNum
+
+    " Remove a deleted buffer from the buffer path signature dictionary
+    if a:deleted
+        if has_key(s:bufPathSignDict, l:bufNum)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            call filter(s:bufPathSignDict, 'v:key != '.l:bufNum)
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
+        call <SID>DEBUG('Leaving UpdateBufferPathSignDict()',5)
+        return
+    endif
+
+    call <SID>DEBUG('Leaving UpdateBufferPathSignDict()',5)
+endfunction
+
+" }}}
+" BuildBufferFinalDict {{{
+"
+function! <SID>BuildBufferFinalDict(arg,deleted)
+    call <SID>DEBUG('Entering BuildBufferFinalDict()',5)
+
+    if type(a:arg) == 3
+        let l:bufnrs = a:arg
+    else
+        let l:bufNum = 0 + a:arg
+        let l:bufName = expand( "#" . l:bufNum . ":p:t")
+
+        if(!has_key(s:bufNameDict, l:bufName))
+            call <SID>DEBUG(l:bufName . ' is not in s:bufNameDict, which should not happen.',5)
+            call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
+            return
+        endif
+
+        let l:bufnrs = s:bufNameDict[l:bufName]
+
+        " Remove a deleted buffer from the buffer unique name dictionary
+        if a:deleted
+            call <SID>UpdateBufferPathSignDict(l:bufNum, a:deleted)
+            call <SID>UpdateBufferUniqNameDict(l:bufNum, a:deleted)
+        endif
+    endif
+
+    call <SID>BuildBufferPathSignDict(l:bufnrs)
+
+    call <SID>BuildBufferUniqNameDict(l:bufnrs)
+
+    call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
+endfunction
+
+" }}}
+" BuildBufferUniqNameDict {{{
+"
+function! <SID>BuildBufferUniqNameDict(bufnrs)
+    call <SID>DEBUG('Entering BuildBufferUniqNameDict()',5)
+
+    let l:bufnrs = a:bufnrs
+
+    for bufnr in l:bufnrs
+        call <SID>UpdateBufferUniqNameDict(bufnr,0)
+    endfor
+
+    call <SID>DEBUG('Leaving BuildBufferUniqNameDict()',5)
+endfunction
+
+" }}}
+" UpdateBufferUniqNameDict {{{
+"
+function! <SID>UpdateBufferUniqNameDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferUniqNameDict('.a:bufNum.','.a:deleted.')',5)
+
+    let l:bufNum = 0 + a:bufNum
+
+    " Remove a deleted buffer from the buffer path dictionary
+    if a:deleted
+        if has_key(s:bufUniqNameDict, l:bufNum)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            call filter(s:bufUniqNameDict, 'v:key != '.l:bufNum)
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
+        call <SID>DEBUG('Leaving UpdateBufferUniqNameDict()',5)
+        return
+    endif
+
+    call <SID>DEBUG('Creating buffer name for ' . l:bufNum,5)
+    let l:bufUniqName = <SID>CreateBufferUniqName(l:bufNum)
+
+    call <SID>DEBUG('Setting ' . l:bufNum . ' to ' . l:bufUniqName,5)
+    let s:bufUniqNameDict[l:bufNum] = l:bufUniqName
+
+    call <SID>DEBUG('Leaving UpdateBufferUniqNameDict()',5)
+endfunction
+
+" }}}
+" BuildAllBufferDicts {{{
+"
+function! <SID>BuildAllBufferDicts()
+    call <SID>DEBUG('Entering BuildAllBuffersDicts()',5)
+
+    " Get the number of the last buffer.
+    let l:NBuffers = bufnr('$')
+
+    " Loop through every buffer less than the total number of buffers.
+    let l:i = 0
+    while(l:i <= l:NBuffers)
+        if !bufexists(l:i)
+            let l:i = l:i + 1
+            continue
+        endif
+
+        call <SID>UpdateBufferNameDict(l:i,0)
+        call <SID>UpdateBufferPathDict(l:i,0)
+
+        let l:i = l:i + 1
+    endwhile
+
+    for bufnrs in values(s:bufNameDict)
+        call <SID>BuildBufferFinalDict(bufnrs,0)
+    endfor
+
+    call <SID>DEBUG('Leaving BuildAllBuffersDicts()',5)
+endfunction
+
+" }}}
+" UpdateAllBufferDicts {{{
+"
+function! <SID>UpdateAllBufferDicts(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateAllBuffersDicts('.a:bufNum.','.a:deleted.')',5)
+
+    call <SID>UpdateBufferNameDict(a:bufNum,a:deleted)
+    call <SID>UpdateBufferPathDict(a:bufNum,a:deleted)
+    call <SID>BuildBufferFinalDict(a:bufNum,a:deleted)
+
+    call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
 endfunction
 
 " }}}
@@ -1301,9 +1574,10 @@ endfunction
 " of eligible buffers.
 "
 function! <SID>HasEligibleBuffers(delBufNum)
-  call <SID>DEBUG('Entering HasEligibleBuffers()',10)
+  call <SID>DEBUG('Entering HasEligibleBuffers('.a:delBufNum.')',10)
 
   if s:skipEligibleBuffersCheck == 1
+    call <SID>DEBUG('Leaving HasEligibleBuffers()',10)
     return 1
   endif
 
@@ -1312,9 +1586,11 @@ function! <SID>HasEligibleBuffers(delBufNum)
   let &report = 10000
   set noshowcmd
 
-  let l:NBuffers = bufnr('$')     " Get the number of the last buffer.
-  let l:i        = 0              " Set the buffer index to zero.
-  let l:found    = 0              " No buffer found
+  " Get the number of the last buffer.
+  let l:NBuffers = bufnr('$')
+
+   " No buffer found
+  let l:found = 0
 
   if (g:miniBufExplorerMoreThanOne > 1)
     call <SID>DEBUG('More Than One mode turned on',6)
@@ -1322,6 +1598,7 @@ function! <SID>HasEligibleBuffers(delBufNum)
   let l:needed = g:miniBufExplorerMoreThanOne
 
   " Loop through every buffer less than the total number of buffers.
+  let l:i = 0
   while(l:i <= l:NBuffers && l:found < l:needed)
     let l:i = l:i + 1
 
@@ -1353,6 +1630,7 @@ function! <SID>HasEligibleBuffers(delBufNum)
 
   call <SID>DEBUG('HasEligibleBuffers found '.l:found.' eligible buffers of '.l:needed.' needed',6)
 
+  call <SID>DEBUG('Leaving HasEligibleBuffers()',10)
   return (l:found >= l:needed)
 endfunction
 
@@ -1418,36 +1696,29 @@ endfunction
 " the MBE window.
 "
 function! <SID>AutoUpdate(delBufNum,curBufNum)
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Entering AutoUpdate('.a:delBufNum.') : '.bufnr('%').' : '.bufname('%'),10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Entering AutoUpdate('.a:delBufNum.','.a:curBufNum.')',10)
 
-  if (g:miniBufExplInAutoUpdate == 1)
+  call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
+
+  if (s:miniBufExplInAutoUpdate == 1)
     call <SID>DEBUG('AutoUpdate recursion stopped',9)
-    call <SID>DEBUG('===========================',10)
-    call <SID>DEBUG('Terminated AutoUpdate()'    ,10)
-    call <SID>DEBUG('===========================',10)
+    call <SID>DEBUG('Leaving AutoUpdate()',10)
     return
   else
-    let g:miniBufExplInAutoUpdate = 1
+    let s:miniBufExplInAutoUpdate = 1
   endif
 
-  " Don't bother autoupdating the MBE window, and skip the FuzzyFinder window
-  " (Thanks toupeira!)
-  if (bufname('%') == '-MiniBufExplorer-' || bufname('%') == '[fuf]' || bufname('%') == '')
-    " If this is the only buffer left then toggle the buffer
-    if (winbufnr(<SID>NextNormalWindow()) == -1)
-      quit
-      call <SID>DEBUG('MBE is the last open window, quit it', 9)
-    else
-      call <SID>DEBUG('AutoUpdate does not run for the MBE window', 9)
-    endif
+  " Quit MBE if no more mormal window left
+  if (bufname('%') == '-MiniBufExplorer-') && (<SID>NextNormalWindow() == -1)
+    call <SID>DEBUG('MBE is the last open window, quit it', 9)
+    quit
+  endif
 
-    call <SID>DEBUG('===========================',10)
-    call <SID>DEBUG('Terminated AutoUpdate()'    ,10)
-    call <SID>DEBUG('===========================',10)
+  " Skip windows holding ignored buffer
+  if <SID>IgnoreBuffer(bufnr('%')) == 1
+    call <SID>DEBUG('Leaving AutoUpdate()',10)
 
-    let g:miniBufExplInAutoUpdate = 0
+    let s:miniBufExplInAutoUpdate = 0
     return
   endif
 
@@ -1462,7 +1733,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   " this allows us to stop updates on startup.
   if s:miniBufExplAutoUpdate == 1
     " Only show MiniBufExplorer if we have a real buffer
-    if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1 && bufname('%') != ""))
+    if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1))
       " if we don't have a window then create one
       let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
 
@@ -1470,13 +1741,11 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
         if (l:winnr == -1)
           if g:miniBufExplorerAutoStart == 1
             call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
-            call <SID>StartExplorer(a:delBufNum, bufname("%"))
+            call <SID>StartExplorer(a:delBufNum, a:curBufNum)
           else
             call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
-            call <SID>DEBUG('===========================',10)
-            call <SID>DEBUG('Terminated AutoUpdate()'    ,10)
-            call <SID>DEBUG('===========================',10)
-            let g:miniBufExplInAutoUpdate = 0
+            call <SID>DEBUG('Leaving AutoUpdate()',10)
+            let s:miniBufExplInAutoUpdate = 0
             return
           endif
         else
@@ -1491,10 +1760,8 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
       else
         if (l:winnr == -1)
           call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
-          call <SID>DEBUG('===========================',10)
-          call <SID>DEBUG('Terminated AutoUpdate()'    ,10)
-          call <SID>DEBUG('===========================',10)
-          let g:miniBufExplInAutoUpdate = 0
+          call <SID>DEBUG('Leaving AutoUpdate()',10)
+          let s:miniBufExplInAutoUpdate = 0
           return
         else
           call <SID>DEBUG('Failed in eligible check', 9)
@@ -1519,11 +1786,9 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
     call <SID>DEBUG('AutoUpdates are turned off, terminating',9)
   endif
 
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Completed AutoUpdate()'     ,10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Leaving AutoUpdate()',10)
 
-  let g:miniBufExplInAutoUpdate = 0
+  let s:miniBufExplInAutoUpdate = 0
 endfunction
 
 " }}}
@@ -1538,6 +1803,7 @@ function! <SID>GetSelectedBuffer()
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('GetSelectedBuffer called in invalid window',1)
+    call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
     return -1
   endif
 
@@ -1547,9 +1813,11 @@ function! <SID>GetSelectedBuffer()
   if @" != ""
     let l:retv = substitute(@",'\([0-9]*\):.*', '\1', '') + 0
     let @" = l:save_reg
+    call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
     return l:retv
   else
     let @" = l:save_reg
+    call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
     return -1
   endif
 endfunction
@@ -1563,13 +1831,12 @@ endfunction
 " Split indicates whether to open with split, 0 no split, 1 split horizontally
 "
 function! <SID>MBESelectBuffer(split)
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Entering MBESelectBuffer()' ,10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Entering MBESelectBuffer()',10)
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('MBESelectBuffer called in invalid window',1)
+    call <SID>DEBUG('Leaving MBESelectBuffer()',10)
     return
   endif
 
@@ -1582,29 +1849,16 @@ function! <SID>MBESelectBuffer(split)
   let l:resize = 0
 
   if(l:bufnr != -1)             " If the buffer exists.
-
     let l:saveAutoUpdate = s:miniBufExplAutoUpdate
     let s:miniBufExplAutoUpdate = 0
-    " Switch to the previous window
-    wincmd p
 
-    " If we are in the buffer explorer or in a nonmodifiable buffer with
-    " g:miniBufExplModSelTarget set then try another window (a few times)
-    if bufname('%') == '-MiniBufExplorer-' || (g:miniBufExplModSelTarget == 1 && getbufvar(bufnr('%'), '&modifiable') == 0)
-      wincmd w
-      if bufname('%') == '-MiniBufExplorer-' || (g:miniBufExplModSelTarget == 1 && getbufvar(bufnr('%'), '&modifiable') == 0)
-        wincmd w
-        if bufname('%') == '-MiniBufExplorer-' || (g:miniBufExplModSelTarget == 1 && getbufvar(bufnr('%'), '&modifiable') == 0)
-          wincmd w
-          " The following handles the case where -MiniBufExplorer-
-          " is the only window left. We need to resize so we don't
-          " end up with a 1 or two line buffer.
-          if bufname('%') == '-MiniBufExplorer-'
-            let l:resize = 1
-            new
-          endif
-        endif
-      endif
+    let l:winNum = <SID>NextNormalWindow()
+    if l:winNum != -1
+      exec l:winNum.'wincmd w'
+    else
+      call <SID>DEBUG('No elegible window avaliable',1)
+      call <SID>DEBUG('Leaving MBESelectBuffer()',10)
+      return
     endif
 
     if a:split == 0
@@ -1618,9 +1872,10 @@ function! <SID>MBESelectBuffer(split)
     if (l:resize)
       resize
     endif
-    let s:miniBufExplAutoUpdate = l:saveAutoUpdate
-    call <SID>AutoUpdate(-1,bufnr("%"))
 
+    let s:miniBufExplAutoUpdate = l:saveAutoUpdate
+
+    call <SID>AutoUpdate(-1,bufnr("%"))
   endif
 
   let &report  = l:save_rep
@@ -1630,9 +1885,7 @@ function! <SID>MBESelectBuffer(split)
     call <SID>StopExplorer()
   endif
 
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Completed MBESelectBuffer()',10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Leaving MBESelectBuffer()',10)
 endfunction
 
 " }}}
@@ -1644,13 +1897,12 @@ endfunction
 " windows that will be affected so that windows don't get removed.
 "
 function! <SID>MBEDeleteBuffer(prevBufName)
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Entering MBEDeleteBuffer()' ,10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Entering MBEDeleteBuffer()',10)
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
     call <SID>DEBUG('MBEDeleteBuffer called in invalid window',1)
+    call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
     return
   endif
 
@@ -1661,6 +1913,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
 
   if l:selBufName == 'MiniBufExplorer.DBG' && g:miniBufExplorerDebugLevel > 0
     call <SID>DEBUG('MBEDeleteBuffer will not delete the debug window, when debugging is turned on.',1)
+    call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
     return
   endif
 
@@ -1741,9 +1994,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
   let &report  = l:save_rep
   let &showcmd = l:save_sc
 
-  call <SID>DEBUG('===========================',10)
-  call <SID>DEBUG('Completed MBEDeleteBuffer()',10)
-  call <SID>DEBUG('===========================',10)
+  call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
 endfunction
 
 " }}}
@@ -1755,7 +2006,7 @@ function! s:MBEClick()
 endfunction
 
 "
-" MBEDoubleClick - Double click with the mouse.
+" MBEDoubleClick - Double click with the mouse. {{{
 "
 function! s:MBEDoubleClick()
   call <SID>DEBUG('Entering MBEDoubleClick()',10)
@@ -1834,10 +2085,9 @@ function! <SID>CycleBuffer(forward)
     exec 'syntax enable'
   endif
 
-  if (l:saveAutoUpdate == 1)
-    call <SID>AutoUpdate(-1,bufnr("%"))
-  endif
   let s:miniBufExplAutoUpdate = l:saveAutoUpdate
+
+  call <SID>AutoUpdate(-1,bufnr("%"))
 endfunction
 
 " }}}
@@ -1851,10 +2101,6 @@ endfunction
 " MRUPush - add buffer to MRU list {{{
 "
 function! <SID>MRUPush(buf)
-  if <SID>IgnoreBuffer(a:buf) == 1
-    return
-  endif
-
   " Remove the buffer number from the list if it already exists.
   call <SID>MRUPop(a:buf)
 

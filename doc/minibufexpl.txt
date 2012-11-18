@@ -241,11 +241,6 @@ NOTE: If you use the single click option in taglist.vim you may
       provided to allow both explorers to provide single click
       buffer selection.
 
-                                                 *'g:miniBufExplModSelTarget'*
-If you use other explorers like TagList you can (As of 6.2.8) put:
-
-  let g:miniBufExplModSelTarget = 1
-
                                                 *'g:miniBufExplCloseOnSelect'*
 If you would like MBE to close when you select a buffer, put:
 
