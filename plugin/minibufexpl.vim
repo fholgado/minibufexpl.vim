@@ -1732,8 +1732,6 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
   if s:miniBufExplAutoUpdate == 1
-    " Only show MiniBufExplorer if we have a real buffer
-    if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1))
       " if we don't have a window then create one
       let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
 
@@ -1779,9 +1777,6 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 		    call <SID>DEBUG('Enable Syntax', 9)
 		    exec 'syntax enable'
 	    endif
-    else
-      call <SID>DEBUG('No buffers loaded...',9)
-    endif
   else
     call <SID>DEBUG('AutoUpdates are turned off, terminating',9)
   endif
