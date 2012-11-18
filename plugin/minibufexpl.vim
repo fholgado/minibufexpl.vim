@@ -1605,7 +1605,10 @@ function! <SID>HasEligibleBuffers(delBufNum)
     " If we have a delBufNum and it is the current
     " buffer then ignore the current buffer.
     " Otherwise, continue.
-    if (a:delBufNum == -1 || l:i != a:delBufNum)
+    if (a:delBufNum != -1 && l:i == a:delBufNum)
+      continue
+    endif
+
       " Make sure the buffer in question is listed.
       if (getbufvar(l:i, '&buflisted') == 1)
         " Get the name of the buffer.
@@ -1622,7 +1625,6 @@ function! <SID>HasEligibleBuffers(delBufNum)
           endif
         endif
       endif
-    endif
   endwhile
 
   let &report  = l:save_rep
