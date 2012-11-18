@@ -975,7 +975,7 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     return
   endif
 
-  let l:ListChanged = <SID>BuildBufferList(a:delBufNum, a:curBufNum, 1)
+  let l:ListChanged = <SID>BuildBufferList(a:delBufNum, a:curBufNum)
 
   if (l:ListChanged == 1 || s:miniBufExplForceDisplay)
     let l:save_rep = &report
@@ -1070,8 +1070,8 @@ endfunction
 " Creates the buffer list string and returns 1 if it is different than
 " last time this was called and 0 otherwise.
 "
-function! <SID>BuildBufferList(delBufNum, curBufNum, updateBufList)
-    call <SID>DEBUG('Entering BuildBufferList('.a:delBufNum.','.a:curBufNum.','.a:updateBufList.')',10)
+function! <SID>BuildBufferList(delBufNum, curBufNum)
+    call <SID>DEBUG('Entering BuildBufferList('.a:delBufNum.','.a:curBufNum.')',10)
 
     let l:CurBufNum = a:curBufNum
 
@@ -1170,10 +1170,8 @@ function! <SID>BuildBufferList(delBufNum, curBufNum, updateBufList)
     endfor
 
     if (s:miniBufExplBufList != l:miniBufExplBufList)
-        if (a:updateBufList)
-            let s:miniBufExplBufList = l:miniBufExplBufList
-            let s:maxTabWidth = l:maxTabWidth
-        endif
+        let s:maxTabWidth = l:maxTabWidth
+        let s:miniBufExplBufList = l:miniBufExplBufList
         call <SID>DEBUG('Leaving BuildBufferList()',10)
         return 1
     else
@@ -1752,7 +1750,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
       else
         " otherwise only update the window if the contents have
         " changed
-        let l:ListChanged = <SID>BuildBufferList(a:delBufNum, a:curBufNum, 0)
+        let l:ListChanged = <SID>BuildBufferList(a:delBufNum, a:curBufNum)
         if (l:ListChanged)
           call <SID>DEBUG('Updating MiniBufExplorer...', 9)
           call <SID>UpdateExplorer(a:delBufNum, a:curBufNum)
