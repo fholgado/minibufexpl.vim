@@ -1732,51 +1732,51 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
   if s:miniBufExplAutoUpdate == 1
-      " if we don't have a window then create one
-      let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
+    " if we don't have a window then create one
+    let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
 
-      if <SID>HasEligibleBuffers(a:delBufNum) == 1
-        if (l:winnr == -1)
-          if g:miniBufExplorerAutoStart == 1
-            call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
-            call <SID>StartExplorer(a:delBufNum, a:curBufNum)
-          else
-            call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
-            call <SID>DEBUG('Leaving AutoUpdate()',10)
-            let s:miniBufExplInAutoUpdate = 0
-            return
-          endif
+    if <SID>HasEligibleBuffers(a:delBufNum) == 1
+      if (l:winnr == -1)
+        if g:miniBufExplorerAutoStart == 1
+          call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
+          call <SID>StartExplorer(a:delBufNum, a:curBufNum)
         else
-          " otherwise only update the window if the contents have
-          " changed
-          let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 0, a:curBufNum)
-          if (l:ListChanged)
-            call <SID>DEBUG('Updating MiniBufExplorer...', 9)
-            call <SID>UpdateExplorer(a:delBufNum, a:curBufNum)
-          endif
-        endif
-      else
-        if (l:winnr == -1)
           call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
           call <SID>DEBUG('Leaving AutoUpdate()',10)
           let s:miniBufExplInAutoUpdate = 0
           return
-        else
-          call <SID>DEBUG('Failed in eligible check', 9)
-          call <SID>StopExplorer()
-          " we do not want to turn auto-updating off
-          let s:miniBufExplAutoUpdate = 1
+        endif
+      else
+        " otherwise only update the window if the contents have
+        " changed
+        let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 0, a:curBufNum)
+        if (l:ListChanged)
+          call <SID>DEBUG('Updating MiniBufExplorer...', 9)
+          call <SID>UpdateExplorer(a:delBufNum, a:curBufNum)
         endif
       endif
+    else
+      if (l:winnr == -1)
+        call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
+        call <SID>DEBUG('Leaving AutoUpdate()',10)
+        let s:miniBufExplInAutoUpdate = 0
+        return
+      else
+        call <SID>DEBUG('Failed in eligible check', 9)
+        call <SID>StopExplorer()
+        " we do not want to turn auto-updating off
+        let s:miniBufExplAutoUpdate = 1
+      endif
+    endif
 
-	    " VIM sometimes turns syntax highlighting off,
-	    " we can force it on, but this may cause weird
-	    " behavior so this is an optional hack to force
-	    " syntax back on when we enter a buffer
-	    if g:miniBufExplForceSyntaxEnable
-		    call <SID>DEBUG('Enable Syntax', 9)
-		    exec 'syntax enable'
-	    endif
+	  " VIM sometimes turns syntax highlighting off,
+	  " we can force it on, but this may cause weird
+	  " behavior so this is an optional hack to force
+	  " syntax back on when we enter a buffer
+	  if g:miniBufExplForceSyntaxEnable
+		  call <SID>DEBUG('Enable Syntax', 9)
+		  exec 'syntax enable'
+	  endif
   else
     call <SID>DEBUG('AutoUpdates are turned off, terminating',9)
   endif
