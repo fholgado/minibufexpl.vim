@@ -978,28 +978,28 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     return
   endif
 
-    let l:save_rep = &report
-    let l:save_sc = &showcmd
-    let &report = 10000
-    set noshowcmd
+  let l:save_rep = &report
+  let l:save_sc = &showcmd
+  let &report = 10000
+  set noshowcmd
 
-    " We need to be able to modify the buffer
-    setlocal modifiable
+  " We need to be able to modify the buffer
+  setlocal modifiable
 
-    " Delete all lines in buffer.
-    silent 1,$d _
+  " Delete all lines in buffer.
+  silent 1,$d _
 
-    " Goto the end of the buffer put the buffer list
-    " and then delete the extra trailing blank line
-    $
-    put! =s:miniBufExplBufList
-    silent $ d _
+  " Goto the end of the buffer put the buffer list
+  " and then delete the extra trailing blank line
+  $
+  put! =s:miniBufExplBufList
+  silent $ d _
 
-    " Prevent the buffer from being modified.
-    setlocal nomodifiable
+  " Prevent the buffer from being modified.
+  setlocal nomodifiable
 
-    let &report  = l:save_rep
-    let &showcmd = l:save_sc
+  let &report  = l:save_rep
+  let &showcmd = l:save_sc
 
   call <SID>DEBUG('Leaving ShowBuffers()',10)
 endfunction
