@@ -442,10 +442,16 @@ autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost AutoC
 autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Building All Buffer Dicts', 5) |call <SID>BuildAllBufferDicts()
-autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Enable AutoUpdate', 10) |
-            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let t:miniBufExplAutoUpdate = 1 |endif
-autocmd MiniBufExplorer TabEnter       * call <SID>DEBUG('-=> TabEnter Enable AutoUpdate', 10) |
-            \ if !exists('t:miniBufExplAutoUpdate') |let t:miniBufExplAutoUpdate = 1 |endif
+autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Start Explorer', 10) |
+            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let t:miniBufExplAutoUpdate = 1 |endif |
+            \ if g:miniBufExplorerAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
+            \ call <SID>StartExplorer(-1, bufnr("%")) |
+            \ endif
+autocmd MiniBufExplorer TabEnter       * call <SID>DEBUG('-=> TabEnter Start Explorer', 10) |
+            \ if !exists('t:miniBufExplAutoUpdate') |let t:miniBufExplAutoUpdate = 1 |endif |
+            \ if g:miniBufExplorerAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
+            \ call <SID>StartExplorer(-1, bufnr("%")) |
+            \ endif
 augroup END
 " }}}
 "
