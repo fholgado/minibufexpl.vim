@@ -484,7 +484,7 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
     return
   endif
 
-  call s:SwitchWindow('w',0,l:winNum)
+  call s:SwitchWindow('w',1,l:winNum)
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
@@ -603,7 +603,7 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
 
   call <SID>DisplayBuffers(a:curBufNum)
 
-  call s:SwitchWindow('p')
+  call s:SwitchWindow('p',1)
 
   call <SID>DEBUG('Leaving StartExplorer()',10)
 endfunction
@@ -619,9 +619,9 @@ function! <SID>StopExplorer()
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
   if l:winNum != -1
-    call s:SwitchWindow('w',0,l:winNum)
+    call s:SwitchWindow('w',1,l:winNum)
     silent! close
-    call s:SwitchWindow('p')
+    call s:SwitchWindow('p',1)
 
     " Work around a redraw bug in gVim (Confirmed present in 7.3.50)
     if has('gui_gtk') && has('gui_running')
@@ -675,13 +675,13 @@ function! <SID>UpdateExplorer(delBufNum,curBufNum)
 
   if l:winNum != winnr()
     let l:winChanged = 1
-    call s:SwitchWindow('w',0,l:winNum)
+    call s:SwitchWindow('w',1,l:winNum)
   endif
 
   call <SID>DisplayBuffers(a:curBufNum)
 
   if exists('l:winChanged')
-    call s:SwitchWindow('p')
+    call s:SwitchWindow('p',1)
   endif
 
   call <SID>DEBUG('Leaving UpdateExplorer()',10)
@@ -757,22 +757,22 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
 
     if l:edge
       if a:vSplit == 0
-        silent exec 'bo '.l:spCmd.' '.a:bufName
+        silent exec 'noautocmd bo '.l:spCmd.' '.a:bufName
       else
-        silent exec 'bo vert '.l:spCmd.' '.a:bufName
+        silent exec 'noautocmd bo vert '.l:spCmd.' '.a:bufName
       endif
     else
       if a:vSplit == 0
-        silent exec 'to '.l:spCmd.' '.a:bufName
+        silent exec 'noautocmd to '.l:spCmd.' '.a:bufName
       else
-        silent exec 'to vert '.l:spCmd.' '.a:bufName
+        silent exec 'noautocmd to vert '.l:spCmd.' '.a:bufName
       endif
     endif
   else
     if a:vSplit == 0
-      silent exec l:spCmd.' '.a:bufName
+      silent exec 'noautocmd '.l:spCmd.' '.a:bufName
     else
-      silent exec 'vert '.l:spCmd.' '.a:bufName
+      silent exec 'noautocmd vert '.l:spCmd.' '.a:bufName
     endif
   endif
 
@@ -790,7 +790,7 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
   endif
 
   " Return to the previous window.
-  call s:SwitchWindow('p')
+  call s:SwitchWindow('p',1)
 
   if a:doDebug
     call <SID>DEBUG('Leaving CreateWindow()',10)
@@ -1847,7 +1847,7 @@ function! <SID>MBESelectBuffer(split)
 
     let l:winNum = <SID>NextNormalWindow()
     if l:winNum != -1
-      call s:SwitchWindow('w',0,l:winNum)
+      call s:SwitchWindow('w',1,l:winNum)
     else
       call <SID>DEBUG('No elegible window avaliable',1)
       call <SID>DEBUG('Leaving MBESelectBuffer()',10)
@@ -1925,7 +1925,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
 
     " Save previous window so that if we show a buffer after
     " deleting. The show will come up in the correct window.
-    call s:SwitchWindow('p')
+    call s:SwitchWindow('p',1)
     let l:prevWin    = winnr()
     let l:prevWinBuf = winbufnr(winnr())
 
@@ -1941,7 +1941,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
         call <SID>DEBUG('Buffer '.l:selBuf.' is being displayed in window: '.l:winNum,5)
 
         " move to window that contains our selected buffer
-        call s:SwitchWindow('w',0,l:winNum)
+        call s:SwitchWindow('w',1,l:winNum)
 
         call <SID>DEBUG('We are now in window: '.winnr().' which contains buffer: '.bufnr('%').' and should contain buffer: '.l:selBuf,5)
 
@@ -1963,12 +1963,12 @@ function! <SID>MBEDeleteBuffer(prevBufName)
 
     " Attempt to restore previous window
     call <SID>DEBUG('Restoring previous window to: '.l:prevWin,5)
-    call s:SwitchWindow('w',0,l:prevWin)
+    call s:SwitchWindow('w',1,l:prevWin)
 
     " Try to get back to the -MiniBufExplorer- window
     let l:winNum = bufwinnr(bufnr('-MiniBufExplorer-'))
     if l:winNum != -1
-        call s:SwitchWindow('w',0,l:winNum)
+        call s:SwitchWindow('w',1,l:winNum)
         call <SID>DEBUG('Got to -MiniBufExplorer- window: '.winnr(),5)
     else
         call <SID>DEBUG('Unable to get to -MiniBufExplorer- window',1)
@@ -2137,11 +2137,11 @@ function! <SID>DEBUG(msg, level)
 
         " Save the current window number so we can come back here
         let l:currWin = winnr()
-        call s:SwitchWindow('p')
+        call s:SwitchWindow('p',1)
         let l:prevWin = winnr()
 
         " Change to debug window
-        call s:SwitchWindow('w',0,l:winNum)
+        call s:SwitchWindow('w',1,l:winNum)
 
         " Make sure we really got to our window, if not we
         " will display a confirm dialog and turn debugging
@@ -2162,8 +2162,8 @@ function! <SID>DEBUG(msg, level)
         norm G
 
         " Return to original window
-        call s:SwitchWindow('w',0,l:prevWin)
-        call s:SwitchWindow('w',0,l:currWin)
+        call s:SwitchWindow('w',1,l:prevWin)
+        call s:SwitchWindow('w',1,l:currWin)
     " Debug output using VIM's echo facility
     elseif g:miniBufExplorerDebugMode == 1
       echo s:debugIndex.':'.a:level.':'.a:msg
