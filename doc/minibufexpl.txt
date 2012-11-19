@@ -1,15 +1,15 @@
 *minibufexpl.txt*    Mini Buffer Explorer
 
+                                                                 *MiniBufExpl*
 ==============================================================================
 CONTENTS                                                *MiniBufExpl-contents*
-                                                        *MiniBufExpl*
 
     1. Install................................|MiniBufExplInstall|
-    2. Key Mappings...........................|MiniBufExplMappings|
+    2. Mappings...............................|MiniBufExplMappings|
     3. Commands...............................|MiniBufExplCommands|
     4. Options................................|MiniBufExplOptions|
        4.1 Splits.............................|MiniBufExplSplits|
-       4.2 Horizontal Size....................|MiniBufExplWindowSize|
+       4.2 Window Size........................|MiniBufExplWindowSize|
        4.3 Automatic Opening..................|MiniBufExplAutoOpen|
        4.4 Keyboard Control...................|MiniBufExplKeyboard|
        4.5 Misc...............................|MiniBufExplMisc|
@@ -81,6 +81,13 @@ mode:
 ------------------------------------------------------------------------------
 4.1 Splits                                                 *MiniBufExplSplits*
 
+                                                       *'g:miniBufExplVSplit'*
+If you would like a vertical explorer you can assign the column width (in
+characters) you want for your explorer window with the following .vimrc
+variable (this was introduced in 6.3.0):
+
+  let g:miniBufExplVSplit = 20   " column width in chars
+
                                                    *'g:miniBufExplSplitBelow'*
 To control where the new split window goes relative to the current window, use
 the setting:
@@ -100,14 +107,6 @@ open up at the edge of the screen. You can turn this off by setting the
 following variable in your .vimrc:
 
   let g:miniBufExplSplitToEdge = 0
-
-                                                       *'g:miniBufExplVSplit'*
-If you would like a vertical explorer you can assign the column width (in
-characters) you want for your explorer window with the following .vimrc
-variable (this was introduced in 6.3.0):
-
-  let g:miniBufExplVSplit = 20   " column width in chars
-
 
 ------------------------------------------------------------------------------
 4.2 Window Size                                        *MiniBufExplWindowSize*
@@ -175,13 +174,14 @@ If you only want open MBE manually when needed, you can put the following into
 your .vimrc:
 
   let g:miniBufExplorerAutoStart = 0
+
                                               *'g:miniBufExplorerMoreThanOne'*
 By default we are now (as of 6.0.1) turning on the MoreThanOne option. This
 stops the -MiniBufExplorer- from opening automatically until more than one
 eligible buffer is available. You can turn this feature off by setting the
 following variable in your .vimrc:
 
-  let g:miniBufExplorerMoreThanOne=1
+  let g:miniBufExplorerMoreThanOne = 1
 
 (The following enhancement is as of 6.2.2) Setting this to 0 will cause the
 MBE window to be loaded even if no buffers are available. Setting it to 1
@@ -277,16 +277,7 @@ highlighting back on (introduced in 6.3.1):
 ------------------------------------------------------------------------------
 4.6 Debugging                                           *MiniBufExplDebugging*
 
-                                               *'g:miniBufExplorerDebugLevel'*
-MBE has had a basic debugging capability for quite some time. However, it has
-not been very friendly in the past. As of 6.0.8, you can put one of each of
-the following into your .vimrc:
-
-  let g:miniBufExplorerDebugLevel = 0  " MBE serious errors output
-  let g:miniBufExplorerDebugLevel = 4  " MBE all errors output
-  let g:miniBufExplorerDebugLevel = 10 " MBE reports everything
-
-                                               *'g:miniBufExplorerDebugMode'*
+                                                *'g:miniBufExplorerDebugMode'*
 You can also set a DebugMode to cause output to be target as follows (default
 is mode 3):
 
@@ -296,8 +287,17 @@ is mode 3):
                                        " to display on the screen
   let g:miniBufExplorerDebugMode  = 2  " Writes to a file
                                        " MiniBufExplorer.DBG
-  let g:miniBufExplorerDebugMode  = 3  " Store output in global:
-                                  " g:miniBufExplorerDebugOutput
+  let g:miniBufExplorerDebugMode  = 3  " Store output in global variable
+                                       " g:miniBufExplorerDebugOutput
+
+                                               *'g:miniBufExplorerDebugLevel'*
+MBE has had a basic debugging capability for quite some time. However, it has
+not been very friendly in the past. As of 6.0.8, you can put one of each of
+the following into your .vimrc:
+
+  let g:miniBufExplorerDebugLevel = 0  " MBE serious errors output
+  let g:miniBufExplorerDebugLevel = 4  " MBE all errors output
+  let g:miniBufExplorerDebugLevel = 10 " MBE reports everything
 
 Or if you are able to start Vim, you might just perform these at a command
 prompt right before you do the operation that is failing.
@@ -355,7 +355,6 @@ might not take you to the expected window.
 - Add the ability to specify a regexp for eligible buffers
   allowing the ability to filter out certain buffers that
   you don't want to control from MBE.
-
 
 ==============================================================================
 7. About                                                    *MiniBufExplAbout*
