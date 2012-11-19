@@ -437,17 +437,17 @@ autocmd MiniBufExplorer BufAdd         * call <SID>DEBUG('-=> BufAdd Updating Al
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete Updating All Buffer Dicts', 10) |call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete ModTrackingListClean AutoCmd for buffer '.bufnr("%"), 10) |call <SID>CleanModTrackingList(bufnr("%"))
-autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
+autocmd MiniBufExplorer BufEnter       * nested call <SID>DEBUG('-=> BufEnter AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
 autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
 autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Building All Buffer Dicts', 5) |call <SID>BuildAllBufferDicts()
-autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Start Explorer', 10) |
+autocmd MiniBufExplorer VimEnter       * nested call <SID>DEBUG('-=> VimEnter Start Explorer', 10) |
             \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let t:miniBufExplAutoUpdate = 1 |endif |
             \ if g:miniBufExplorerAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
             \ call <SID>StartExplorer(-1, bufnr("%")) |
             \ endif
-autocmd MiniBufExplorer TabEnter       * call <SID>DEBUG('-=> TabEnter Start Explorer', 10) |
+autocmd MiniBufExplorer TabEnter       * nested call <SID>DEBUG('-=> TabEnter Start Explorer', 10) |
             \ if !exists('t:miniBufExplAutoUpdate') |let t:miniBufExplAutoUpdate = 1 |endif |
             \ if g:miniBufExplorerAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
             \ call <SID>StartExplorer(-1, bufnr("%")) |
@@ -603,7 +603,9 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
 
   call <SID>DisplayBuffers(a:curBufNum)
 
-  call s:SwitchWindow('p',1)
+  " Switch away from MBE allowing autocmd to run which will
+  " trigger PowerLine's BufLeave event handler
+  call s:SwitchWindow('p',0)
 
   call <SID>DEBUG('Leaving StartExplorer()',10)
 endfunction
@@ -685,7 +687,9 @@ function! <SID>UpdateExplorer(delBufNum,curBufNum)
   call <SID>DisplayBuffers(a:curBufNum)
 
   if exists('l:winChanged')
-    call s:SwitchWindow('p',1)
+    " Switch away from MBE allowing autocmd to run which will
+    " trigger PowerLine's BufLeave event handler
+    call s:SwitchWindow('p',0)
     call s:SwitchWindow('w',1,l:currWin)
   endif
 
