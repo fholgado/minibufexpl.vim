@@ -398,7 +398,7 @@ let s:miniBufExplBufList = ''
 " We start out with this off for startup, but once vim is running we
 " turn this on. This prevent any BufEnter event from being triggered
 " before VimEnter event.
-let s:miniBufExplAutoUpdate = 0
+let t:miniBufExplAutoUpdate = 0
 
 " Variable used as a mutex so that AutoUpdates would not get nested.
 let s:miniBufExplInAutoUpdate = 0
@@ -443,7 +443,9 @@ autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Building All Buffer Dicts', 5) |call <SID>BuildAllBufferDicts()
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Enable AutoUpdate', 10) |
-            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let s:miniBufExplAutoUpdate = 1 |endif
+            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let t:miniBufExplAutoUpdate = 1 |endif
+autocmd MiniBufExplorer TabEnter       * call <SID>DEBUG('-=> TabEnter Enable AutoUpdate', 10) |
+            \ if !exists('t:miniBufExplAutoUpdate') |let t:miniBufExplAutoUpdate = 1 |endif
 augroup END
 " }}}
 "
@@ -456,7 +458,7 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
 
   call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
 
-  let s:miniBufExplAutoUpdate = 1
+  let t:miniBufExplAutoUpdate = 1
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
@@ -606,7 +608,7 @@ endfunction
 function! <SID>StopExplorer()
   call <SID>DEBUG('Entering StopExplorer()',10)
 
-  let s:miniBufExplAutoUpdate = 0
+  let t:miniBufExplAutoUpdate = 0
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
@@ -1726,7 +1728,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
-  if s:miniBufExplAutoUpdate == 1
+  if t:miniBufExplAutoUpdate == 1
     " if we don't have a window then create one
     let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 1)
 
@@ -1755,7 +1757,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
         call <SID>DEBUG('Failed in eligible check', 9)
         call <SID>StopExplorer()
         " we do not want to turn auto-updating off
-        let s:miniBufExplAutoUpdate = 1
+        let t:miniBufExplAutoUpdate = 1
       endif
     endif
 
@@ -1834,8 +1836,8 @@ function! <SID>MBESelectBuffer(split)
   let l:resize = 0
 
   if(l:bufnr != -1)             " If the buffer exists.
-    let l:saveAutoUpdate = s:miniBufExplAutoUpdate
-    let s:miniBufExplAutoUpdate = 0
+    let l:saveAutoUpdate = t:miniBufExplAutoUpdate
+    let t:miniBufExplAutoUpdate = 0
 
     let l:winNum = <SID>NextNormalWindow()
     if l:winNum != -1
@@ -1858,7 +1860,7 @@ function! <SID>MBESelectBuffer(split)
       resize
     endif
 
-    let s:miniBufExplAutoUpdate = l:saveAutoUpdate
+    let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
     call <SID>AutoUpdate(-1,bufnr("%"))
   endif
@@ -1912,8 +1914,8 @@ function! <SID>MBEDeleteBuffer(prevBufName)
 
     " Don't want auto updates while we are processing a delete
     " request.
-    let l:saveAutoUpdate = s:miniBufExplAutoUpdate
-    let s:miniBufExplAutoUpdate = 0
+    let l:saveAutoUpdate = t:miniBufExplAutoUpdate
+    let t:miniBufExplAutoUpdate = 0
 
     " Save previous window so that if we show a buffer after
     " deleting. The show will come up in the correct window.
@@ -1970,7 +1972,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
     exec 'silent! bd '.l:selBuf
 
-    let s:miniBufExplAutoUpdate = l:saveAutoUpdate
+    let t:miniBufExplAutoUpdate = l:saveAutoUpdate
     call <SID>DisplayBuffers(-1,a:prevBufName)
     call cursor(l:curLine, l:curCol)
 
@@ -2041,9 +2043,9 @@ function! <SID>CycleBuffer(forward)
     return
   endif
 
-  let l:saveAutoUpdate = s:miniBufExplAutoUpdate
+  let l:saveAutoUpdate = t:miniBufExplAutoUpdate
 
-  let s:miniBufExplAutoUpdate = 0
+  let t:miniBufExplAutoUpdate = 0
 
   " Change buffer (keeping track of before and after buffers)
   let l:origBuf = bufnr('%')
@@ -2070,7 +2072,7 @@ function! <SID>CycleBuffer(forward)
     exec 'syntax enable'
   endif
 
-  let s:miniBufExplAutoUpdate = l:saveAutoUpdate
+  let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
   call <SID>AutoUpdate(-1,bufnr("%"))
 endfunction
