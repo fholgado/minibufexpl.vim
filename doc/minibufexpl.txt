@@ -88,18 +88,22 @@ variable (this was introduced in 6.3.0):
 
   let g:miniBufExplVSplit = 20   " column width in chars
 
-                                                   *'g:miniBufExplSplitBelow'*
+                                                      *'g:miniBufExplBRSplit'*
 To control where the new split window goes relative to the current window, use
 the setting:
 
-  let g:miniBufExplSplitBelow=0  " Put new window above
+  let g:miniBufExplBRSplit = 0   " Put new window above
                                  " current or on the
                                  " left for vertical split
-  let g:miniBufExplSplitBelow=1  " Put new window below
+  let g:miniBufExplBRSplit = 1   " Put new window below
                                  " current or on the
                                  " right for vertical split
 
-The default for this is read from the 'splitbelow' Vim option.
+The default for this is read from the 'splitbelow' or 'splitright' Vim option
+which depends on 'g:miniBufExplVSplit' option.
+
+                                                   *'g:miniBufExplSplitBelow'*
+This option has been depreciated by 'g:miniBufExplBRSplit'.
 
                                                   *'g:miniBufExplSplitToEdge'*
 By default we are now (as of 6.0.2) forcing the -MiniBufExplorer- window to
