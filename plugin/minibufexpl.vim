@@ -675,6 +675,10 @@ function! <SID>UpdateExplorer(delBufNum,curBufNum)
 
   if l:winNum != winnr()
     let l:winChanged = 1
+
+    let l:currWin = winnr()
+    call s:SwitchWindow('p',1)
+
     call s:SwitchWindow('w',1,l:winNum)
   endif
 
@@ -682,6 +686,7 @@ function! <SID>UpdateExplorer(delBufNum,curBufNum)
 
   if exists('l:winChanged')
     call s:SwitchWindow('p',1)
+    call s:SwitchWindow('w',1,l:currWin)
   endif
 
   call <SID>DEBUG('Leaving UpdateExplorer()',10)
@@ -2138,7 +2143,6 @@ function! <SID>DEBUG(msg, level)
         " Save the current window number so we can come back here
         let l:currWin = winnr()
         call s:SwitchWindow('p',1)
-        let l:prevWin = winnr()
 
         " Change to debug window
         call s:SwitchWindow('w',1,l:winNum)
@@ -2162,7 +2166,7 @@ function! <SID>DEBUG(msg, level)
         norm G
 
         " Return to original window
-        call s:SwitchWindow('w',1,l:prevWin)
+        call s:SwitchWindow('p',1)
         call s:SwitchWindow('w',1,l:currWin)
     " Debug output using VIM's echo facility
     elseif g:miniBufExplorerDebugMode == 1
