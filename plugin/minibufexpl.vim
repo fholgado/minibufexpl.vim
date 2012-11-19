@@ -23,7 +23,7 @@
 "
 "=============================================================================
 " }}}
-
+"
 " Startup Check
 "
 " Has this plugin already been loaded? {{{
@@ -32,8 +32,9 @@ if exists('loaded_minibufexplorer')
   finish
 endif
 let loaded_minibufexplorer = 1
-" }}}
 
+" }}}
+"
 " Mappings and Commands
 "
 " MBE Keyboard Mappings {{{
@@ -54,6 +55,7 @@ endif
 if !hasmapto('<Plug>MBEMarkCurrent')
   map <unique> <Leader>mq <Plug>MBEMarkCurrent
 endif
+
 " }}}
 " MBE <Script> internal map {{{
 "
@@ -83,36 +85,34 @@ if !exists(':MBEbn')
 endif
 if !exists(':MBEbp')
   command! MBEbp call <SID>CycleBuffer(0)
-endif " }}}
+endif
 
+" }}}
+"
 " Global Configuration Variables - Depreciated
 "
-" Depreciated variables {{{
-if exists('g:miniBufExplSplitBelow') "Depreciated
+" {{{
+
+" SplitBelow (depreciated)
+"
+if exists('g:miniBufExplSplitBelow')
   let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
 endif
 
 " MaxHeight (depreciated)
-" When sizing the -MiniBufExplorer- window, assign a maximum window height.
-" 0 = size to fit all buffers, otherwise the value is number of lines for
-" buffer. [Depreciated use g:miniBufExplMaxSize]
 "
 if exists('g:miniBufExplMaxHeight')
   let g:miniBufExplMaxSize = g:miniBufExplMaxHeight
 endif
 
 " MinHeight (depreciated)
-" When sizing the -MiniBufExplorer- window, assign a minumum window height.
-" the value is minimum number of lines for buffer. Setting this to zero can
-" cause strange height behavior. The default value is 1 [Depreciated use
-" g:miniBufExplMinSize]
 "
 if exists('g:miniBufExplMinHeight')
   let g:miniBufExplMinSize = g:miniBufExplMinHeight
 endif
 
 " }}}
-
+"
 " Global Configuration Variables
 "
 " Start MBE automatically ? {{{
@@ -306,7 +306,7 @@ endif
 " flag that can be set to 1 in a users .vimrc to allow
 " single click switching of tabs. By default we use
 " double click for tab selection.
-
+"
 if !exists('g:miniBufExplUseSingleClick')
   let g:miniBufExplUseSingleClick = 0
 endif
@@ -367,7 +367,7 @@ if !exists('g:miniBufExplSortBy')
 endif
 
 " }}}
-
+"
 " Variables used internally
 "
 " Script/Global variables {{{
@@ -421,7 +421,7 @@ let s:bufPathDict = {}
 let s:bufPathSignDict = {}
 
 " }}}
-
+"
 " Auto Commands
 "
 " Setup an autocommand group and some autocommands {{{
@@ -433,7 +433,7 @@ let s:bufPathSignDict = {}
 setlocal updatetime=300
 
 augroup MiniBufExplorer
-autocmd MiniBufExplorer BufNew         * call <SID>DEBUG('-=> BufNew Updating All Buffer Dicts', 5) |call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
+autocmd MiniBufExplorer BufAdd         * call <SID>DEBUG('-=> BufAdd Updating All Buffer Dicts', 5) |call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete Updating All Buffer Dicts', 10) |call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
 autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete ModTrackingListClean AutoCmd for buffer '.bufnr("%"), 10) |call <SID>CleanModTrackingList(bufnr("%"))
@@ -446,7 +446,7 @@ autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Enable Au
             \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let s:miniBufExplAutoUpdate = 1 |endif
 augroup END
 " }}}
-
+"
 " Functions
 "
 " StartExplorer - Sets up our explorer and causes it to be displayed {{{
@@ -638,7 +638,6 @@ function! <SID>ToggleExplorer()
     call <SID>StopExplorer()
   else
     call <SID>StartExplorer(-1, bufnr("%"))
-    wincmd p
   endif
 
   call <SID>DEBUG('Leaving ToggleExplorer()',10)
@@ -1045,7 +1044,7 @@ function! <SID>IgnoreBuffer(buf)
   endif
 
   " Skip non normal buffers.
-  if getbufvar(a:buf, "&buftype") == ''
+  if getbufvar(a:buf, "&buftype") != ''
     call <SID>DEBUG('Buffer '.a:buf.' is not normal, ignoring...',5)
     return 1
   endif
@@ -1189,7 +1188,7 @@ function! <SID>CreateBufferUniqName(bufNum)
     let l:bufPathPrefix = ""
 
     if(!has_key(s:bufPathSignDict, l:bufNum))
-        call <SID>DEBUG(l:bufNum . ' is not in s:bufPathSignDict, which should not happen.',5)
+        call <SID>DEBUG(l:bufNum . ' is not in s:bufPathSignDict, aborting...',5)
         call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
         return l:bufName
     endif
@@ -1427,7 +1426,7 @@ function! <SID>BuildBufferFinalDict(arg,deleted)
         let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
         if(!has_key(s:bufNameDict, l:bufName))
-            call <SID>DEBUG(l:bufName . ' is not in s:bufNameDict, which should not happen.',5)
+            call <SID>DEBUG(l:bufName . ' is not in s:bufNameDict, aborting...',5)
             call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
             return
         endif
