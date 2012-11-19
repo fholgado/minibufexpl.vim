@@ -92,21 +92,14 @@ endif
 " Global Configuration Variables - Depreciated
 "
 " {{{
-
-" SplitBelow (depreciated)
-"
 if exists('g:miniBufExplSplitBelow')
   let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
 endif
 
-" MaxHeight (depreciated)
-"
 if exists('g:miniBufExplMaxHeight')
   let g:miniBufExplMaxSize = g:miniBufExplMaxHeight
 endif
 
-" MinHeight (depreciated)
-"
 if exists('g:miniBufExplMinHeight')
   let g:miniBufExplMinSize = g:miniBufExplMinHeight
 endif
@@ -122,17 +115,6 @@ if !exists('g:miniBufExplorerAutoStart')
 endif
 
 " }}}
-" Debug Level {{{
-"
-" 0 = no logging
-" 1=5 = errors ; 1 is the most important
-" 5-9 = info ; 5 is the most important
-" 10 = Entry/Exit
-if !exists('g:miniBufExplorerDebugLevel')
-  let g:miniBufExplorerDebugLevel = 1
-endif
-
-" }}}
 " Debug Mode {{{
 "
 " 0 = debug to a window
@@ -144,6 +126,17 @@ endif
 "     global variable [This is the default]
 if !exists('g:miniBufExplorerDebugMode')
   let g:miniBufExplorerDebugMode = 3
+endif
+
+" }}}
+" Debug Level {{{
+"
+" 0 = no logging
+" 1=5 = errors ; 1 is the most important
+" 5-9 = info ; 5 is the most important
+" 10 = Entry/Exit
+if !exists('g:miniBufExplorerDebugLevel')
+  let g:miniBufExplorerDebugLevel = 1
 endif
 
 " }}}
@@ -567,37 +560,37 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
 
   " If you press return, o or e in the -MiniBufExplorer- then try
   " to open the selected buffer in the previous window.
-  nnoremap <buffer> <CR> :call <SID>MBESelectBuffer(0)<CR>:<BS>
-  nnoremap <buffer> o :call <SID>MBESelectBuffer(0)<CR>:<BS>
-  nnoremap <buffer> e :call <SID>MBESelectBuffer(0)<CR>:<BS>
+  nnoremap <buffer> o       :call <SID>MBESelectBuffer(0)<CR>:<BS>
+  nnoremap <buffer> e       :call <SID>MBESelectBuffer(0)<CR>:<BS>
+  nnoremap <buffer> <CR>    :call <SID>MBESelectBuffer(0)<CR>:<BS>
   " If you press s in the -MiniBufExplorer- then try
   " to open the selected buffer in a split in the previous window.
-  nnoremap <buffer> s :call <SID>MBESelectBuffer(1)<CR>:<BS>
+  nnoremap <buffer> s       :call <SID>MBESelectBuffer(1)<CR>:<BS>
   " If you press j in the -MiniBufExplorer- then try
   " to open the selected buffer in a vertical split in the previous window.
-  nnoremap <buffer> v :call <SID>MBESelectBuffer(2)<CR>:<BS>
+  nnoremap <buffer> v       :call <SID>MBESelectBuffer(2)<CR>:<BS>
   " If you DoubleClick in the -MiniBufExplorer- then try
   " to open the selected buffer in the previous window.
   nnoremap <buffer> <2-LEFTMOUSE> :call <SID>MBEDoubleClick()<CR>:<BS>
   " If you press d in the -MiniBufExplorer- then try to
   " delete the selected buffer.
-  nnoremap <buffer> d :call <SID>MBEDeleteBuffer(bufname("#"))<CR>:<BS>
+  nnoremap <buffer> d       :call <SID>MBEDeleteBuffer(bufname("#"))<CR>:<BS>
   " If you press w in the -MiniBufExplorer- then switch back
   " to the previous window.
-  nnoremap <buffer> p :wincmd p<CR>:<BS>
+  nnoremap <buffer> p       :wincmd p<CR>:<BS>
   " The following allow us to use regular movement keys to
   " scroll in a wrapped single line buffer
-  nnoremap <buffer> j gj
-  nnoremap <buffer> k gk
-  nnoremap <buffer> <down> gj
-  nnoremap <buffer> <up> gk
+  nnoremap <buffer> k       gk
+  nnoremap <buffer> j       gj
+  nnoremap <buffer> <up>    gk
+  nnoremap <buffer> <down>  gj
   " The following allows for quicker moving between buffer
   " names in the [MBE] window it also saves the last-pattern
   " and restores it.
+  nnoremap <buffer> l       :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+  nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
   nnoremap <buffer> <TAB>   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
   nnoremap <buffer> <S-TAB> :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
-  nnoremap <buffer> l   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
-  nnoremap <buffer> h :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
 
   call <SID>BuildBufferList(a:delBufNum,a:curBufNum)
 
