@@ -195,6 +195,10 @@ window wouldn't auto-open until 4 eligibles buffers had been loaded. This is
 nice for folks that don't want an MBE window unless they are editing more than
 two or three buffers.
 
+                                             *'g:miniBufExplorerHideWhenDIff'*
+Disable automatic opening if vim is started in diff mode(vimdiff, or with '-d'
+option). This option only affected the first tab page created at vim start.
+
 ------------------------------------------------------------------------------
 4.4 Keyboard Control                                     *MiniBufExplKeyboard*
 
