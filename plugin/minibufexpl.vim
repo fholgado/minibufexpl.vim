@@ -52,9 +52,6 @@ endif
 if !hasmapto('<Plug>TMiniBufExplorer')
   map <unique> <Leader>mbt <Plug>TMiniBufExplorer
 endif
-if !hasmapto('<Plug>MBEMarkCurrent')
-  map <unique> <Leader>mq <Plug>MBEMarkCurrent
-endif
 
 " }}}
 " MBE <Script> internal map {{{
@@ -63,7 +60,6 @@ noremap <unique> <script> <Plug>MiniBufExplorer  :call <SID>StartExplorer(-1, bu
 noremap <unique> <script> <Plug>CMiniBufExplorer :call <SID>StopExplorer()<CR>:<BS>
 noremap <unique> <script> <Plug>UMiniBufExplorer :call <SID>AutoUpdate(-1,bufnr("%"))<CR>:<BS>
 noremap <unique> <script> <Plug>TMiniBufExplorer :call <SID>ToggleExplorer()<CR>:<BS>
-noremap <unique> <script> <Plug>MBEMarkCurrent :call <SID>MarkCurrentBuffer(bufname("%"),1)<CR>:<BS>
 
 " }}}
 " MBE commands {{{
