@@ -480,6 +480,7 @@ endfunction
 function! <SID>BufAddHandler()
   call <SID>DEBUG('==> Entering BufAdd Handler', 10)
 
+  call <SID>MRUAdd(str2nr(expand("<abuf>")))
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
 
   call <SID>DEBUG('<== Leaving BufAdd Handler', 10)
@@ -1147,13 +1148,6 @@ function! <SID>BuildBufferList(delBufNum, curBufNum)
 
         if (<SID>IsBufferIgnored(l:i))
             continue
-        endif
-
-        if g:miniBufExplSortBy == "mru"
-            let l:mruIdx = index(s:MRUList, l:i)
-            if l:mruIdx == -1
-                call add(s:MRUList, l:i)
-            endif
         endif
 
         let l:BufName = expand( "#" . l:i . ":p:t")
@@ -2052,6 +2046,13 @@ function! <SID>CycleBuffer(forward)
   let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
   call <SID>AutoUpdate(-1,bufnr("%"))
+endfunction
+
+" }}}
+" MRUAdd {{{
+"
+function! <SID>MRUAdd(buf)
+  call add(s:MRUList, a:buf)
 endfunction
 
 " }}}
