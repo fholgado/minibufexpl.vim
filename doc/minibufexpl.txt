@@ -248,35 +248,47 @@ This option has been depreciated by 'g:miniBufExplHideWhenDiff'.
 4.4 Keyboard Control                                     *MiniBufExplKeyboard*
 
                                               *'g:miniBufExplMapWindowNavVim'*
-To enable the optional mapping of Control + Vim Direction Keys [hjkl] to
-window movement commands, you can put the following into your .vimrc:
-
-  let g:miniBufExplMapWindowNavVim = 1
-
                                            *'g:miniBufExplMapWindowNavArrows'*
-To enable the optional mapping of Control + Arrow Keys to window movement
-commands, you can put the following into your .vimrc:
-
-  let g:miniBufExplMapWindowNavArrows = 1
-
                                             *'g:miniBufExplMapCTabSwitchBufs'*
-To enable the optional mapping of <C-TAB> and <C-S-TAB> to a function that
-will bring up the next or previous buffer in the current window, you can put
-the following into your .vimrc:
-
-  let g:miniBufExplMapCTabSwitchBufs = 1
-
                                          *'g:miniBufExplMapCTabSwitchWindows'*
-To enable the optional mapping of <C-TAB> and <C-S-TAB> to mappings that will
-move to the next and previous (respectively) window, you can put the following
-into your .vimrc:
+These configuration variabes have been obsolete, MBE does no longer provide
+this functionality any more. If you'd like them be back, please add the
+following mappings to your .vimrc file.
 
-  let g:miniBufExplMapCTabSwitchWindows = 1
+    " If you like control + vim direction key to navigate
+    " windows then perform the remapping
+    "
+    noremap <C-J>     <C-W>j
+    noremap <C-K>     <C-W>k
+    noremap <C-H>     <C-W>h
+    noremap <C-L>     <C-W>l
 
+    " If you like control + arrow key to navigate windows
+    " then perform the remapping
+    "
+    noremap <C-Down>  <C-W>j
+    noremap <C-Up>    <C-W>k
+    noremap <C-Left>  <C-W>h
+    noremap <C-Right> <C-W>l
 
-NOTE: If you set the ...TabSwitchBufs AND ...TabSwitchWindows,
-      ...TabSwitchBufs will be enabled and ...TabSwitchWindows
-      will not.
+    " If you like <C-TAB> and <C-S-TAB> to switch buffers
+    " in the current window then perform the remapping
+    "
+    noremap <C-TAB>   :MBEbn<CR>
+    noremap <C-S-TAB> :MBEbp<CR>
+    "
+    " Or, in MRU fashion
+    "
+    noremap <C-TAB>   :MBEbf<CR>
+    noremap <C-S-TAB> :MBEbb<CR>
+
+    "
+    " If you like <C-TAB> and <C-S-TAB> to switch windows
+    " then perform the remapping
+    "
+    noremap <C-TAB>   <C-W>w
+    noremap <C-S-TAB> <C-W>W
+
 
 ------------------------------------------------------------------------------
 4.5 Misc                                                     *MiniBufExplMisc*
