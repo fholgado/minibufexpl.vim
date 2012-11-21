@@ -1084,11 +1084,11 @@ function! <SID>ShowBuffers()
 endfunction
 
 " }}}
-" IgnoreBuffer - check to see if buffer should be ignored {{{
+" IsBufferIgnored - check to see if buffer should be ignored {{{
 "
 " Returns 0 if this buffer should be displayed in the list, 1 otherwise.
 "
-function! <SID>IgnoreBuffer(buf)
+function! <SID>IsBufferIgnored(buf)
   " Skip unlisted buffers.
   if buflisted(a:buf) == 0
     call <SID>DEBUG('Buffer '.a:buf.' is unlisted, ignoring...',5)
@@ -1139,7 +1139,7 @@ function! <SID>BuildBufferList(delBufNum, curBufNum)
             continue
         endif
 
-        if (<SID>IgnoreBuffer(l:i))
+        if (<SID>IsBufferIgnored(l:i))
             continue
         endif
 
@@ -1663,7 +1663,7 @@ function! <SID>HasEligibleBuffers(delBufNum)
       continue
     endif
 
-    if <SID>IgnoreBuffer(l:i)
+    if <SID>IsBufferIgnored(l:i)
       continue
     endif
 
@@ -1711,8 +1711,8 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   endif
 
   " Skip windows holding ignored buffer
-  if a:delBufNum == -1 && <SID>IgnoreBuffer(a:curBufNum) == 1
-        \ || a:delBufNum != -1 && <SID>IgnoreBuffer(a:delBufNum) == 1
+  if a:delBufNum == -1 && <SID>IsBufferIgnored(a:curBufNum) == 1
+        \ || a:delBufNum != -1 && <SID>IsBufferIgnored(a:delBufNum) == 1
     call <SID>DEBUG('Leaving AutoUpdate()',10)
 
     let s:miniBufExplInAutoUpdate = 0
@@ -1996,7 +1996,7 @@ function! <SID>NextNormalWindow()
   let l:i = 1
   while(l:i <= l:winSum)
     call <SID>DEBUG('window: '.l:i.', buffer: ('.winbufnr(l:i).':'.bufname(winbufnr(l:i)).')',9)
-    if (!<SID>IgnoreBuffer(winbufnr(l:i)))
+    if (!<SID>IsBufferIgnored(winbufnr(l:i)))
         call <SID>DEBUG('Found window '.l:i,8)
         call <SID>DEBUG('Leaving NextNormalWindow()',10)
         return l:i
@@ -2020,7 +2020,7 @@ endfunction
 " are cycled forward.
 "
 function! <SID>CycleBuffer(forward)
-  if <SID>IgnoreBuffer(bufnr('%')) == 1
+  if <SID>IsBufferIgnored(bufnr('%')) == 1
     return
   endif
 
