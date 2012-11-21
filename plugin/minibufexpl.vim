@@ -356,10 +356,10 @@ autocmd MiniBufExplorer TabEnter       * nested call <SID>TabEnterHandler()
 autocmd MiniBufExplorer BufAdd         *        call <SID>BufAddHandler()
 autocmd MiniBufExplorer BufEnter       * nested call <SID>BufEnterHandler()
 autocmd MiniBufExplorer BufDelete      *        call <SID>BufDeleteHandler()
-autocmd MiniBufExplorer CursorHoldI    *
-      \ call <SID>DEBUG('==> Entering CursorHoldI UpdateBufferStateDict', 10) |
+autocmd MiniBufExplorer CursorHold,CursorHoldI    *
+      \ call <SID>DEBUG('==> Entering CursorHold/CursorHoldI UpdateBufferStateDict', 10) |
       \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
-      \ call <SID>DEBUG('<== Leaving CursorHoldI UpdateBufferStateDict', 10)
+      \ call <SID>DEBUG('<== Leaving CursorHold/CursorHoldI UpdateBufferStateDict', 10)
 augroup END
 
 function! <SID>VimEnterHandler()
