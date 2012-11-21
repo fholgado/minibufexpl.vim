@@ -644,7 +644,7 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
   " to enter a buffer.
   if g:miniBufExplUseSingleClick == 1
     let l:mapcmd = ':nnoremap <silent> <LEFTMOUSE> <LEFTMOUSE>'
-    let l:clickcmd = ':if bufname("%") == "-MiniBufExplorer-" <bar> call <SID>MBEClick() <bar> endif <CR>'
+    let l:clickcmd = ':if bufname("%") == "-MiniBufExplorer-" <bar> call <SID>MBESelectBuffer(0) <bar> endif <CR>'
     " no mapping for leftmouse
     if maparg('<LEFTMOUSE>', 'n') == ''
       exec l:mapcmd . l:clickcmd
@@ -657,7 +657,7 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
   " If you DoubleClick in the MBE window then try to open the selected
   " buffer in the previous window.
   else
-    nnoremap <buffer> <2-LEFTMOUSE> :call <SID>MBEDoubleClick()<CR>:<BS>
+    nnoremap <buffer> <2-LEFTMOUSE> :call <SID>MBESelectBuffer(0)<CR>:<BS>
   endif
 
   call <SID>BuildBufferList(a:delBufNum,a:curBufNum)
@@ -2016,22 +2016,6 @@ function! <SID>MBEDeleteBuffer(prevBufName)
   let &showcmd = l:save_sc
 
   call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
-endfunction
-
-" }}}
-" MBEClick - Handle mouse double click {{{
-"
-function! s:MBEClick()
-  call <SID>DEBUG('Entering MBEClick()',10)
-  call <SID>MBESelectBuffer(0)
-endfunction
-
-" }}}
-" MBEDoubleClick - Double click with the mouse. {{{
-"
-function! s:MBEDoubleClick()
-  call <SID>DEBUG('Entering MBEDoubleClick()',10)
-  call <SID>MBESelectBuffer(0)
 endfunction
 
 " }}}
