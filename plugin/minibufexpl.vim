@@ -348,7 +348,7 @@ let s:bufPathSignDict = {}
 
 "set update time for the CursorHold function so that it is called 100ms after
 "a key is pressed
-setlocal updatetime=300
+set updatetime=300
 
 augroup MiniBufExplorer
 autocmd MiniBufExplorer VimEnter       * nested call <SID>VimEnterHandler()
@@ -356,10 +356,10 @@ autocmd MiniBufExplorer TabEnter       * nested call <SID>TabEnterHandler()
 autocmd MiniBufExplorer BufAdd         *        call <SID>BufAddHandler()
 autocmd MiniBufExplorer BufEnter       * nested call <SID>BufEnterHandler()
 autocmd MiniBufExplorer BufDelete      *        call <SID>BufDeleteHandler()
-autocmd MiniBufExplorer CursorHoldI    *
-      \ call <SID>DEBUG('==> Entering CursorHoldI UpdateBufferStateDict', 10) |
+autocmd MiniBufExplorer CursorHold,CursorHoldI    *
+      \ call <SID>DEBUG('==> Entering CursorHold/CursorHoldI UpdateBufferStateDict', 10) |
       \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
-      \ call <SID>DEBUG('<== Leaving CursorHoldI UpdateBufferStateDict', 10)
+      \ call <SID>DEBUG('<== Leaving CursorHold/CursorHoldI UpdateBufferStateDict', 10)
 augroup END
 
 function! <SID>VimEnterHandler()
@@ -1572,10 +1572,13 @@ endfunction
 " }}}
 " UpdateBufferStateDict {{{
 function! <SID>UpdateBufferStateDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferStateDict()',5)
+
     let l:bufNum = 0 + a:bufNum
 
     if a:deleted && has_key(s:bufStateDict, l:bufNum)
         call filter(s:bufStateDict, 'v:key != '.l:bufNum)
+        call <SID>DEBUG('Leaving UpdateBufferStateDict()',5)
         return
     endif
 
@@ -1587,6 +1590,8 @@ function! <SID>UpdateBufferStateDict(bufNum,deleted)
     else
         let s:bufStateDict[l:bufNum] = getbufvar(a:bufNum, '&modified')
     endif
+
+    call <SID>DEBUG('Leaving UpdateBufferStateDict()',5)
 endfunction
 
 " }}}
