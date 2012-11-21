@@ -104,6 +104,10 @@ if exists('g:miniBufExplMinHeight')
   let g:miniBufExplMinSize = g:miniBufExplMinHeight
 endif
 
+if exists('g:miniBufExplorerMoreThanOne')
+  let g:miniBufExplBuffersNeeded = g:miniBufExplorerMoreThanOne
+endif
+
 " }}}
 "
 " Global Configuration Variables
@@ -149,8 +153,8 @@ endif
 " MoreThanOne? {{{
 " Display Mini Buf Explorer when there are 'More Than One' eligible buffers
 "
-if !exists('g:miniBufExplorerMoreThanOne')
-  let g:miniBufExplorerMoreThanOne = 2
+if !exists('g:miniBufExplBuffersNeeded')
+  let g:miniBufExplBuffersNeeded = 2
 endif
 
 " }}}
@@ -397,7 +401,7 @@ let t:miniBufExplAutoUpdate = 0
 let s:miniBufExplInAutoUpdate = 0
 
 " If MBE was opened manually, then we should skip eligible buffers checking,
-" open MBE window no matter what value 'g:miniBufExplorerMoreThanOne' is set.
+" open MBE window no matter what value 'g:miniBufExplBuffersNeeded' is set.
 let s:skipEligibleBuffersCheck = 0
 
 " Dictionary used to keep track of the names we have seen.
@@ -1594,10 +1598,7 @@ function! <SID>HasEligibleBuffers(delBufNum)
    " No buffer found
   let l:found = 0
 
-  if (g:miniBufExplorerMoreThanOne > 1)
-    call <SID>DEBUG('More Than One mode turned on',6)
-  endif
-  let l:needed = g:miniBufExplorerMoreThanOne
+  let l:needed = g:miniBufExplBuffersNeeded
 
   " Loop through every buffer less than the total number of buffers.
   let l:i = 0
