@@ -99,6 +99,12 @@ configuration of Vim.
 :MBEToggle                                                        *:MBEToggle*
     Toggle the Explorer window open and closed.
 
+:MBEbn                                                                *:MBEbn*
+    Switch to next normal buffer in current window.
+
+:MBEbp                                                                *:MBEbp*
+    Switch to previous normal buffer in current window.
+
 ==============================================================================
 4. Options                                                *MiniBufExplOptions*
 
