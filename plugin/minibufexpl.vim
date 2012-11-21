@@ -2048,11 +2048,6 @@ function! <SID>CycleBuffer(forward)
     let l:curBuf = bufnr('%')
   endwhile
 
-  if g:miniBufExplForceSyntaxEnable
-    call <SID>DEBUG('Enable Syntax', 9)
-    exec 'syntax enable'
-  endif
-
   let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
   call <SID>AutoUpdate(-1,bufnr("%"))
