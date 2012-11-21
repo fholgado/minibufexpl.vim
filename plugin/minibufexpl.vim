@@ -429,24 +429,73 @@ let s:bufPathSignDict = {}
 setlocal updatetime=300
 
 augroup MiniBufExplorer
-autocmd MiniBufExplorer BufAdd         * call <SID>DEBUG('-=> BufAdd Updating All Buffer Dicts', 5) |call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
-autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete Updating All Buffer Dicts', 10) |call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
-autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
-autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete ModTrackingListClean AutoCmd for buffer '.expand("<abuf>"), 10) |call <SID>CleanModTrackingList(expand("<abuf>"))
-autocmd MiniBufExplorer BufEnter       * nested call <SID>DEBUG('-=> BufEnter AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
-autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
-autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Building All Buffer Dicts', 5) |call <SID>BuildAllBufferDicts()
-autocmd MiniBufExplorer VimEnter       * nested call <SID>DEBUG('-=> VimEnter Start Explorer', 10) |
-            \ if g:miniBufExplHideWhenDiff!=1 || !&diff |let t:miniBufExplAutoUpdate = 1 |endif |
-            \ if g:miniBufExplAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
-            \ call <SID>StartExplorer(-1, bufnr("%")) |
-            \ endif
-autocmd MiniBufExplorer TabEnter       * nested call <SID>DEBUG('-=> TabEnter Start Explorer', 10) |
-            \ if !exists('t:miniBufExplAutoUpdate') |let t:miniBufExplAutoUpdate = 1 |endif |
-            \ if g:miniBufExplAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
-            \ call <SID>StartExplorer(-1, bufnr("%")) |
-            \ endif
+autocmd MiniBufExplorer VimEnter       * nested call <SID>VimEnterHandler()
+autocmd MiniBufExplorer TabEnter       * nested call <SID>TabEnterHandler()
+autocmd MiniBufExplorer BufAdd         *        call <SID>BufAddHandler()
+autocmd MiniBufExplorer BufEnter       * nested call <SID>BufEnterHandler()
+autocmd MiniBufExplorer BufDelete      *        call <SID>BufDeleteHandler()
+autocmd MiniBufExplorer CursorHoldI    *
+      \ call <SID>DEBUG('==> Entering CursorHoldI AutoUpdateCheck', 10) |
+      \ call <SID>AutoUpdateCheck(bufnr("%")) |
+      \ call <SID>DEBUG('<== Leaving CursorHoldI AutoUpdateCheck', 10)
 augroup END
+
+function! <SID>VimEnterHandler()
+  call <SID>DEBUG('==> Entering VimEnter Handler', 10)
+
+  call <SID>BuildAllBufferDicts()
+
+  if g:miniBufExplHideWhenDiff!=1 || !&diff
+    let t:miniBufExplAutoUpdate = 1
+  endif
+
+  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1 && <SID>HasEligibleBuffers(-1) == 1
+    call <SID>StartExplorer(-1, bufnr("%"))
+  endif
+
+  call <SID>DEBUG('<== Leaving VimEnter Handler', 10)
+endfunction
+
+function! <SID>TabEnterHandler()
+  call <SID>DEBUG('==> Entering TabEnter Handler', 10)
+
+  if !exists('t:miniBufExplAutoUpdate')
+    let t:miniBufExplAutoUpdate = 1
+  endif
+
+  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1 && <SID>HasEligibleBuffers(-1) == 1
+    call <SID>StartExplorer(-1, bufnr("%"))
+  endif
+
+  call <SID>DEBUG('<== Leaving TabEnter Handler', 10)
+endfunction
+
+function! <SID>BufAddHandler()
+  call <SID>DEBUG('==> Entering BufAdd Handler', 10)
+
+  call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
+
+  call <SID>DEBUG('<== Leaving BufAdd Handler', 10)
+endfunction
+
+function! <SID>BufEnterHandler()
+  call <SID>DEBUG('==> Entering BufEnter Handler', 10)
+
+  call <SID>AutoUpdate(-1,bufnr("%"))
+
+  call <SID>DEBUG('<== Leaving BufEnter Handler', 10)
+endfunction
+
+function! <SID>BufDeleteHandler()
+  call <SID>DEBUG('==> Entering BufDelete Handler', 10)
+
+  call <SID>CleanModTrackingList(expand("<abuf>"))
+  call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
+
+  call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
+
+  call <SID>DEBUG('<== Leaving BufDelete Handler', 10)
+endfunction
 " }}}
 "
 " Functions
