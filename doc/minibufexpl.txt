@@ -105,6 +105,12 @@ configuration of Vim.
 :MBEbp                                                                *:MBEbp*
     Switch to previous normal buffer in current window.
 
+:MBEbf                                                                *:MBEbf*
+    Move one buffer forward in the most recent used buffer list.
+
+:MBEbb                                                                *:MBEbb*
+    Move one buffer backward in the most recent used buffer list.
+
 ==============================================================================
 4. Options                                                *MiniBufExplOptions*
 
