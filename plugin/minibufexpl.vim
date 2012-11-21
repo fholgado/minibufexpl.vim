@@ -104,14 +104,38 @@ if exists('g:miniBufExplMinHeight')
   let g:miniBufExplMinSize = g:miniBufExplMinHeight
 endif
 
+if exists('g:miniBufExplorerMoreThanOne')
+  let g:miniBufExplBuffersNeeded = g:miniBufExplorerMoreThanOne
+endif
+
+if exists('g:miniBufExplorerAutoStart')
+  let g:miniBufExplAutoStart = g:miniBufExplorerAutoStart
+endif
+
+if exists('g:miniBufExplorerDebugMode')
+  let g:miniBufExplDebugMode = g:miniBufExplorerDebugMode
+endif
+
+if exists('g:miniBufExplorerDebugLevel')
+  let g:miniBufExplDebugLevel = g:miniBufExplorerDebugLevel
+endif
+
+if exists('g:miniBufExplorerDebugOutput')
+  let g:miniBufExplDebugOutput = g:miniBufExplorerDebugOutput
+endif
+
+if exists('g:miniBufExplorerHideWhenDiff')
+  let g:miniBufExplHideWhenDiff = g:miniBufExplorerHideWhenDiff
+endif
+
 " }}}
 "
 " Global Configuration Variables
 "
 " Start MBE automatically ? {{{
 "
-if !exists('g:miniBufExplorerAutoStart')
-  let g:miniBufExplorerAutoStart = 1
+if !exists('g:miniBufExplAutoStart')
+  let g:miniBufExplAutoStart = 1
 endif
 
 " }}}
@@ -122,10 +146,10 @@ endif
 " 2 = write to a file named MiniBufExplorer.DBG
 "     in the directory where vim was started
 "     THIS IS VERY SLOW
-" 3 = Write into g:miniBufExplorerDebugOutput
+" 3 = Write into g:miniBufExplDebugOutput
 "     global variable [This is the default]
-if !exists('g:miniBufExplorerDebugMode')
-  let g:miniBufExplorerDebugMode = 3
+if !exists('g:miniBufExplDebugMode')
+  let g:miniBufExplDebugMode = 3
 endif
 
 " }}}
@@ -135,22 +159,22 @@ endif
 " 1=5 = errors ; 1 is the most important
 " 5-9 = info ; 5 is the most important
 " 10 = Entry/Exit
-if !exists('g:miniBufExplorerDebugLevel')
-  let g:miniBufExplorerDebugLevel = 1
+if !exists('g:miniBufExplDebugLevel')
+  let g:miniBufExplDebugLevel = 1
 endif
 
 " }}}
 " Stop auto starting MBE in diff mode? {{{
-if !exists('g:miniBufExplorerHideWhenDiff')
-    let g:miniBufExplorerHideWhenDiff = 0
+if !exists('g:miniBufExplHideWhenDiff')
+    let g:miniBufExplHideWhenDiff = 0
 endif
 
 " }}}
 " MoreThanOne? {{{
 " Display Mini Buf Explorer when there are 'More Than One' eligible buffers
 "
-if !exists('g:miniBufExplorerMoreThanOne')
-  let g:miniBufExplorerMoreThanOne = 2
+if !exists('g:miniBufExplBuffersNeeded')
+  let g:miniBufExplBuffersNeeded = 2
 endif
 
 " }}}
@@ -304,27 +328,6 @@ if !exists('g:miniBufExplUseSingleClick')
   let g:miniBufExplUseSingleClick = 0
 endif
 
-"
-" attempt to perform single click mapping, it would be much
-" nicer if we could nnoremap <buffer> ... however vim does
-" not fire the <buffer> <leftmouse> when you use the mouse
-" to enter a buffer.
-"
-if g:miniBufExplUseSingleClick == 1
-  let s:clickmap = ':if bufname("%") == "-MiniBufExplorer-" <bar> call <SID>MBEClick() <bar> endif <CR>'
-  if maparg('<LEFTMOUSE>', 'n') == ''
-    " no mapping for leftmouse
-    exec ':nnoremap <silent> <LEFTMOUSE> <LEFTMOUSE>' . s:clickmap
-  else
-    " we have a mapping
-    let  g:miniBufExplDoneClickSave = 1
-    let  s:m = ':nnoremap <silent> <LEFTMOUSE> <LEFTMOUSE>'
-    let  s:m = s:m . substitute(substitute(maparg('<LEFTMOUSE>', 'n'), '|', '<bar>', 'g'), '\c^<LEFTMOUSE>', '', '')
-    let  s:m = s:m . s:clickmap
-    exec s:m
-  endif
-endif
-
 " }}}
 " Close on Select? {{{
 " Flag that can be set to 1 in a users .vimrc to hide
@@ -348,8 +351,8 @@ endif
 " }}}
 " Status Line Text for MBE window {{{
 "
-if !exists('g:statusLineText')
-  let g:statusLineText = "-MiniBufExplorer-"
+if !exists('g:miniBufExplStatusLineText')
+  let g:miniBufExplStatusLineText = "-MiniBufExplorer-"
 endif
 
 " }}}
@@ -365,7 +368,7 @@ endif
 "
 " Script/Global variables {{{
 " In debug mode 3 this variable will hold the debug output
-let g:miniBufExplorerDebugOutput = ''
+let g:miniBufExplDebugOutput = ''
 
 " check to see what platform we are in
 if (has('unix'))
@@ -397,7 +400,7 @@ let t:miniBufExplAutoUpdate = 0
 let s:miniBufExplInAutoUpdate = 0
 
 " If MBE was opened manually, then we should skip eligible buffers checking,
-" open MBE window no matter what value 'g:miniBufExplorerMoreThanOne' is set.
+" open MBE window no matter what value 'g:miniBufExplBuffersNeeded' is set.
 let s:skipEligibleBuffersCheck = 0
 
 " Dictionary used to keep track of the names we have seen.
@@ -436,13 +439,13 @@ autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Building All Buffer Dicts', 5) |call <SID>BuildAllBufferDicts()
 autocmd MiniBufExplorer VimEnter       * nested call <SID>DEBUG('-=> VimEnter Start Explorer', 10) |
-            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let t:miniBufExplAutoUpdate = 1 |endif |
-            \ if g:miniBufExplorerAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
+            \ if g:miniBufExplHideWhenDiff!=1 || !&diff |let t:miniBufExplAutoUpdate = 1 |endif |
+            \ if g:miniBufExplAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
             \ call <SID>StartExplorer(-1, bufnr("%")) |
             \ endif
 autocmd MiniBufExplorer TabEnter       * nested call <SID>DEBUG('-=> TabEnter Start Explorer', 10) |
             \ if !exists('t:miniBufExplAutoUpdate') |let t:miniBufExplAutoUpdate = 1 |endif |
-            \ if g:miniBufExplorerAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
+            \ if g:miniBufExplAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
             \ call <SID>StartExplorer(-1, bufnr("%")) |
             \ endif
 augroup END
@@ -520,7 +523,7 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
 
   " Set the text of the statusline for the MBE buffer. See help:stl for
   " many options
-  exec 'setlocal statusline='.g:statusLineText
+  exec 'setlocal statusline='.g:miniBufExplStatusLineText
 
   " No spell check
   setlocal nospell
@@ -569,15 +572,9 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
   " If you press j in the -MiniBufExplorer- then try
   " to open the selected buffer in a vertical split in the previous window.
   nnoremap <buffer> v       :call <SID>MBESelectBuffer(2)<CR>:<BS>
-  " If you DoubleClick in the -MiniBufExplorer- then try
-  " to open the selected buffer in the previous window.
-  nnoremap <buffer> <2-LEFTMOUSE> :call <SID>MBEDoubleClick()<CR>:<BS>
   " If you press d in the -MiniBufExplorer- then try to
   " delete the selected buffer.
   nnoremap <buffer> d       :call <SID>MBEDeleteBuffer(bufname("#"))<CR>:<BS>
-  " If you press w in the -MiniBufExplorer- then switch back
-  " to the previous window.
-  nnoremap <buffer> p       :wincmd p<CR>:<BS>
   " The following allow us to use regular movement keys to
   " scroll in a wrapped single line buffer
   nnoremap <buffer> k       gk
@@ -591,6 +588,28 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
   nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
   nnoremap <buffer> <TAB>   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
   nnoremap <buffer> <S-TAB> :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+
+  " Attempt to perform single click mapping
+  " It would be much nicer if we could 'nnoremap <buffer> ...', however
+  " vim does not fire the '<buffer> <leftmouse>' when you use the mouse
+  " to enter a buffer.
+  if g:miniBufExplUseSingleClick == 1
+    let l:mapcmd = ':nnoremap <silent> <LEFTMOUSE> <LEFTMOUSE>'
+    let l:clickcmd = ':if bufname("%") == "-MiniBufExplorer-" <bar> call <SID>MBEClick() <bar> endif <CR>'
+    " no mapping for leftmouse
+    if maparg('<LEFTMOUSE>', 'n') == ''
+      exec l:mapcmd . l:clickcmd
+    " we have a mapping
+    else
+      let  l:mapcmd = l:mapcmd . substitute(substitute(maparg('<LEFTMOUSE>', 'n'), '|', '<bar>', 'g'), '\c^<LEFTMOUSE>', '', '')
+      let  l:mapcmd = l:mapcmd . l:clickcmd
+      exec l:mapcmd
+    endif
+  " If you DoubleClick in the MBE window then try to open the selected
+  " buffer in the previous window.
+  else
+    nnoremap <buffer> <2-LEFTMOUSE> :call <SID>MBEDoubleClick()<CR>:<BS>
+  endif
 
   call <SID>BuildBufferList(a:delBufNum,a:curBufNum)
 
@@ -1594,10 +1613,7 @@ function! <SID>HasEligibleBuffers(delBufNum)
    " No buffer found
   let l:found = 0
 
-  if (g:miniBufExplorerMoreThanOne > 1)
-    call <SID>DEBUG('More Than One mode turned on',6)
-  endif
-  let l:needed = g:miniBufExplorerMoreThanOne
+  let l:needed = g:miniBufExplBuffersNeeded
 
   " Loop through every buffer less than the total number of buffers.
   let l:i = 0
@@ -1742,7 +1758,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 
     if <SID>HasEligibleBuffers(a:delBufNum) == 1
       if (l:winnr == -1)
-        if g:miniBufExplorerAutoStart == 1
+        if g:miniBufExplAutoStart == 1
           call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
           call <SID>StartExplorer(a:delBufNum, a:curBufNum)
         else
@@ -1906,7 +1922,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
   let l:selBuf     = <SID>GetSelectedBuffer()
   let l:selBufName = bufname(l:selBuf)
 
-  if l:selBufName == 'MiniBufExplorer.DBG' && g:miniBufExplorerDebugLevel > 0
+  if l:selBufName == 'MiniBufExplorer.DBG' && g:miniBufExplDebugLevel > 0
     call <SID>DEBUG('MBEDeleteBuffer will not delete the debug window, when debugging is turned on.',1)
     call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
     return
@@ -2111,7 +2127,7 @@ endfunction
 " capability.
 "
 function! <SID>DEBUG(msg, level)
-  if g:miniBufExplorerDebugLevel >= a:level
+  if g:miniBufExplDebugLevel >= a:level
 
     " Prevent a report of our actions from showing up.
     let l:save_rep    = &report
@@ -2120,7 +2136,7 @@ function! <SID>DEBUG(msg, level)
     set noshowcmd
 
     " Debug output to a buffer
-    if g:miniBufExplorerDebugMode == 0
+    if g:miniBufExplDebugMode == 0
         if bufname('%') == 'MiniBufExplorer.DBG'
             return
         endif
@@ -2129,7 +2145,7 @@ function! <SID>DEBUG(msg, level)
         let l:winNum = <SID>FindCreateWindow('MiniBufExplorer.DBG', 0, 1, 1, 1, 0)
 
         if l:winNum == -1
-          let g:miniBufExplorerDebugMode == 3
+          let g:miniBufExplDebugMode == 3
           call <SID>DEBUG('Failed to get the MBE debugging window, reset debugging mode to 3.',1)
           call <SID>DEBUG('Forwarding message...',1)
           call <SID>DEBUG(a:msg,1)
@@ -2149,7 +2165,7 @@ function! <SID>DEBUG(msg, level)
         " off so that we won't break things even more.
         if bufname('%') != 'MiniBufExplorer.DBG'
             call confirm('Error in window debugging code. Dissabling MiniBufExplorer debugging.', 'OK')
-            let g:miniBufExplorerDebugLevel = 0
+            let g:miniBufExplDebugLevel = 0
             return
         endif
 
@@ -2166,11 +2182,11 @@ function! <SID>DEBUG(msg, level)
         call s:SwitchWindow('p',1)
         call s:SwitchWindow('w',1,l:currWin)
     " Debug output using VIM's echo facility
-    elseif g:miniBufExplorerDebugMode == 1
+    elseif g:miniBufExplDebugMode == 1
       echo s:debugIndex.':'.a:level.':'.a:msg
     " Debug output to a file -- VERY SLOW!!!
     " should be OK on UNIX and Win32 (not the 95/98 variants)
-    elseif g:miniBufExplorerDebugMode == 2
+    elseif g:miniBufExplDebugMode == 2
         if has('system') || has('fork')
             if has('win32') && !has('win95')
                 let l:result = system("cmd /c 'echo ".s:debugIndex.':'.a:level.':'.a:msg." >> MiniBufExplorer.DBG'")
@@ -2180,10 +2196,10 @@ function! <SID>DEBUG(msg, level)
             endif
         else
             call confirm('Error in file writing version of the debugging code, vim not compiled with system or fork. Dissabling MiniBufExplorer debugging.', 'OK')
-            let g:miniBufExplorerDebugLevel = 0
+            let g:miniBufExplDebugLevel = 0
         endif
-    elseif g:miniBufExplorerDebugMode == 3
-        let g:miniBufExplorerDebugOutput = g:miniBufExplorerDebugOutput."\n".s:debugIndex.':'.a:level.':'.a:msg
+    elseif g:miniBufExplDebugMode == 3
+        let g:miniBufExplDebugOutput = g:miniBufExplDebugOutput."\n".s:debugIndex.':'.a:level.':'.a:msg
     endif
 
     let s:debugIndex = s:debugIndex + 1
