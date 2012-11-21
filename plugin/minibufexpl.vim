@@ -496,6 +496,8 @@ endfunction
 function! <SID>BufDeleteHandler()
   call <SID>DEBUG('==> Entering BufDelete Handler', 10)
 
+  call <SID>MRUPop(str2nr(expand("<abuf>")))
+
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 
   call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
@@ -1724,11 +1726,6 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
   endif
 
   call <SID>MRUPush(a:curBufNum)
-
-  if (a:delBufNum != -1)
-    call <SID>DEBUG('AutoUpdate will make sure that buffer '.a:delBufNum.' is not included in the buffer list.', 5)
-    call <SID>MRUPop(a:delBufNum)
-  endif
 
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
