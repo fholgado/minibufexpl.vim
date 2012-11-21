@@ -383,9 +383,8 @@ let s:debugIndex = 0
 " Variable used to pass maxTabWidth info between functions
 let s:maxTabWidth = 0
 
-" Build initial MRUList. This makes sure all the files specified on the
-" command line are picked up correctly.
-let s:MRUList = range(1, bufnr('$'))
+" List for tracking order of the buffer entering
+let s:MRUList = []
 
 " Dictionary used to keep track of the modification state of buffers
 let s:bufStateDict = {}
@@ -445,6 +444,11 @@ augroup END
 
 function! <SID>VimEnterHandler()
   call <SID>DEBUG('==> Entering VimEnter Handler', 10)
+
+  " Build initial MRUList.
+  " This makes sure all the files specified on the command
+  " line are picked up correctly.
+  let s:MRUList = range(1, bufnr('$'))
 
   call <SID>BuildAllBufferDicts()
 
