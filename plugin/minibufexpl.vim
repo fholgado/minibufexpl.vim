@@ -1154,9 +1154,9 @@ function! <SID>CycleBuffer(forward,...)
     call <SID>DEBUG('BufList is '.string(s:BufList),1)
     let curBufIndex = index(s:BufList, l:curBufNum)
     call <SID>DEBUG('curBufIndex is '.l:curBufIndex,1)
-    let forBufIndex = l:curBufIndex - 1 < 0 ? len(s:BufList) - 1 : l:curBufIndex - 1
+    let forBufIndex = l:curBufIndex + 1 >= len(s:BufList) ? 0 : l:curBufIndex + 1
     call <SID>DEBUG('forBufIndex is '.l:forBufIndex,1)
-    let bacBufIndex = l:curBufIndex + 1 >= len(s:BufList) ? 0 : l:curBufIndex + 1
+    let bacBufIndex = l:curBufIndex - 1 < 0 ? len(s:BufList) - 1 : l:curBufIndex - 1
     call <SID>DEBUG('bacBufIndex is '.l:bacBufIndex,1)
 
     if a:forward
