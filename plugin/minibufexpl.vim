@@ -37,48 +37,25 @@ let loaded_minibufexplorer = 1
 "
 " Mappings and Commands
 "
-" MBE Keyboard Mappings {{{
-" If we don't already have keyboard mappings for MBE then create them
-"
-if !hasmapto('<Plug>MiniBufExplorer')
-  map <unique> <Leader>mbe <Plug>MiniBufExplorer
-endif
-if !hasmapto('<Plug>CMiniBufExplorer')
-  map <unique> <Leader>mbc <Plug>CMiniBufExplorer
-endif
-if !hasmapto('<Plug>UMiniBufExplorer')
-  map <unique> <Leader>mbu <Plug>UMiniBufExplorer
-endif
-if !hasmapto('<Plug>TMiniBufExplorer')
-  map <unique> <Leader>mbt <Plug>TMiniBufExplorer
-endif
-if !hasmapto('<Plug>MBEMarkCurrent')
-  map <unique> <Leader>mq <Plug>MBEMarkCurrent
-endif
-
-" }}}
-" MBE <Script> internal map {{{
-"
-noremap <unique> <script> <Plug>MiniBufExplorer  :call <SID>StartExplorer(-1, bufnr("%"))<CR>:<BS>
-noremap <unique> <script> <Plug>CMiniBufExplorer :call <SID>StopExplorer()<CR>:<BS>
-noremap <unique> <script> <Plug>UMiniBufExplorer :call <SID>AutoUpdate(-1,bufnr("%"))<CR>:<BS>
-noremap <unique> <script> <Plug>TMiniBufExplorer :call <SID>ToggleExplorer()<CR>:<BS>
-noremap <unique> <script> <Plug>MBEMarkCurrent :call <SID>MarkCurrentBuffer(bufname("%"),1)<CR>:<BS>
-
-" }}}
 " MBE commands {{{
 "
 if !exists(':MiniBufExplorer')
-  command! MiniBufExplorer  call <SID>StartExplorer(-1, bufnr("%"))
+  command! MiniBufExplorer echoe 'MiniBufExplorer is depreciated, please use MBEOpen instead.'
 endif
 if !exists(':CMiniBufExplorer')
-  command! CMiniBufExplorer  call <SID>StopExplorer()
-endif
-if !exists(':UMiniBufExplorer')
-  command! UMiniBufExplorer  call <SID>AutoUpdate(-1,bufnr("%"))
+  command! CMiniBufExplorer echoe 'CMiniBufExplorer is depreciated, please use MBEClose instead.'
 endif
 if !exists(':TMiniBufExplorer')
-  command! TMiniBufExplorer  call <SID>ToggleExplorer()
+  command! TMiniBufExplorer echoe 'TMiniBufExplorer is depreciated, please use MBEToggle instead.'
+endif
+if !exists(':MBEOpen')
+  command! MBEOpen    call <SID>StartExplorer(-1, bufnr("%"))
+endif
+if !exists(':MBEClose')
+  command! MBEClose   call <SID>StopExplorer()
+endif
+if !exists(':MBEToggle')
+  command! MBEToggle  call <SID>ToggleExplorer()
 endif
 if !exists(':MBEbn')
   command! MBEbn call <SID>CycleBuffer(1)
@@ -247,74 +224,6 @@ endif
 "
 if !exists('g:miniBufExplShowBufNumbers')
   let g:miniBufExplShowBufNumbers = 1
-endif
-
-" }}}
-" Extended window navigation commands? {{{
-" Global flag to turn extended window navigation commands on or off
-" enabled = 1, dissabled = 0
-"
-if !exists('g:miniBufExplMapWindowNav')
-  " This is for backwards compatibility and may be removed in a
-  " later release, please use the ...NavVim and/or ...NavArrows
-  " settings.
-  let g:miniBufExplMapWindowNav = 0
-endif
-if !exists('g:miniBufExplMapWindowNavVim')
-  let g:miniBufExplMapWindowNavVim = 0
-endif
-if !exists('g:miniBufExplMapWindowNavArrows')
-  let g:miniBufExplMapWindowNavArrows = 0
-endif
-if !exists('g:miniBufExplMapCTabSwitchBufs')
-  let g:miniBufExplMapCTabSwitchBufs = 0
-endif
-" Notice: that if CTabSwitchBufs is turned on then
-" we turn off CTabSwitchWindows.
-if g:miniBufExplMapCTabSwitchBufs == 1 || !exists('g:miniBufExplMapCTabSwitchWindows')
-  let g:miniBufExplMapCTabSwitchWindows = 0
-endif
-
-"
-" If we have enabled control + vim direction key remapping
-" then perform the remapping
-"
-" Notice: I left g:miniBufExplMapWindowNav in for backward
-" compatibility. Eventually this mapping will be removed so
-" please use the newer g:miniBufExplMapWindowNavVim setting.
-if g:miniBufExplMapWindowNavVim || g:miniBufExplMapWindowNav
-  noremap <C-J> <C-W>j
-  noremap <C-K> <C-W>k
-  noremap <C-H> <C-W>h
-  noremap <C-L> <C-W>l
-endif
-
-"
-" If we have enabled control + arrow key remapping
-" then perform the remapping
-"
-if g:miniBufExplMapWindowNavArrows
-  noremap <C-Down>  <C-W>j
-  noremap <C-Up>    <C-W>k
-  noremap <C-Left>  <C-W>h
-  noremap <C-Right> <C-W>l
-endif
-
-" If we have enabled <C-TAB> and <C-S-TAB> to switch buffers
-" in the current window then perform the remapping
-"
-if g:miniBufExplMapCTabSwitchBufs
-  noremap <C-TAB>   :call <SID>CycleBuffer(1)<CR>:<BS>
-  noremap <C-S-TAB> :call <SID>CycleBuffer(0)<CR>:<BS>
-endif
-
-"
-" If we have enabled <C-TAB> and <C-S-TAB> to switch windows
-" then perform the remapping
-"
-if g:miniBufExplMapCTabSwitchWindows
-  noremap <C-TAB>   <C-W>w
-  noremap <C-S-TAB> <C-W>W
 endif
 
 "}}}
