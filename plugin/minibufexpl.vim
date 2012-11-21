@@ -40,13 +40,22 @@ let loaded_minibufexplorer = 1
 " MBE commands {{{
 "
 if !exists(':MiniBufExplorer')
-  command! MiniBufExplorer  call <SID>StartExplorer(-1, bufnr("%"))
+  command! MiniBufExplorer echoe 'MiniBufExplorer is depreciated, please use MBEOpen instead.'
 endif
 if !exists(':CMiniBufExplorer')
-  command! CMiniBufExplorer  call <SID>StopExplorer()
+  command! CMiniBufExplorer echoe 'CMiniBufExplorer is depreciated, please use MBEClose instead.'
 endif
 if !exists(':TMiniBufExplorer')
-  command! TMiniBufExplorer  call <SID>ToggleExplorer()
+  command! TMiniBufExplorer echoe 'TMiniBufExplorer is depreciated, please use MBEToggle instead.'
+endif
+if !exists(':MBEOpen')
+  command! MBEOpen    call <SID>StartExplorer(-1, bufnr("%"))
+endif
+if !exists(':MBEClose')
+  command! MBEClose   call <SID>StopExplorer()
+endif
+if !exists(':MBEToggle')
+  command! MBEToggle  call <SID>ToggleExplorer()
 endif
 if !exists(':MBEbn')
   command! MBEbn call <SID>CycleBuffer(1)
