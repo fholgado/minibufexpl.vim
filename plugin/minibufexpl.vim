@@ -377,11 +377,11 @@ else
     let s:PathSeparator = '\'
 endif
 
-" Variable used to pass maxTabWidth info between functions
-let s:maxTabWidth = 0
-
 " Variable used to count debug output lines
 let s:debugIndex = 0
+
+" Variable used to pass maxTabWidth info between functions
+let s:maxTabWidth = 0
 
 " Build initial MRUList. This makes sure all the files specified on the
 " command line are picked up correctly.
@@ -1679,17 +1679,12 @@ function! <SID>HasEligibleBuffers(delBufNum)
   let &report = 10000
   set noshowcmd
 
-  " Get the number of the last buffer.
-  let l:NBuffers = bufnr('$')
-
-   " No buffer found
   let l:found = 0
-
   let l:needed = g:miniBufExplBuffersNeeded
 
   " Loop through every buffer less than the total number of buffers.
   let l:i = 0
-  while(l:i <= l:NBuffers && l:found < l:needed)
+  while(l:i <= bufnr('$') && l:found < l:needed)
     let l:i = l:i + 1
 
     " If we have a delBufNum and it is the current
@@ -1720,7 +1715,7 @@ function! <SID>HasEligibleBuffers(delBufNum)
   let &report  = l:save_rep
   let &showcmd = l:save_sc
 
-  call <SID>DEBUG('HasEligibleBuffers found '.l:found.' eligible buffers of '.l:needed.' needed',6)
+  call <SID>DEBUG('Found '.l:found.' eligible buffers of '.l:needed.' needed',6)
 
   call <SID>DEBUG('Leaving HasEligibleBuffers()',10)
   return (l:found >= l:needed)
