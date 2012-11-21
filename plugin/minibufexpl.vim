@@ -1310,7 +1310,7 @@ function! <SID>UpdateBufferPathDict(bufNum,deleted)
     " we just want make sure entries in 's:bufPathDict' are synced
     " with 's:bufNameDict'.
     if l:bufName == ''
-        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        call <SID>DEBUG('Leaving UpdateBufferPathDict()',5)
         return
     endif
 
@@ -1322,7 +1322,7 @@ function! <SID>UpdateBufferPathDict(bufNum,deleted)
             call filter(s:bufPathDict, 'v:key != '.l:bufNum)
             call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
         endif
-        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        call <SID>DEBUG('Leaving UpdateBufferPathDict()',5)
         return
     endif
 
