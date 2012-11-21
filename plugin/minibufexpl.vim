@@ -685,7 +685,7 @@ function! <SID>UpdateExplorer(curBufNum)
     let l:currWin = winnr()
     call s:SwitchWindow('p',1)
 
-    call s:SwitchWindow('w',1,l:winNum)
+    call s:SwitchWindow('w',0,l:winNum)
   endif
 
   call <SID>DisplayBuffers(a:curBufNum)
