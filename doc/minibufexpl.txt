@@ -1,15 +1,17 @@
 *minibufexpl.txt*    Mini Buffer Explorer
 
+                                                                 *MiniBufExpl*
 ==============================================================================
 CONTENTS                                                *MiniBufExpl-contents*
-                                                        *MiniBufExpl*
 
     1. Install................................|MiniBufExplInstall|
-    2. Key Mappings...........................|MiniBufExplMappings|
+    2. Mappings...............................|MiniBufExplMappings|
+       2.1 Global Mappings                    |MiniBufExplMappings-Global|
+       2.2 Window Mappings                    |MiniBufExplMappings-Window|
     3. Commands...............................|MiniBufExplCommands|
     4. Options................................|MiniBufExplOptions|
        4.1 Splits.............................|MiniBufExplSplits|
-       4.2 Horizontal Size....................|MiniBufExplWindowSize|
+       4.2 Window Size........................|MiniBufExplWindowSize|
        4.3 Automatic Opening..................|MiniBufExplAutoOpen|
        4.4 Keyboard Control...................|MiniBufExplKeyboard|
        4.5 Misc...............................|MiniBufExplMisc|
@@ -29,6 +31,9 @@ automatically sourced. If not, you must manually source this file using
 ==============================================================================
 2. Key Mappings                                          *MiniBufExplMappings*
 
+------------------------------------------------------------------------------
+2.1 Global Mappings                               *MiniBufExplMappings-Global*
+
 You may use the default keymappings of
 
   <Leader>mbe - Opens MiniBufExplorer
@@ -47,6 +52,39 @@ Other keymappings include: <Leader>mbc to close the Explorer window,
 <Leader>mbu to force the Explorer to Update and <Leader>mbt to toggle the
 Explorer window; it will open if closed or close if open. Each of these key
 bindings can be overridden (see the notes on <Leader>mbe above.)
+
+------------------------------------------------------------------------------
+2.2 Window Mappings                               *MiniBufExplMappings-Window*
+
+    o                                                  *MiniBufExpl-Mapping-o*
+    e                                                  *MiniBufExpl-Mapping-e*
+    <CR>                                            *MiniBufExpl-Mapping-<CR>*
+                                   Open selected buffer in the previous window
+
+    s                                                  *MiniBufExpl-Mapping-s*
+             Open selected buffer in a horizontal split of the previous window
+
+    v                                                  *MiniBufExpl-Mapping-v*
+               Open selected buffer in a vertical split of the previous window
+
+    d                                                  *MiniBufExpl-Mapping-d*
+                  Delete selected buffer without closing the window it located
+
+    k                                                  *MiniBufExpl-Mapping-k*
+    <up>                                            *MiniBufExpl-Mapping-<up>*
+                                            Move one line up in the MBE window
+
+    h                                                  *MiniBufExpl-Mapping-h*
+    <down>                                        *MiniBufExpl-Mapping-<down>*
+                                          Move one line down in the MBE window
+
+    l                                                  *MiniBufExpl-Mapping-l*
+    <TAB>                                          *MiniBufExpl-Mapping-<TAB>*
+                                     Move one buffer forward in the MBE window
+
+    j                                                  *MiniBufExpl-Mapping-j*
+    <S-TAB>                                      *MiniBufExpl-Mapping-<S-TAB>*
+                                    Move one buffer backward in the MBE window
 
 ==============================================================================
 3. Commands                                              *MiniBufExplCommands*
@@ -81,26 +119,6 @@ mode:
 ------------------------------------------------------------------------------
 4.1 Splits                                                 *MiniBufExplSplits*
 
-                                                   *'g:miniBufExplSplitBelow'*
-To control where the new split window goes relative to the current window, use
-the setting:
-
-  let g:miniBufExplSplitBelow=0  " Put new window above
-                                 " current or on the
-                                 " left for vertical split
-  let g:miniBufExplSplitBelow=1  " Put new window below
-                                 " current or on the
-                                 " right for vertical split
-
-The default for this is read from the 'splitbelow' Vim option.
-
-                                                  *'g:miniBufExplSplitToEdge'*
-By default we are now (as of 6.0.2) forcing the -MiniBufExplorer- window to
-open up at the edge of the screen. You can turn this off by setting the
-following variable in your .vimrc:
-
-  let g:miniBufExplSplitToEdge = 0
-
                                                        *'g:miniBufExplVSplit'*
 If you would like a vertical explorer you can assign the column width (in
 characters) you want for your explorer window with the following .vimrc
@@ -108,6 +126,29 @@ variable (this was introduced in 6.3.0):
 
   let g:miniBufExplVSplit = 20   " column width in chars
 
+                                                      *'g:miniBufExplBRSplit'*
+To control where the new split window goes relative to the current window, use
+the setting:
+
+  let g:miniBufExplBRSplit = 0   " Put new window above
+                                 " current or on the
+                                 " left for vertical split
+  let g:miniBufExplBRSplit = 1   " Put new window below
+                                 " current or on the
+                                 " right for vertical split
+
+The default for this is read from the 'splitbelow' or 'splitright' Vim option
+which depends on 'g:miniBufExplVSplit' option.
+
+                                                   *'g:miniBufExplSplitBelow'*
+This option has been depreciated by 'g:miniBufExplBRSplit'.
+
+                                                  *'g:miniBufExplSplitToEdge'*
+By default we are now (as of 6.0.2) forcing the -MiniBufExplorer- window to
+open up at the edge of the screen. You can turn this off by setting the
+following variable in your .vimrc:
+
+  let g:miniBufExplSplitToEdge = 0
 
 ------------------------------------------------------------------------------
 4.2 Window Size                                        *MiniBufExplWindowSize*
@@ -170,26 +211,38 @@ setting is backwards compatible if you don't use MinSize.
 ------------------------------------------------------------------------------
 4.3 Automatic Opening                                    *MiniBufExplAutoOpen*
 
-                                                *'g:miniBufExplorerAutoStart'*
+                                                    *'g:miniBufExplAutoStart'*
 If you only want open MBE manually when needed, you can put the following into
 your .vimrc:
 
   let g:miniBufExplorerAutoStart = 0
+
+                                                *'g:miniBufExplorerAutoStart'*
+This option has been depreciated by 'g:miniBufExplAutoStart'.
+
+                                                *'g:miniBufExplBuffersNeeded'*
+This variable controls how man buffers should be available until MBE shows up,
+if 'g:miniBufExplorerAutoStart' is enabled. By default, at least 2 buffers are
+needed.
+
+You can put the following into your .vimrc to let MBE start as soon as a normal
+buffer is available.
+
+  let g:miniBufExplBuffersNeeded = 1
+
+You can put the following into your .vimrc to skip the eligible buffer checking.
+
+  let g:miniBufExplBuffersNeeded = 0
+
                                               *'g:miniBufExplorerMoreThanOne'*
-By default we are now (as of 6.0.1) turning on the MoreThanOne option. This
-stops the -MiniBufExplorer- from opening automatically until more than one
-eligible buffer is available. You can turn this feature off by setting the
-following variable in your .vimrc:
+This option has been depreciated by 'g:miniBufExplBuffersNeeded'.
 
-  let g:miniBufExplorerMoreThanOne=1
+                                                 *'g:miniBufExplHideWhenDiff'*
+Disable automatic opening if vim is started in diff mode(vimdiff, or with '-d'
+option). This option only affected the first tab page created at vim start.
 
-(The following enhancement is as of 6.2.2) Setting this to 0 will cause the
-MBE window to be loaded even if no buffers are available. Setting it to 1
-causes the MBE window to be loaded as soon as an eligible buffer is read. You
-can also set it to larger numbers. So if you set it to 4 for example the MBE
-window wouldn't auto-open until 4 eligibles buffers had been loaded. This is
-nice for folks that don't want an MBE window unless they are editing more than
-two or three buffers.
+                                             *'g:miniBufExplorerHideWhenDiff'*
+This option has been depreciated by 'g:miniBufExplHideWhenDiff'.
 
 ------------------------------------------------------------------------------
 4.4 Keyboard Control                                     *MiniBufExplKeyboard*
@@ -228,6 +281,9 @@ NOTE: If you set the ...TabSwitchBufs AND ...TabSwitchWindows,
 ------------------------------------------------------------------------------
 4.5 Misc                                                     *MiniBufExplMisc*
 
+                                               *'g:miniBufExplStatusLineText'*
+MBE window status line text.
+
                                                *'g:miniBufExplUseSingleClick'*
 As of MBE 6.3.0, you can put the following into your .vimrc:
 
@@ -235,11 +291,6 @@ As of MBE 6.3.0, you can put the following into your .vimrc:
 
 If you would like to single click on tabs rather than double clicking on them
 to goto the selected buffer.
-
-NOTE: If you use the single click option in taglist.vim you may
-      need to get an updated version that includes a patch I
-      provided to allow both explorers to provide single click
-      buffer selection.
 
                                                 *'g:miniBufExplCloseOnSelect'*
 If you would like MBE to close when you select a buffer, put:
@@ -277,27 +328,33 @@ highlighting back on (introduced in 6.3.1):
 ------------------------------------------------------------------------------
 4.6 Debugging                                           *MiniBufExplDebugging*
 
-                                               *'g:miniBufExplorerDebugLevel'*
+                                                    *'g:miniBufExplDebugMode'*
+You can also set a DebugMode to cause output to be target as follows (default
+is mode 3):
+
+  let g:miniBufExplDebugMode  = 0      " Errors will show up in
+                                       " a Vim window
+  let g:miniBufExplDebugMode  = 1      " Uses Vim's echo function
+                                       " to display on the screen
+  let g:miniBufExplDebugMode  = 2      " Writes to a file
+                                       " MiniBufExplorer.DBG
+  let g:miniBufExplDebugMode  = 3      " Store output in global variable
+                                       " g:miniBufExplDebugOutput
+
+                                                *'g:miniBufExplorerDebugMode'*
+This option has been depreciated by 'g:miniBufExplDebugMode'.
+
+                                                   *'g:miniBufExplDebugLevel'*
 MBE has had a basic debugging capability for quite some time. However, it has
 not been very friendly in the past. As of 6.0.8, you can put one of each of
 the following into your .vimrc:
 
-  let g:miniBufExplorerDebugLevel = 0  " MBE serious errors output
-  let g:miniBufExplorerDebugLevel = 4  " MBE all errors output
-  let g:miniBufExplorerDebugLevel = 10 " MBE reports everything
+  let g:miniBufExplDebugLevel = 0      " MBE serious errors output
+  let g:miniBufExplDebugLevel = 4      " MBE all errors output
+  let g:miniBufExplDebugLevel = 10     " MBE reports everything
 
-                                               *'g:miniBufExplorerDebugMode'*
-You can also set a DebugMode to cause output to be target as follows (default
-is mode 3):
-
-  let g:miniBufExplorerDebugMode  = 0  " Errors will show up in
-                                       " a Vim window
-  let g:miniBufExplorerDebugMode  = 1  " Uses Vim's echo function
-                                       " to display on the screen
-  let g:miniBufExplorerDebugMode  = 2  " Writes to a file
-                                       " MiniBufExplorer.DBG
-  let g:miniBufExplorerDebugMode  = 3  " Store output in global:
-                                  " g:miniBufExplorerDebugOutput
+                                               *'g:miniBufExplorerDebugLevel'*
+This option has been depreciated by 'g:miniBufExplDebugLevel'.
 
 Or if you are able to start Vim, you might just perform these at a command
 prompt right before you do the operation that is failing.
@@ -355,7 +412,6 @@ might not take you to the expected window.
 - Add the ability to specify a regexp for eligible buffers
   allowing the ability to filter out certain buffers that
   you don't want to control from MBE.
-
 
 ==============================================================================
 7. About                                                    *MiniBufExplAbout*
@@ -547,7 +603,7 @@ might not take you to the expected window.
       means I can easily close the MBE window when I'm
       not using it and get it back when I want it.
     - Changed default debug mode to 3 (write to global
-      g:miniBufExplorerDebugOutput)
+      g:miniBufExplDebugOutput)
     - Made a pass through the documentation to clarify
       serveral issues and provide more complete docs
       for mappings and commands.
