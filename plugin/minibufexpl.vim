@@ -2020,10 +2020,7 @@ endfunction
 " are cycled forward.
 "
 function! <SID>CycleBuffer(forward)
-  " If we are in the MBE window, switch to the next one, otherwise a new
-  " window will be created
-  if (bufname("%") == "-MiniBufExplorer-")
-    call <SID>DEBUG('Can not cycle buffer inside MBE window', 1)
+  if <SID>IgnoreBuffer(bufnr('%')) == 1
     return
   endif
 
