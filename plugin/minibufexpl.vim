@@ -86,6 +86,12 @@ endif
 if !exists(':MBEbp')
   command! MBEbp call <SID>CycleBuffer(0)
 endif
+if !exists(':MBEbf')
+  command! MBEbf call <SID>CycleBuffer(1,1)
+endif
+if !exists(':MBEbb')
+  command! MBEbb call <SID>CycleBuffer(0,1)
+endif
 
 " }}}
 "
@@ -383,8 +389,13 @@ let s:debugIndex = 0
 " Variable used to pass maxTabWidth info between functions
 let s:maxTabWidth = 0
 
+let s:BufList = []
+
 " List for tracking order of the buffer entering
 let s:MRUList = []
+
+" Whether MRU List should be updated.
+let s:MRUEnable = 1
 
 " Dictionary used to keep track of the modification state of buffers
 let s:bufStateDict = {}
@@ -448,6 +459,7 @@ function! <SID>VimEnterHandler()
   " Build initial MRUList.
   " This makes sure all the files specified on the command
   " line are picked up correctly.
+  let s:BufList = range(1, bufnr('$'))
   let s:MRUList = range(1, bufnr('$'))
 
   call <SID>BuildAllBufferDicts()
@@ -480,7 +492,9 @@ endfunction
 function! <SID>BufAddHandler()
   call <SID>DEBUG('==> Entering BufAdd Handler', 10)
 
-  call <SID>MRUAdd(str2nr(expand("<abuf>")))
+  call <SID>ListAdd(s:BufList,str2nr(expand("<abuf>")))
+  call <SID>ListAdd(s:MRUList,str2nr(expand("<abuf>")))
+
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
 
   call <SID>DEBUG('<== Leaving BufAdd Handler', 10)
@@ -489,9 +503,15 @@ endfunction
 function! <SID>BufEnterHandler()
   call <SID>DEBUG('==> Entering BufEnter Handler', 10)
 
+  for l:i in s:BufList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>ListPop(s:BufList,l:i)
+    endif
+  endfor
+
   for l:i in s:MRUList
     if <SID>IsBufferIgnored(l:i)
-        call <SID>MRUPop(l:i)
+        call <SID>ListPop(s:MRUList,l:i)
     endif
   endfor
 
@@ -503,7 +523,8 @@ endfunction
 function! <SID>BufDeleteHandler()
   call <SID>DEBUG('==> Entering BufDelete Handler', 10)
 
-  call <SID>MRUPop(str2nr(expand("<abuf>")))
+  call <SID>ListPop(s:BufList,str2nr(expand("<abuf>")))
+  call <SID>ListPop(s:MRUList,str2nr(expand("<abuf>")))
 
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 
@@ -1094,6 +1115,65 @@ function! <SID>ShowBuffers()
   let &showcmd = l:save_sc
 
   call <SID>DEBUG('Leaving ShowBuffers()',10)
+endfunction
+
+" }}}
+" CycleBuffer - Cycle Through Buffers {{{
+"
+" Move to next or previous buffer in the current window. If there
+" are no more modifiable buffers then stay on the current buffer.
+" can be called with no parameters in which case the buffers are
+" cycled forward. Otherwise a single argument is accepted, if
+" it's 0 then the buffers are cycled backwards, otherwise they
+" are cycled forward.
+"
+function! <SID>CycleBuffer(forward,...)
+  if <SID>IgnoreBuffer(bufnr('%')) == 1
+    return
+  endif
+
+  let curBufNum = bufnr('%')
+
+  if exists('a:1') && a:1 == 1
+    call <SID>DEBUG('MRUList is '.string(s:MRUList),1)
+    let curBufIndex = index(s:MRUList, l:curBufNum)
+    call <SID>DEBUG('curBufIndex is '.l:curBufIndex,1)
+    let forBufIndex = l:curBufIndex - 1 < 0 ? len(s:MRUList) - 1 : l:curBufIndex - 1
+    call <SID>DEBUG('bacBufIndex is '.l:bacBufIndex,1)
+    let bacBufIndex = l:curBufIndex + 1 >= len(s:MRUList) ? 0 : l:curBufIndex + 1
+    call <SID>DEBUG('forBufIndex is '.l:forBufIndex,1)
+
+    if a:forward
+      let l:moveCmd = 'b! '.s:MRUList[l:forBufIndex]
+    else
+      let l:moveCmd = 'b! '.s:MRUList[l:bacBufIndex]
+    endif
+
+    let s:MRUEnable = 0
+  else
+    call <SID>DEBUG('BufList is '.string(s:BufList),1)
+    let curBufIndex = index(s:BufList, l:curBufNum)
+    call <SID>DEBUG('curBufIndex is '.l:curBufIndex,1)
+    let forBufIndex = l:curBufIndex + 1 >= len(s:BufList) ? 0 : l:curBufIndex + 1
+    call <SID>DEBUG('forBufIndex is '.l:forBufIndex,1)
+    let bacBufIndex = l:curBufIndex - 1 < 0 ? len(s:BufList) - 1 : l:curBufIndex - 1
+    call <SID>DEBUG('bacBufIndex is '.l:bacBufIndex,1)
+
+    if a:forward
+      let l:moveCmd = 'b! '.s:BufList[l:forBufIndex]
+    else
+      let l:moveCmd = 'b! '.s:BufList[l:bacBufIndex]
+    endif
+
+    let s:MRUEnable = 1
+  endif
+
+  call <SID>DEBUG('===============move cmd is '.l:moveCmd,1)
+
+  " Change buffer (keeping track of before and after buffers)
+  exec l:moveCmd
+
+  let s:MRUEnable = 1
 endfunction
 
 " }}}
@@ -1725,7 +1805,9 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
     return
   endif
 
-  call <SID>MRUPush(a:curBufNum)
+  if s:MRUEnable == 1
+    call <SID>ListPush(s:MRUList,a:curBufNum)
+  endif
 
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
@@ -2011,72 +2093,28 @@ function! <SID>NextNormalWindow()
 endfunction
 
 " }}}
-" CycleBuffer - Cycle Through Buffers {{{
+" ListAdd {{{
 "
-" Move to next or previous buffer in the current window. If there
-" are no more modifiable buffers then stay on the current buffer.
-" can be called with no parameters in which case the buffers are
-" cycled forward. Otherwise a single argument is accepted, if
-" it's 0 then the buffers are cycled backwards, otherwise they
-" are cycled forward.
-"
-function! <SID>CycleBuffer(forward)
-  if <SID>IsBufferIgnored(bufnr('%')) == 1
-    return
-  endif
-
-  let l:saveAutoUpdate = t:miniBufExplAutoUpdate
-
-  let t:miniBufExplAutoUpdate = 0
-
-  " Change buffer (keeping track of before and after buffers)
-  let l:origBuf = bufnr('%')
-  if (a:forward == 1)
-    bn!
-  else
-    bp!
-  endif
-  let l:curBuf  = bufnr('%')
-
-  " Skip any non-modifiable buffers, but don't cycle forever
-  " This should stop us from stopping in any of the [Explorers]
-  while getbufvar(l:curBuf, '&modifiable') == 0 && l:origBuf != l:curBuf
-    if (a:forward == 1)
-      bn!
-    else
-      bp!
-    endif
-    let l:curBuf = bufnr('%')
-  endwhile
-
-  let t:miniBufExplAutoUpdate = l:saveAutoUpdate
-
-  call <SID>AutoUpdate(-1,bufnr("%"))
+function! <SID>ListAdd(list,val)
+  call add(a:list, a:val)
 endfunction
 
 " }}}
-" MRUAdd {{{
+" ListPop {{{
 "
-function! <SID>MRUAdd(buf)
-  call add(s:MRUList, a:buf)
+function! <SID>ListPop(list,val)
+  call filter(a:list, 'v:val != '.a:val)
 endfunction
 
 " }}}
-" MRUPop - remove buffer from MRU list {{{
+" ListPush {{{
 "
-function! <SID>MRUPop(buf)
-  call filter(s:MRUList, 'v:val != '.a:buf)
-endfunction
-
-" }}}
-" MRUPush - add buffer to MRU list {{{
-"
-function! <SID>MRUPush(buf)
+function! <SID>ListPush(list,val)
   " Remove the buffer number from the list if it already exists.
-  call <SID>MRUPop(a:buf)
+  call <SID>ListPop(a:list,a:val)
 
   " Add the buffer number to the head of the list.
-  call insert(s:MRUList,a:buf)
+  call insert(a:list,a:val)
 endfunction
 
 " }}}
