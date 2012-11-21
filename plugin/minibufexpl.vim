@@ -1663,22 +1663,11 @@ function! <SID>HasEligibleBuffers(delBufNum)
       continue
     endif
 
-    " Make sure the buffer in question is listed.
-    if (getbufvar(l:i, '&buflisted') == 1)
-      " Get the name of the buffer.
-      let l:BufName = bufname(l:i)
-      " Check to see if the buffer is a blank or not. If the buffer does have
-      " a name, process it.
-      if (strlen(l:BufName))
-        " Only show modifiable buffers (The idea is that we don't
-        " want to show Explorers)
-        if ((getbufvar(l:i, '&modifiable') == 1) && (BufName != '-MiniBufExplorer-'))
-
-            let l:found = l:found + 1
-
-        endif
-      endif
+    if <SID>IgnoreBuffer(l:i)
+      continue
     endif
+
+    let l:found = l:found + 1
   endwhile
 
   call <SID>DEBUG('Found '.l:found.' eligible buffers of '.l:needed.' needed',6)
