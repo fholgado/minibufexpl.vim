@@ -480,7 +480,8 @@ endfunction
 function! <SID>BufAddHandler()
   call <SID>DEBUG('==> Entering BufAdd Handler', 10)
 
-  call <SID>MRUAdd(str2nr(expand("<abuf>")))
+  call <SID>ListAdd(s:MRUList,str2nr(expand("<abuf>")))
+
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
 
   call <SID>DEBUG('<== Leaving BufAdd Handler', 10)
@@ -491,7 +492,7 @@ function! <SID>BufEnterHandler()
 
   for l:i in s:MRUList
     if <SID>IsBufferIgnored(l:i)
-        call <SID>MRUPop(l:i)
+        call <SID>ListPop(s:MRUList,l:i)
     endif
   endfor
 
@@ -503,7 +504,7 @@ endfunction
 function! <SID>BufDeleteHandler()
   call <SID>DEBUG('==> Entering BufDelete Handler', 10)
 
-  call <SID>MRUPop(str2nr(expand("<abuf>")))
+  call <SID>ListPop(s:MRUList,str2nr(expand("<abuf>")))
 
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 
@@ -1725,7 +1726,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
     return
   endif
 
-  call <SID>MRUPush(a:curBufNum)
+  call <SID>ListPush(s:MRUList,a:curBufNum)
 
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
@@ -2055,28 +2056,28 @@ function! <SID>CycleBuffer(forward)
 endfunction
 
 " }}}
-" MRUAdd {{{
+" ListAdd {{{
 "
-function! <SID>MRUAdd(buf)
-  call add(s:MRUList, a:buf)
+function! <SID>ListAdd(list,val)
+  call add(a:list, a:val)
 endfunction
 
 " }}}
-" MRUPop - remove buffer from MRU list {{{
+" ListPop {{{
 "
-function! <SID>MRUPop(buf)
-  call filter(s:MRUList, 'v:val != '.a:buf)
+function! <SID>ListPop(list,val)
+  call filter(a:list, 'v:val != '.a:val)
 endfunction
 
 " }}}
-" MRUPush - add buffer to MRU list {{{
+" ListPush {{{
 "
-function! <SID>MRUPush(buf)
+function! <SID>ListPush(list,val)
   " Remove the buffer number from the list if it already exists.
-  call <SID>MRUPop(a:buf)
+  call <SID>ListPop(a:list,a:val)
 
   " Add the buffer number to the head of the list.
-  call insert(s:MRUList,a:buf)
+  call insert(a:list,a:val)
 endfunction
 
 " }}}
