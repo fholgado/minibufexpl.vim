@@ -1572,10 +1572,13 @@ endfunction
 " }}}
 " UpdateBufferStateDict {{{
 function! <SID>UpdateBufferStateDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferStateDict()',5)
+
     let l:bufNum = 0 + a:bufNum
 
     if a:deleted && has_key(s:bufStateDict, l:bufNum)
         call filter(s:bufStateDict, 'v:key != '.l:bufNum)
+        call <SID>DEBUG('Leaving UpdateBufferStateDict()',5)
         return
     endif
 
@@ -1587,6 +1590,8 @@ function! <SID>UpdateBufferStateDict(bufNum,deleted)
     else
         let s:bufStateDict[l:bufNum] = getbufvar(a:bufNum, '&modified')
     endif
+
+    call <SID>DEBUG('Leaving UpdateBufferStateDict()',5)
 endfunction
 
 " }}}
