@@ -1099,17 +1099,6 @@ function! <SID>FocusCurrentBuffer(bufnr)
 endfunction
 
 " }}}
-" Max - Returns the max of two numbers {{{
-"
-function! <SID>Max(argOne, argTwo)
-  if a:argOne > a:argTwo
-    return a:argOne
-  else
-    return a:argTwo
-  endif
-endfunction
-
-" }}}
 " IgnoreBuffer - check to see if buffer should be ignored {{{
 "
 " Returns 0 if this buffer should be displayed in the list, 1 otherwise.
@@ -1215,7 +1204,7 @@ function! <SID>BuildBufferList(delBufNum, curBufNum)
             let l:tab .= '!'
         endif
 
-        let l:maxTabWidth = <SID>Max(strlen(l:tab), l:maxTabWidth)
+        let l:maxTabWidth = strlen(l:tab) > l:maxTabWidth ? strlen(l:tab) : l:maxTabWidth
 
         call add(l:tabList, l:tab)
     endwhile
