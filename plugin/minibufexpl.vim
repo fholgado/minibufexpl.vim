@@ -348,8 +348,8 @@ endif
 " }}}
 " Status Line Text for MBE window {{{
 "
-if !exists('g:statusLineText')
-  let g:statusLineText = "-MiniBufExplorer-"
+if !exists('g:miniBufExplStatusLineText')
+  let g:miniBufExplStatusLineText = "-MiniBufExplorer-"
 endif
 
 " }}}
@@ -520,7 +520,7 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
 
   " Set the text of the statusline for the MBE buffer. See help:stl for
   " many options
-  exec 'setlocal statusline='.g:statusLineText
+  exec 'setlocal statusline='.g:miniBufExplStatusLineText
 
   " No spell check
   setlocal nospell

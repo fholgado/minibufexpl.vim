@@ -236,6 +236,9 @@ NOTE: If you set the ...TabSwitchBufs AND ...TabSwitchWindows,
 ------------------------------------------------------------------------------
 4.5 Misc                                                     *MiniBufExplMisc*
 
+                                               *'g:miniBufExplStatusLineText'*
+MBE window status line text.
+
                                                *'g:miniBufExplUseSingleClick'*
 As of MBE 6.3.0, you can put the following into your .vimrc:
 
