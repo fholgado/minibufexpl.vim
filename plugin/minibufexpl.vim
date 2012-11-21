@@ -348,7 +348,7 @@ let s:bufPathSignDict = {}
 
 "set update time for the CursorHold function so that it is called 100ms after
 "a key is pressed
-setlocal updatetime=300
+set updatetime=300
 
 augroup MiniBufExplorer
 autocmd MiniBufExplorer VimEnter       * nested call <SID>VimEnterHandler()
