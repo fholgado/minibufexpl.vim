@@ -328,27 +328,6 @@ if !exists('g:miniBufExplUseSingleClick')
   let g:miniBufExplUseSingleClick = 0
 endif
 
-"
-" attempt to perform single click mapping, it would be much
-" nicer if we could nnoremap <buffer> ... however vim does
-" not fire the <buffer> <leftmouse> when you use the mouse
-" to enter a buffer.
-"
-if g:miniBufExplUseSingleClick == 1
-  let s:clickmap = ':if bufname("%") == "-MiniBufExplorer-" <bar> call <SID>MBEClick() <bar> endif <CR>'
-  if maparg('<LEFTMOUSE>', 'n') == ''
-    " no mapping for leftmouse
-    exec ':nnoremap <silent> <LEFTMOUSE> <LEFTMOUSE>' . s:clickmap
-  else
-    " we have a mapping
-    let  g:miniBufExplDoneClickSave = 1
-    let  s:m = ':nnoremap <silent> <LEFTMOUSE> <LEFTMOUSE>'
-    let  s:m = s:m . substitute(substitute(maparg('<LEFTMOUSE>', 'n'), '|', '<bar>', 'g'), '\c^<LEFTMOUSE>', '', '')
-    let  s:m = s:m . s:clickmap
-    exec s:m
-  endif
-endif
-
 " }}}
 " Close on Select? {{{
 " Flag that can be set to 1 in a users .vimrc to hide
@@ -593,9 +572,6 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
   " If you press j in the -MiniBufExplorer- then try
   " to open the selected buffer in a vertical split in the previous window.
   nnoremap <buffer> v       :call <SID>MBESelectBuffer(2)<CR>:<BS>
-  " If you DoubleClick in the -MiniBufExplorer- then try
-  " to open the selected buffer in the previous window.
-  nnoremap <buffer> <2-LEFTMOUSE> :call <SID>MBEDoubleClick()<CR>:<BS>
   " If you press d in the -MiniBufExplorer- then try to
   " delete the selected buffer.
   nnoremap <buffer> d       :call <SID>MBEDeleteBuffer(bufname("#"))<CR>:<BS>
@@ -612,6 +588,28 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
   nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
   nnoremap <buffer> <TAB>   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
   nnoremap <buffer> <S-TAB> :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+
+  " Attempt to perform single click mapping
+  " It would be much nicer if we could 'nnoremap <buffer> ...', however
+  " vim does not fire the '<buffer> <leftmouse>' when you use the mouse
+  " to enter a buffer.
+  if g:miniBufExplUseSingleClick == 1
+    let l:mapcmd = ':nnoremap <silent> <LEFTMOUSE> <LEFTMOUSE>'
+    let l:clickcmd = ':if bufname("%") == "-MiniBufExplorer-" <bar> call <SID>MBEClick() <bar> endif <CR>'
+    " no mapping for leftmouse
+    if maparg('<LEFTMOUSE>', 'n') == ''
+      exec l:mapcmd . l:clickcmd
+    " we have a mapping
+    else
+      let  l:mapcmd = l:mapcmd . substitute(substitute(maparg('<LEFTMOUSE>', 'n'), '|', '<bar>', 'g'), '\c^<LEFTMOUSE>', '', '')
+      let  l:mapcmd = l:mapcmd . l:clickcmd
+      exec l:mapcmd
+    endif
+  " If you DoubleClick in the MBE window then try to open the selected
+  " buffer in the previous window.
+  else
+    nnoremap <buffer> <2-LEFTMOUSE> :call <SID>MBEDoubleClick()<CR>:<BS>
+  endif
 
   call <SID>BuildBufferList(a:delBufNum,a:curBufNum)
 

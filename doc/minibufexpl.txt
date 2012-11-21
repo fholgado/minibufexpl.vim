@@ -254,11 +254,6 @@ As of MBE 6.3.0, you can put the following into your .vimrc:
 If you would like to single click on tabs rather than double clicking on them
 to goto the selected buffer.
 
-NOTE: If you use the single click option in taglist.vim you may
-      need to get an updated version that includes a patch I
-      provided to allow both explorers to provide single click
-      buffer selection.
-
                                                 *'g:miniBufExplCloseOnSelect'*
 If you would like MBE to close when you select a buffer, put:
 
