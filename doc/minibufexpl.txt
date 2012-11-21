@@ -6,6 +6,8 @@ CONTENTS                                                *MiniBufExpl-contents*
 
     1. Install................................|MiniBufExplInstall|
     2. Mappings...............................|MiniBufExplMappings|
+       2.1 Global Mappings                    |MiniBufExplMappings-Global|
+       2.2 Window Mappings                    |MiniBufExplMappings-Window|
     3. Commands...............................|MiniBufExplCommands|
     4. Options................................|MiniBufExplOptions|
        4.1 Splits.............................|MiniBufExplSplits|
@@ -29,6 +31,9 @@ automatically sourced. If not, you must manually source this file using
 ==============================================================================
 2. Key Mappings                                          *MiniBufExplMappings*
 
+------------------------------------------------------------------------------
+2.1 Global Mappings                               *MiniBufExplMappings-Global*
+
 You may use the default keymappings of
 
   <Leader>mbe - Opens MiniBufExplorer
@@ -47,6 +52,39 @@ Other keymappings include: <Leader>mbc to close the Explorer window,
 <Leader>mbu to force the Explorer to Update and <Leader>mbt to toggle the
 Explorer window; it will open if closed or close if open. Each of these key
 bindings can be overridden (see the notes on <Leader>mbe above.)
+
+------------------------------------------------------------------------------
+2.2 Window Mappings                               *MiniBufExplMappings-Window*
+
+    o                                                  *MiniBufExpl-Mapping-o*
+    e                                                  *MiniBufExpl-Mapping-e*
+    <CR>                                            *MiniBufExpl-Mapping-<CR>*
+                                   Open selected buffer in the previous window
+
+    s                                                  *MiniBufExpl-Mapping-s*
+             Open selected buffer in a horizontal split of the previous window
+
+    v                                                  *MiniBufExpl-Mapping-v*
+               Open selected buffer in a vertical split of the previous window
+
+    d                                                  *MiniBufExpl-Mapping-d*
+                  Delete selected buffer without closing the window it located
+
+    k                                                  *MiniBufExpl-Mapping-k*
+    <up>                                            *MiniBufExpl-Mapping-<up>*
+                                            Move one line up in the MBE window
+
+    h                                                  *MiniBufExpl-Mapping-h*
+    <down>                                        *MiniBufExpl-Mapping-<down>*
+                                          Move one line down in the MBE window
+
+    l                                                  *MiniBufExpl-Mapping-l*
+    <TAB>                                          *MiniBufExpl-Mapping-<TAB>*
+                                     Move one buffer forward in the MBE window
+
+    j                                                  *MiniBufExpl-Mapping-j*
+    <S-TAB>                                      *MiniBufExpl-Mapping-<S-TAB>*
+                                    Move one buffer backward in the MBE window
 
 ==============================================================================
 3. Commands                                              *MiniBufExplCommands*
