@@ -387,6 +387,9 @@ let s:debugIndex = 0
 " command line are picked up correctly.
 let s:MRUList = range(1, bufnr('$'))
 
+" Dictionary used to keep track of the modification state of buffers
+let s:bufStateDict = {}
+
 " Global used to store the buffer list so that we don't update the MBE
 " unless the list has changed.
 let s:miniBufExplBufList = ''
@@ -435,9 +438,9 @@ autocmd MiniBufExplorer BufAdd         *        call <SID>BufAddHandler()
 autocmd MiniBufExplorer BufEnter       * nested call <SID>BufEnterHandler()
 autocmd MiniBufExplorer BufDelete      *        call <SID>BufDeleteHandler()
 autocmd MiniBufExplorer CursorHoldI    *
-      \ call <SID>DEBUG('==> Entering CursorHoldI AutoUpdateCheck', 10) |
-      \ call <SID>AutoUpdateCheck(bufnr("%")) |
-      \ call <SID>DEBUG('<== Leaving CursorHoldI AutoUpdateCheck', 10)
+      \ call <SID>DEBUG('==> Entering CursorHoldI UpdateBufferStateDict', 10) |
+      \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
+      \ call <SID>DEBUG('<== Leaving CursorHoldI UpdateBufferStateDict', 10)
 augroup END
 
 function! <SID>VimEnterHandler()
@@ -489,7 +492,6 @@ endfunction
 function! <SID>BufDeleteHandler()
   call <SID>DEBUG('==> Entering BufDelete Handler', 10)
 
-  call <SID>CleanModTrackingList(expand("<abuf>"))
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 
   call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
@@ -1585,6 +1587,7 @@ function! <SID>BuildAllBufferDicts()
 
         call <SID>UpdateBufferNameDict(l:i,0)
         call <SID>UpdateBufferPathDict(l:i,0)
+        call <SID>UpdateBufferStateDict(l:i,0)
 
         let l:i = l:i + 1
     endwhile
@@ -1604,9 +1607,31 @@ function! <SID>UpdateAllBufferDicts(bufNum,deleted)
 
     call <SID>UpdateBufferNameDict(a:bufNum,a:deleted)
     call <SID>UpdateBufferPathDict(a:bufNum,a:deleted)
+    call <SID>UpdateBufferStateDict(a:bufNum,a:deleted)
+
     call <SID>BuildBufferFinalDict(a:bufNum,a:deleted)
 
     call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
+endfunction
+
+" }}}
+" UpdateBufferStateDict {{{
+function! <SID>UpdateBufferStateDict(bufNum,deleted)
+    let l:bufNum = 0 + a:bufNum
+
+    if a:deleted && has_key(s:bufStateDict, l:bufNum)
+        call filter(s:bufStateDict, 'v:key != '.l:bufNum)
+        return
+    endif
+
+    if has_key(s:bufStateDict, l:bufNum)
+        if s:bufStateDict[l:bufNum] != getbufvar(a:bufNum, '&modified')
+            let s:bufStateDict[l:bufNum] = getbufvar(a:bufNum, '&modified')
+            call <SID>AutoUpdate(-1,bufnr(a:bufNum))
+        endif
+    else
+        let s:bufStateDict[l:bufNum] = getbufvar(a:bufNum, '&modified')
+    endif
 endfunction
 
 " }}}
@@ -1699,52 +1724,6 @@ function! <SID>HasEligibleBuffers(delBufNum)
 
   call <SID>DEBUG('Leaving HasEligibleBuffers()',10)
   return (l:found >= l:needed)
-endfunction
-
-" }}}
-" Auto Update Check - Function called by auto commands to see if MBE needs to {{{
-" be updated
-" If current buffer's modified flag has changed THEN
-" call the auto update function. ELSE
-" Don't do anything
-" This is implemented to save resources so that MBE does not have to update
-" on every keypress to check if the buffer has been modified
-let g:modTrackingList = []
-function! <SID>AutoUpdateCheck(currBuf)
-    let l:bufAlreadyExists = 0
-    for item in g:modTrackingList
-        if (item[0] == a:currBuf)
-            let l:bufAlreadyExists = 1
-            if(getbufvar(a:currBuf, '&modified') != item[1])
-                call <SID>AutoUpdate(-1,bufnr(a:currBuf))
-                "update g:modTrackingList with new &mod flag state
-                "call <SID>DEBUG(getbufvar(a:currBuf, '&modified'),1)
-                let item[1] = getbufvar(a:currBuf, '&modified')
-            elseif(getbufvar(a:currBuf, '&modified') == item[1])
-                "do nothing
-            endif
-        endif
-    endfor
-    if (l:bufAlreadyExists == 0)
-        call add(g:modTrackingList, [a:currBuf,0])
-    endif
-    call <SID>DEBUG('Buffer List is '.join(g:modTrackingList),10)
-endfunction
-
-" }}}
-" Clean Mod Tracking List - Function called when a buffer is deleted to keep the {{{
-" list used to track modified buffers nice and small
-" On buffer delete, loop through g:modTrackingList and delete the item that
-" matches this buffer's number
-function! <SID>CleanModTrackingList(currBuf)
-    let l:trackingListPos = 0
-    for item in g:modTrackingList
-        if (item[0] == a:currBuf)
-            call <SID>DEBUG('Buffer index to be deleted is '.l:trackingListPos,10)
-            call remove(g:modTrackingList, l:trackingListPos)
-        endif
-        let l:trackingListPos = l:trackingListPos + 1
-    endfor
 endfunction
 
 " }}}
