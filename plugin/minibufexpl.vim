@@ -939,7 +939,9 @@ function! <SID>DisplayBuffers(curBufNum)
 
   call <SID>ShowBuffers()
   call <SID>ResizeWindow()
-  call <SID>FocusCurrentBuffer(a:curBufNum)
+
+  " Place cursor at current buffer in MBE
+  call search('\V['.a:curBufNum.':'.expand('#'.a:curBufNum.':t').']', 'w')
 
   call <SID>DEBUG('Leaving DisplayExplorer()',10)
 endfunction
@@ -1079,23 +1081,6 @@ function! <SID>ShowBuffers()
   let &showcmd = l:save_sc
 
   call <SID>DEBUG('Leaving ShowBuffers()',10)
-endfunction
-
-" }}}
-" FocusCurrentBuffer {{{
-function! <SID>FocusCurrentBuffer(bufnr)
-  " Make sure we are in our window
-  if bufname('%') != '-MiniBufExplorer-'
-    call <SID>DEBUG('FocuCurrentBuffer called in invalid window',1)
-    return
-  endif
-
-  if (a:bufnr != -1)
-    let l:bufname = expand('#'.a:bufnr.':t')
-    call search('\V['.a:bufnr.':'.l:bufname.']', 'w')
-  else
-    call <SID>DEBUG('No current buffer to search for',9)
-  endif
 endfunction
 
 " }}}
