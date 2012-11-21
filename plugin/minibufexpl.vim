@@ -108,14 +108,34 @@ if exists('g:miniBufExplorerMoreThanOne')
   let g:miniBufExplBuffersNeeded = g:miniBufExplorerMoreThanOne
 endif
 
+if exists('g:miniBufExplorerAutoStart')
+  let g:miniBufExplAutoStart = g:miniBufExplorerAutoStart
+endif
+
+if exists('g:miniBufExplorerDebugMode')
+  let g:miniBufExplDebugMode = g:miniBufExplorerDebugMode
+endif
+
+if exists('g:miniBufExplorerDebugLevel')
+  let g:miniBufExplDebugLevel = g:miniBufExplorerDebugLevel
+endif
+
+if exists('g:miniBufExplorerDebugOutput')
+  let g:miniBufExplDebugOutput = g:miniBufExplorerDebugOutput
+endif
+
+if exists('g:miniBufExplorerHideWhenDiff')
+  let g:miniBufExplHideWhenDiff = g:miniBufExplorerHideWhenDiff
+endif
+
 " }}}
 "
 " Global Configuration Variables
 "
 " Start MBE automatically ? {{{
 "
-if !exists('g:miniBufExplorerAutoStart')
-  let g:miniBufExplorerAutoStart = 1
+if !exists('g:miniBufExplAutoStart')
+  let g:miniBufExplAutoStart = 1
 endif
 
 " }}}
@@ -126,10 +146,10 @@ endif
 " 2 = write to a file named MiniBufExplorer.DBG
 "     in the directory where vim was started
 "     THIS IS VERY SLOW
-" 3 = Write into g:miniBufExplorerDebugOutput
+" 3 = Write into g:miniBufExplDebugOutput
 "     global variable [This is the default]
-if !exists('g:miniBufExplorerDebugMode')
-  let g:miniBufExplorerDebugMode = 3
+if !exists('g:miniBufExplDebugMode')
+  let g:miniBufExplDebugMode = 3
 endif
 
 " }}}
@@ -139,14 +159,14 @@ endif
 " 1=5 = errors ; 1 is the most important
 " 5-9 = info ; 5 is the most important
 " 10 = Entry/Exit
-if !exists('g:miniBufExplorerDebugLevel')
-  let g:miniBufExplorerDebugLevel = 1
+if !exists('g:miniBufExplDebugLevel')
+  let g:miniBufExplDebugLevel = 1
 endif
 
 " }}}
 " Stop auto starting MBE in diff mode? {{{
-if !exists('g:miniBufExplorerHideWhenDiff')
-    let g:miniBufExplorerHideWhenDiff = 0
+if !exists('g:miniBufExplHideWhenDiff')
+    let g:miniBufExplHideWhenDiff = 0
 endif
 
 " }}}
@@ -369,7 +389,7 @@ endif
 "
 " Script/Global variables {{{
 " In debug mode 3 this variable will hold the debug output
-let g:miniBufExplorerDebugOutput = ''
+let g:miniBufExplDebugOutput = ''
 
 " check to see what platform we are in
 if (has('unix'))
@@ -440,13 +460,13 @@ autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd
 autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
 autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Building All Buffer Dicts', 5) |call <SID>BuildAllBufferDicts()
 autocmd MiniBufExplorer VimEnter       * nested call <SID>DEBUG('-=> VimEnter Start Explorer', 10) |
-            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let t:miniBufExplAutoUpdate = 1 |endif |
-            \ if g:miniBufExplorerAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
+            \ if g:miniBufExplHideWhenDiff!=1 || !&diff |let t:miniBufExplAutoUpdate = 1 |endif |
+            \ if g:miniBufExplAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
             \ call <SID>StartExplorer(-1, bufnr("%")) |
             \ endif
 autocmd MiniBufExplorer TabEnter       * nested call <SID>DEBUG('-=> TabEnter Start Explorer', 10) |
             \ if !exists('t:miniBufExplAutoUpdate') |let t:miniBufExplAutoUpdate = 1 |endif |
-            \ if g:miniBufExplorerAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
+            \ if g:miniBufExplAutoStart && <SID>HasEligibleBuffers(-1) == 1 && t:miniBufExplAutoUpdate == 1|
             \ call <SID>StartExplorer(-1, bufnr("%")) |
             \ endif
 augroup END
@@ -1743,7 +1763,7 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 
     if <SID>HasEligibleBuffers(a:delBufNum) == 1
       if (l:winnr == -1)
-        if g:miniBufExplorerAutoStart == 1
+        if g:miniBufExplAutoStart == 1
           call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
           call <SID>StartExplorer(a:delBufNum, a:curBufNum)
         else
@@ -1907,7 +1927,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
   let l:selBuf     = <SID>GetSelectedBuffer()
   let l:selBufName = bufname(l:selBuf)
 
-  if l:selBufName == 'MiniBufExplorer.DBG' && g:miniBufExplorerDebugLevel > 0
+  if l:selBufName == 'MiniBufExplorer.DBG' && g:miniBufExplDebugLevel > 0
     call <SID>DEBUG('MBEDeleteBuffer will not delete the debug window, when debugging is turned on.',1)
     call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
     return
@@ -2112,7 +2132,7 @@ endfunction
 " capability.
 "
 function! <SID>DEBUG(msg, level)
-  if g:miniBufExplorerDebugLevel >= a:level
+  if g:miniBufExplDebugLevel >= a:level
 
     " Prevent a report of our actions from showing up.
     let l:save_rep    = &report
@@ -2121,7 +2141,7 @@ function! <SID>DEBUG(msg, level)
     set noshowcmd
 
     " Debug output to a buffer
-    if g:miniBufExplorerDebugMode == 0
+    if g:miniBufExplDebugMode == 0
         if bufname('%') == 'MiniBufExplorer.DBG'
             return
         endif
@@ -2130,7 +2150,7 @@ function! <SID>DEBUG(msg, level)
         let l:winNum = <SID>FindCreateWindow('MiniBufExplorer.DBG', 0, 1, 1, 1, 0)
 
         if l:winNum == -1
-          let g:miniBufExplorerDebugMode == 3
+          let g:miniBufExplDebugMode == 3
           call <SID>DEBUG('Failed to get the MBE debugging window, reset debugging mode to 3.',1)
           call <SID>DEBUG('Forwarding message...',1)
           call <SID>DEBUG(a:msg,1)
@@ -2150,7 +2170,7 @@ function! <SID>DEBUG(msg, level)
         " off so that we won't break things even more.
         if bufname('%') != 'MiniBufExplorer.DBG'
             call confirm('Error in window debugging code. Dissabling MiniBufExplorer debugging.', 'OK')
-            let g:miniBufExplorerDebugLevel = 0
+            let g:miniBufExplDebugLevel = 0
             return
         endif
 
@@ -2167,11 +2187,11 @@ function! <SID>DEBUG(msg, level)
         call s:SwitchWindow('p',1)
         call s:SwitchWindow('w',1,l:currWin)
     " Debug output using VIM's echo facility
-    elseif g:miniBufExplorerDebugMode == 1
+    elseif g:miniBufExplDebugMode == 1
       echo s:debugIndex.':'.a:level.':'.a:msg
     " Debug output to a file -- VERY SLOW!!!
     " should be OK on UNIX and Win32 (not the 95/98 variants)
-    elseif g:miniBufExplorerDebugMode == 2
+    elseif g:miniBufExplDebugMode == 2
         if has('system') || has('fork')
             if has('win32') && !has('win95')
                 let l:result = system("cmd /c 'echo ".s:debugIndex.':'.a:level.':'.a:msg." >> MiniBufExplorer.DBG'")
@@ -2181,10 +2201,10 @@ function! <SID>DEBUG(msg, level)
             endif
         else
             call confirm('Error in file writing version of the debugging code, vim not compiled with system or fork. Dissabling MiniBufExplorer debugging.', 'OK')
-            let g:miniBufExplorerDebugLevel = 0
+            let g:miniBufExplDebugLevel = 0
         endif
-    elseif g:miniBufExplorerDebugMode == 3
-        let g:miniBufExplorerDebugOutput = g:miniBufExplorerDebugOutput."\n".s:debugIndex.':'.a:level.':'.a:msg
+    elseif g:miniBufExplDebugMode == 3
+        let g:miniBufExplDebugOutput = g:miniBufExplDebugOutput."\n".s:debugIndex.':'.a:level.':'.a:msg
     endif
 
     let s:debugIndex = s:debugIndex + 1
