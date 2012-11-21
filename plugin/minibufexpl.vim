@@ -489,6 +489,12 @@ endfunction
 function! <SID>BufEnterHandler()
   call <SID>DEBUG('==> Entering BufEnter Handler', 10)
 
+  for l:i in s:MRUList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>MRUPop(l:i)
+    endif
+  endfor
+
   call <SID>AutoUpdate(-1,bufnr("%"))
 
   call <SID>DEBUG('<== Leaving BufEnter Handler', 10)
