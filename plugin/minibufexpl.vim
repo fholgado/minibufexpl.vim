@@ -383,6 +383,8 @@ let s:debugIndex = 0
 " Variable used to pass maxTabWidth info between functions
 let s:maxTabWidth = 0
 
+let s:BufList = []
+
 " List for tracking order of the buffer entering
 let s:MRUList = []
 
@@ -448,6 +450,7 @@ function! <SID>VimEnterHandler()
   " Build initial MRUList.
   " This makes sure all the files specified on the command
   " line are picked up correctly.
+  let s:BufList = range(1, bufnr('$'))
   let s:MRUList = range(1, bufnr('$'))
 
   call <SID>BuildAllBufferDicts()
@@ -480,6 +483,7 @@ endfunction
 function! <SID>BufAddHandler()
   call <SID>DEBUG('==> Entering BufAdd Handler', 10)
 
+  call <SID>ListAdd(s:BufList,str2nr(expand("<abuf>")))
   call <SID>ListAdd(s:MRUList,str2nr(expand("<abuf>")))
 
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
@@ -489,6 +493,12 @@ endfunction
 
 function! <SID>BufEnterHandler()
   call <SID>DEBUG('==> Entering BufEnter Handler', 10)
+
+  for l:i in s:BufList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>ListPop(s:BufList,l:i)
+    endif
+  endfor
 
   for l:i in s:MRUList
     if <SID>IsBufferIgnored(l:i)
@@ -504,6 +514,7 @@ endfunction
 function! <SID>BufDeleteHandler()
   call <SID>DEBUG('==> Entering BufDelete Handler', 10)
 
+  call <SID>ListPop(s:BufList,str2nr(expand("<abuf>")))
   call <SID>ListPop(s:MRUList,str2nr(expand("<abuf>")))
 
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
