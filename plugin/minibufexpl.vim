@@ -1648,11 +1648,6 @@ function! <SID>HasEligibleBuffers(delBufNum)
     return 1
   endif
 
-  let l:save_rep = &report
-  let l:save_sc = &showcmd
-  let &report = 10000
-  set noshowcmd
-
   let l:found = 0
   let l:needed = g:miniBufExplBuffersNeeded
 
@@ -1685,9 +1680,6 @@ function! <SID>HasEligibleBuffers(delBufNum)
       endif
     endif
   endwhile
-
-  let &report  = l:save_rep
-  let &showcmd = l:save_sc
 
   call <SID>DEBUG('Found '.l:found.' eligible buffers of '.l:needed.' needed',6)
 
