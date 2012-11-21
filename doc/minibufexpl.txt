@@ -40,14 +40,12 @@ You may want to add something like the following to your .vimrc file:
 
   map <Leader>mbe :MiniBufExplorer<cr>
   map <Leader>mbc :CMiniBufExplorer<cr>
-  map <Leader>mbu :UMiniBufExplorer<cr>
   map <Leader>mbt :TMiniBufExplorer<cr>
 
 Or, much shorter form:
 
   map <Leader>e :MiniBufExplorer<cr>
   map <Leader>c :CMiniBufExplorer<cr>
-  map <Leader>u :UMiniBufExplorer<cr>
   map <Leader>t :TMiniBufExplorer<cr>
 
 Either way, the key bindings used in these mappings should fit with your
@@ -94,9 +92,6 @@ configuration of Vim.
 
 :CMiniBufExplorer                                         *:CMiniBufExplorer*
     Close the Explorer if it's open
-
-:UMiniBufExplorer                                         *:UMiniBufExplorer*
-    Update Explorer without navigating
 
 :TMiniBufExplorer                                         *:TMiniBufExplorer*
     Toggle the Explorer window open and closed.

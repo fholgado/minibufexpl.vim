@@ -45,9 +45,6 @@ endif
 if !exists(':CMiniBufExplorer')
   command! CMiniBufExplorer  call <SID>StopExplorer()
 endif
-if !exists(':UMiniBufExplorer')
-  command! UMiniBufExplorer  call <SID>AutoUpdate(-1,bufnr("%"))
-endif
 if !exists(':TMiniBufExplorer')
   command! TMiniBufExplorer  call <SID>ToggleExplorer()
 endif
