@@ -383,9 +383,8 @@ let s:debugIndex = 0
 " Variable used to pass maxTabWidth info between functions
 let s:maxTabWidth = 0
 
-" Build initial MRUList. This makes sure all the files specified on the
-" command line are picked up correctly.
-let s:MRUList = range(1, bufnr('$'))
+" List for tracking order of the buffer entering
+let s:MRUList = []
 
 " Dictionary used to keep track of the modification state of buffers
 let s:bufStateDict = {}
@@ -446,6 +445,11 @@ augroup END
 function! <SID>VimEnterHandler()
   call <SID>DEBUG('==> Entering VimEnter Handler', 10)
 
+  " Build initial MRUList.
+  " This makes sure all the files specified on the command
+  " line are picked up correctly.
+  let s:MRUList = range(1, bufnr('$'))
+
   call <SID>BuildAllBufferDicts()
 
   if g:miniBufExplHideWhenDiff!=1 || !&diff
@@ -476,6 +480,7 @@ endfunction
 function! <SID>BufAddHandler()
   call <SID>DEBUG('==> Entering BufAdd Handler', 10)
 
+  call <SID>MRUAdd(str2nr(expand("<abuf>")))
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
 
   call <SID>DEBUG('<== Leaving BufAdd Handler', 10)
@@ -484,6 +489,12 @@ endfunction
 function! <SID>BufEnterHandler()
   call <SID>DEBUG('==> Entering BufEnter Handler', 10)
 
+  for l:i in s:MRUList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>MRUPop(l:i)
+    endif
+  endfor
+
   call <SID>AutoUpdate(-1,bufnr("%"))
 
   call <SID>DEBUG('<== Leaving BufEnter Handler', 10)
@@ -491,6 +502,8 @@ endfunction
 
 function! <SID>BufDeleteHandler()
   call <SID>DEBUG('==> Entering BufDelete Handler', 10)
+
+  call <SID>MRUPop(str2nr(expand("<abuf>")))
 
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 
@@ -1143,13 +1156,6 @@ function! <SID>BuildBufferList(delBufNum, curBufNum)
             continue
         endif
 
-        if g:miniBufExplSortBy == "mru"
-            let l:mruIdx = index(s:MRUList, l:i)
-            if l:mruIdx == -1
-                call add(s:MRUList, l:i)
-            endif
-        endif
-
         let l:BufName = expand( "#" . l:i . ":p:t")
 
         " Identify buffers with no name
@@ -1721,11 +1727,6 @@ function! <SID>AutoUpdate(delBufNum,curBufNum)
 
   call <SID>MRUPush(a:curBufNum)
 
-  if (a:delBufNum != -1)
-    call <SID>DEBUG('AutoUpdate will make sure that buffer '.a:delBufNum.' is not included in the buffer list.', 5)
-    call <SID>MRUPop(a:delBufNum)
-  endif
-
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
   if t:miniBufExplAutoUpdate == 1
@@ -2051,6 +2052,13 @@ function! <SID>CycleBuffer(forward)
   let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
   call <SID>AutoUpdate(-1,bufnr("%"))
+endfunction
+
+" }}}
+" MRUAdd {{{
+"
+function! <SID>MRUAdd(buf)
+  call add(s:MRUList, a:buf)
 endfunction
 
 " }}}
