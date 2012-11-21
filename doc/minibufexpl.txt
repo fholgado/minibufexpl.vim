@@ -173,31 +173,38 @@ setting is backwards compatible if you don't use MinSize.
 ------------------------------------------------------------------------------
 4.3 Automatic Opening                                    *MiniBufExplAutoOpen*
 
-                                                *'g:miniBufExplorerAutoStart'*
+                                                    *'g:miniBufExplAutoStart'*
 If you only want open MBE manually when needed, you can put the following into
 your .vimrc:
 
   let g:miniBufExplorerAutoStart = 0
 
+                                                *'g:miniBufExplorerAutoStart'*
+This option has been depreciated by 'g:miniBufExplAutoStart'.
+
+                                                *'g:miniBufExplBuffersNeeded'*
+This variable controls how man buffers should be available until MBE shows up,
+if 'g:miniBufExplorerAutoStart' is enabled. By default, at least 2 buffers are
+needed.
+
+You can put the following into your .vimrc to let MBE start as soon as a normal
+buffer is available.
+
+  let g:miniBufExplBuffersNeeded = 1
+
+You can put the following into your .vimrc to skip the eligible buffer checking.
+
+  let g:miniBufExplBuffersNeeded = 0
+
                                               *'g:miniBufExplorerMoreThanOne'*
-By default we are now (as of 6.0.1) turning on the MoreThanOne option. This
-stops the -MiniBufExplorer- from opening automatically until more than one
-eligible buffer is available. You can turn this feature off by setting the
-following variable in your .vimrc:
+This option has been depreciated by 'g:miniBufExplBuffersNeeded'.
 
-  let g:miniBufExplorerMoreThanOne = 1
-
-(The following enhancement is as of 6.2.2) Setting this to 0 will cause the
-MBE window to be loaded even if no buffers are available. Setting it to 1
-causes the MBE window to be loaded as soon as an eligible buffer is read. You
-can also set it to larger numbers. So if you set it to 4 for example the MBE
-window wouldn't auto-open until 4 eligibles buffers had been loaded. This is
-nice for folks that don't want an MBE window unless they are editing more than
-two or three buffers.
-
-                                             *'g:miniBufExplorerHideWhenDIff'*
+                                                 *'g:miniBufExplHideWhenDiff'*
 Disable automatic opening if vim is started in diff mode(vimdiff, or with '-d'
 option). This option only affected the first tab page created at vim start.
+
+                                             *'g:miniBufExplorerHideWhenDiff'*
+This option has been depreciated by 'g:miniBufExplHideWhenDiff'.
 
 ------------------------------------------------------------------------------
 4.4 Keyboard Control                                     *MiniBufExplKeyboard*
@@ -235,6 +242,9 @@ NOTE: If you set the ...TabSwitchBufs AND ...TabSwitchWindows,
 
 ------------------------------------------------------------------------------
 4.5 Misc                                                     *MiniBufExplMisc*
+
+                                               *'g:miniBufExplStatusLineText'*
+MBE window status line text.
 
                                                *'g:miniBufExplUseSingleClick'*
 As of MBE 6.3.0, you can put the following into your .vimrc:
@@ -285,27 +295,33 @@ highlighting back on (introduced in 6.3.1):
 ------------------------------------------------------------------------------
 4.6 Debugging                                           *MiniBufExplDebugging*
 
-                                                *'g:miniBufExplorerDebugMode'*
+                                                    *'g:miniBufExplDebugMode'*
 You can also set a DebugMode to cause output to be target as follows (default
 is mode 3):
 
-  let g:miniBufExplorerDebugMode  = 0  " Errors will show up in
+  let g:miniBufExplDebugMode  = 0      " Errors will show up in
                                        " a Vim window
-  let g:miniBufExplorerDebugMode  = 1  " Uses Vim's echo function
+  let g:miniBufExplDebugMode  = 1      " Uses Vim's echo function
                                        " to display on the screen
-  let g:miniBufExplorerDebugMode  = 2  " Writes to a file
+  let g:miniBufExplDebugMode  = 2      " Writes to a file
                                        " MiniBufExplorer.DBG
-  let g:miniBufExplorerDebugMode  = 3  " Store output in global variable
-                                       " g:miniBufExplorerDebugOutput
+  let g:miniBufExplDebugMode  = 3      " Store output in global variable
+                                       " g:miniBufExplDebugOutput
 
-                                               *'g:miniBufExplorerDebugLevel'*
+                                                *'g:miniBufExplorerDebugMode'*
+This option has been depreciated by 'g:miniBufExplDebugMode'.
+
+                                                   *'g:miniBufExplDebugLevel'*
 MBE has had a basic debugging capability for quite some time. However, it has
 not been very friendly in the past. As of 6.0.8, you can put one of each of
 the following into your .vimrc:
 
-  let g:miniBufExplorerDebugLevel = 0  " MBE serious errors output
-  let g:miniBufExplorerDebugLevel = 4  " MBE all errors output
-  let g:miniBufExplorerDebugLevel = 10 " MBE reports everything
+  let g:miniBufExplDebugLevel = 0      " MBE serious errors output
+  let g:miniBufExplDebugLevel = 4      " MBE all errors output
+  let g:miniBufExplDebugLevel = 10     " MBE reports everything
+
+                                               *'g:miniBufExplorerDebugLevel'*
+This option has been depreciated by 'g:miniBufExplDebugLevel'.
 
 Or if you are able to start Vim, you might just perform these at a command
 prompt right before you do the operation that is failing.
@@ -554,7 +570,7 @@ might not take you to the expected window.
       means I can easily close the MBE window when I'm
       not using it and get it back when I want it.
     - Changed default debug mode to 3 (write to global
-      g:miniBufExplorerDebugOutput)
+      g:miniBufExplDebugOutput)
     - Made a pass through the documentation to clarify
       serveral issues and provide more complete docs
       for mappings and commands.
