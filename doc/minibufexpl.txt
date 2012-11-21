@@ -34,24 +34,24 @@ automatically sourced. If not, you must manually source this file using
 ------------------------------------------------------------------------------
 2.1 Global Mappings                               *MiniBufExplMappings-Global*
 
-You may use the default keymappings of
+MBE has no longer provide default key bindings for controling MBE window.
 
-  <Leader>mbe - Opens MiniBufExplorer
+You may want to add something like the following to your .vimrc file:
 
-or you may want to add something like the following key mapping to your
-_vimrc/.vimrc file.
+  map <Leader>mbe :MiniBufExplorer<cr>
+  map <Leader>mbc :CMiniBufExplorer<cr>
+  map <Leader>mbu :UMiniBufExplorer<cr>
+  map <Leader>mbt :TMiniBufExplorer<cr>
 
-  map <Leader>b :MiniBufExplorer<cr>
+Or, much shorter form:
 
-However, in most cases you won't need any key-bindings at all.
+  map <Leader>e :MiniBufExplorer<cr>
+  map <Leader>c :CMiniBufExplorer<cr>
+  map <Leader>u :UMiniBufExplorer<cr>
+  map <Leader>t :TMiniBufExplorer<cr>
 
-<Leader> is usually backslash so type "\mbe" (quickly) to open the
--MiniBufExplorer- window.
-
-Other keymappings include: <Leader>mbc to close the Explorer window,
-<Leader>mbu to force the Explorer to Update and <Leader>mbt to toggle the
-Explorer window; it will open if closed or close if open. Each of these key
-bindings can be overridden (see the notes on <Leader>mbe above.)
+Either way, the key bindings used in these mappings should fit with your
+configuration of Vim.
 
 ------------------------------------------------------------------------------
 2.2 Window Mappings                               *MiniBufExplMappings-Window*
@@ -88,18 +88,6 @@ bindings can be overridden (see the notes on <Leader>mbe above.)
 
 ==============================================================================
 3. Commands                                              *MiniBufExplCommands*
-
-You can map these additional commands as follows:
-
-  map <Leader>c :CMiniBufExplorer<cr>
-  map <Leader>u :UMiniBufExplorer<cr>
-  map <Leader>t :TMiniBufExplorer<cr>
-
-NOTE: you can change the key binding used in these mappings
-so that they fit with your configuration of Vim.
-
-You can also call each of these features by typing the following in command
-mode:
 
 :MiniBufExplorer                                           *:MiniBufExplorer*
     Open and/or goto Explorer
