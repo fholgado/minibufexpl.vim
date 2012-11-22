@@ -49,10 +49,10 @@ if !exists(':TMiniBufExplorer')
   command! TMiniBufExplorer echoe 'TMiniBufExplorer is depreciated, please use MBEToggle instead.'
 endif
 if !exists(':MBEOpen')
-  command! MBEOpen    call <SID>StartExplorer(bufnr("%"))
+  command! MBEOpen    let t:skipEligibleBuffersCheck = 1 | call <SID>StartExplorer(bufnr("%"))
 endif
 if !exists(':MBEClose')
-  command! MBEClose   call <SID>StopExplorer()
+  command! MBEClose   let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer()
 endif
 if !exists(':MBEToggle')
   command! MBEToggle  call <SID>ToggleExplorer()
@@ -324,7 +324,7 @@ let s:miniBufExplInAutoUpdate = 0
 
 " If MBE was opened manually, then we should skip eligible buffers checking,
 " open MBE window no matter what value 'g:miniBufExplBuffersNeeded' is set.
-let s:skipEligibleBuffersCheck = 0
+let t:skipEligibleBuffersCheck = 0
 
 " Dictionary used to keep track of the names we have seen.
 let s:bufNameDict = {}
@@ -378,6 +378,8 @@ function! <SID>VimEnterHandler()
     let t:miniBufExplAutoUpdate = 1
   endif
 
+  let t:skipEligibleBuffersCheck = 0
+
   if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1 && <SID>HasEligibleBuffers() == 1
     call <SID>StartExplorer(bufnr("%"))
   endif
@@ -391,6 +393,8 @@ function! <SID>TabEnterHandler()
   if !exists('t:miniBufExplAutoUpdate')
     let t:miniBufExplAutoUpdate = 1
   endif
+
+  let t:skipEligibleBuffersCheck = 0
 
   if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1 && <SID>HasEligibleBuffers() == 1
     call <SID>StartExplorer(bufnr("%"))
@@ -645,13 +649,14 @@ endfunction
 function! <SID>ToggleExplorer()
   call <SID>DEBUG('Entering ToggleExplorer()',10)
 
-  let s:skipEligibleBuffersCheck = 1
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
   if l:winNum != -1
+    let t:skipEligibleBuffersCheck = 0
     call <SID>StopExplorer()
   else
+    let t:skipEligibleBuffersCheck = 1
     call <SID>StartExplorer(bufnr("%"))
   endif
 
@@ -1628,7 +1633,7 @@ endfunction
 function! <SID>HasEligibleBuffers()
   call <SID>DEBUG('Entering HasEligibleBuffers()',10)
 
-  if s:skipEligibleBuffersCheck == 1
+  if t:skipEligibleBuffersCheck == 1
     call <SID>DEBUG('Leaving HasEligibleBuffers()',10)
     return 1
   endif
