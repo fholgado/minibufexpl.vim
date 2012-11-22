@@ -49,16 +49,16 @@ if !exists(':TMiniBufExplorer')
   command! TMiniBufExplorer echoe 'TMiniBufExplorer is depreciated, please use MBEToggle instead.'
 endif
 if !exists(':MBEOpen')
-  command! -bang MBEOpen      let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer() | endif | call <SID>StartExplorer(bufnr("%"))
+  command! -bang MBEOpen      let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
 endif
 if !exists(':MBEOpenAll')
-  command! -bang MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer() | endif | call <SID>StartExplorer(bufnr("%"))
+  command! -bang MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
 endif
 if !exists(':MBEClose')
-  command! MBEClose   let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer()
+  command! -bang MBEClose     let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
 endif
 if !exists(':MBECloseAll')
-  command! MBECloseAll  tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer()
+  command! -bang MBECloseAll  tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
 endif
 if !exists(':MBEToggle')
   command! -bang MBEToggle    call <SID>ToggleExplorer(0,'<bang>'=='!')
@@ -636,10 +636,10 @@ endfunction
 " }}}
 " StopExplorer - Looks for our explorer and closes the window if it is open {{{
 "
-function! <SID>StopExplorer()
+function! <SID>StopExplorer(force)
   call <SID>DEBUG('Entering StopExplorer()',10)
 
-  if <SID>HasEligibleBuffers()
+  if a:force || <SID>HasEligibleBuffers()
     let t:miniBufExplAutoUpdate = 0
   endif
 
@@ -666,15 +666,16 @@ endfunction
 "   toggle MBE in all tabs
 " a:force, 0 no, 1 yes
 "   reopen MBE when it is already open
+"   close MBE with auto-updating disabled
 "
 function! <SID>ToggleExplorer(all,force)
   call <SID>DEBUG('Entering ToggleExplorer()',10)
 
   if a:tabs
     if s:TabsMBEState
-      tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer()
+      tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer(a:force)
     else
-      tabdo let t:skipEligibleBuffersCheck = 1 | if a:force | call <SID>StopExplorer() | endif | call <SID>StartExplorer(bufnr("%"))
+      tabdo let t:skipEligibleBuffersCheck = 1 | if a:force | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
     endif
     let s:TabsMBEState = !s:TabsMBEState
   else
@@ -682,7 +683,7 @@ function! <SID>ToggleExplorer(all,force)
 
     if l:winNum != -1
       let t:skipEligibleBuffersCheck = 0
-      call <SID>StopExplorer()
+      call <SID>StopExplorer(a:force)
     else
       let t:skipEligibleBuffersCheck = 1
       call <SID>StartExplorer(bufnr("%"))
@@ -1746,7 +1747,7 @@ function! <SID>AutoUpdate(curBufNum)
         return
       else
         call <SID>DEBUG('Failed in eligible check', 9)
-        call <SID>StopExplorer()
+        call <SID>StopExplorer(0)
         " we do not want to turn auto-updating off
         let t:miniBufExplAutoUpdate = 1
       endif
@@ -1860,7 +1861,7 @@ function! <SID>MBESelectBuffer(split)
   let &showcmd = l:save_sc
 
   if g:miniBufExplCloseOnSelect == 1
-    call <SID>StopExplorer()
+    call <SID>StopExplorer(0)
   endif
 
   call <SID>DEBUG('Leaving MBESelectBuffer()',10)
