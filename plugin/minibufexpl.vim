@@ -380,7 +380,8 @@ function! <SID>VimEnterHandler()
 
   let t:skipEligibleBuffersCheck = 0
 
-  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1 && <SID>HasEligibleBuffers() == 1
+  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
+        \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
     call <SID>StartExplorer(bufnr("%"))
   endif
 
@@ -396,7 +397,8 @@ function! <SID>TabEnterHandler()
 
   let t:skipEligibleBuffersCheck = 0
 
-  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1 && <SID>HasEligibleBuffers() == 1
+  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
+        \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
     call <SID>StartExplorer(bufnr("%"))
   endif
 
@@ -1633,11 +1635,6 @@ endfunction
 function! <SID>HasEligibleBuffers()
   call <SID>DEBUG('Entering HasEligibleBuffers()',10)
 
-  if t:skipEligibleBuffersCheck == 1
-    call <SID>DEBUG('Leaving HasEligibleBuffers()',10)
-    return 1
-  endif
-
   let l:found = len(s:BufList)
   let l:needed = g:miniBufExplBuffersNeeded
 
@@ -1699,7 +1696,7 @@ function! <SID>AutoUpdate(curBufNum)
     " if we don't have a window then create one
     let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-    if <SID>HasEligibleBuffers() == 1
+    if t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1
       if (l:winnr == -1)
         if g:miniBufExplAutoStart == 1
           call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
