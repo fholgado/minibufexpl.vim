@@ -627,7 +627,9 @@ endfunction
 function! <SID>StopExplorer()
   call <SID>DEBUG('Entering StopExplorer()',10)
 
-  let t:miniBufExplAutoUpdate = 0
+  if <SID>HasEligibleBuffers()
+    let t:miniBufExplAutoUpdate = 0
+  endif
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
