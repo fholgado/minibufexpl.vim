@@ -298,6 +298,7 @@ let s:debugIndex = 0
 " Variable used to pass maxTabWidth info between functions
 let s:maxTabWidth = 0
 
+" List for all eligible buffers
 let s:BufList = []
 
 " List for tracking order of the buffer entering
