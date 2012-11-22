@@ -51,11 +51,20 @@ endif
 if !exists(':MBEOpen')
   command! MBEOpen    let t:skipEligibleBuffersCheck = 1 | call <SID>StartExplorer(bufnr("%"))
 endif
+if !exists(':MBEOpenAll')
+  command! MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | call <SID>StartExplorer(bufnr("%"))
+endif
 if !exists(':MBEClose')
   command! MBEClose   let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer()
 endif
+if !exists(':MBECloseAll')
+  command! MBECloseAll  tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer()
+endif
 if !exists(':MBEToggle')
-  command! MBEToggle  call <SID>ToggleExplorer()
+  command! MBEToggle    call <SID>ToggleExplorer(0)
+endif
+if !exists(':MBEToggleAll')
+  command! MBEToggleAll call <SID>ToggleExplorer(1)
 endif
 if !exists(':MBEbn')
   command! MBEbn call <SID>CycleBuffer(1)
@@ -297,6 +306,9 @@ let s:debugIndex = 0
 
 " Variable used to pass maxTabWidth info between functions
 let s:maxTabWidth = 0
+
+" Variable used as a mutex to indicate the current state of MBEToggleAll
+let s:TabsMBEState = 0
 
 " List for all eligible buffers
 let s:BufList = []
@@ -650,18 +662,29 @@ endfunction
 " }}}
 " ToggleExplorer - Looks for our explorer and opens/closes the window {{{
 "
-function! <SID>ToggleExplorer()
+" a:tabs, 0 no, 1 yes
+"   toggle MBE in all tabs
+"
+function! <SID>ToggleExplorer(tabs)
   call <SID>DEBUG('Entering ToggleExplorer()',10)
 
-
-  let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
-
-  if l:winNum != -1
-    let t:skipEligibleBuffersCheck = 0
-    call <SID>StopExplorer()
+  if a:tabs
+    if s:TabsMBEState
+      tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer()
+    else
+      tabdo let t:skipEligibleBuffersCheck = 1 | call <SID>StartExplorer(bufnr("%"))
+    endif
+    let s:TabsMBEState = !s:TabsMBEState
   else
-    let t:skipEligibleBuffersCheck = 1
-    call <SID>StartExplorer(bufnr("%"))
+    let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
+
+    if l:winNum != -1
+      let t:skipEligibleBuffersCheck = 0
+      call <SID>StopExplorer()
+    else
+      let t:skipEligibleBuffersCheck = 1
+      call <SID>StartExplorer(bufnr("%"))
+    endif
   endif
 
   call <SID>DEBUG('Leaving ToggleExplorer()',10)
