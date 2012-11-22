@@ -49,10 +49,10 @@ if !exists(':TMiniBufExplorer')
   command! TMiniBufExplorer echoe 'TMiniBufExplorer is depreciated, please use MBEToggle instead.'
 endif
 if !exists(':MBEOpen')
-  command! MBEOpen    let t:skipEligibleBuffersCheck = 1 | call <SID>StartExplorer(bufnr("%"))
+  command! -bang MBEOpen      let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer() | endif | call <SID>StartExplorer(bufnr("%"))
 endif
 if !exists(':MBEOpenAll')
-  command! MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | call <SID>StartExplorer(bufnr("%"))
+  command! -bang MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer() | endif | call <SID>StartExplorer(bufnr("%"))
 endif
 if !exists(':MBEClose')
   command! MBEClose   let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer()
@@ -61,10 +61,10 @@ if !exists(':MBECloseAll')
   command! MBECloseAll  tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer()
 endif
 if !exists(':MBEToggle')
-  command! MBEToggle    call <SID>ToggleExplorer(0)
+  command! -bang MBEToggle    call <SID>ToggleExplorer(0,'<bang>'=='!')
 endif
 if !exists(':MBEToggleAll')
-  command! MBEToggleAll call <SID>ToggleExplorer(1)
+  command! -bang MBEToggleAll call <SID>ToggleExplorer(1,'<bang>'=='!')
 endif
 if !exists(':MBEbn')
   command! MBEbn call <SID>CycleBuffer(1)
@@ -664,15 +664,17 @@ endfunction
 "
 " a:tabs, 0 no, 1 yes
 "   toggle MBE in all tabs
+" a:force, 0 no, 1 yes
+"   reopen MBE when it is already open
 "
-function! <SID>ToggleExplorer(tabs)
+function! <SID>ToggleExplorer(all,force)
   call <SID>DEBUG('Entering ToggleExplorer()',10)
 
   if a:tabs
     if s:TabsMBEState
       tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer()
     else
-      tabdo let t:skipEligibleBuffersCheck = 1 | call <SID>StartExplorer(bufnr("%"))
+      tabdo let t:skipEligibleBuffersCheck = 1 | if a:force | call <SID>StopExplorer() | endif | call <SID>StartExplorer(bufnr("%"))
     endif
     let s:TabsMBEState = !s:TabsMBEState
   else
