@@ -668,7 +668,7 @@ endfunction
 "   reopen MBE when it is already open
 "   close MBE with auto-updating disabled
 "
-function! <SID>ToggleExplorer(all,force)
+function! <SID>ToggleExplorer(tabs,force)
   call <SID>DEBUG('Entering ToggleExplorer()',10)
 
   if a:tabs
