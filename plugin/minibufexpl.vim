@@ -1171,7 +1171,7 @@ function! <SID>DetachBuffer(bufNum)
 
     call <SID>DEBUG('Window contains buffer: '.bufnr('%').' which should be: '.l:bufNum,5)
     let l:origBuf = bufnr('%')
-    call <SID>CycleBuffer(1)
+    call <SID>CycleBuffer(0,1)
     let l:currBuf = bufnr('%')
     call <SID>DEBUG('Window now contains buffer: '.bufnr('%').' which should not be: '.l:bufNum,5)
 
