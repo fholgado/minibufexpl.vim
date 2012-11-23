@@ -1152,6 +1152,70 @@ function! <SID>CycleBuffer(forward,...)
 endfunction
 
 " }}}
+" DeleteBuffer {{{
+"
+" Delete a buffer but preserve the window it was in
+"
+function! <SID>DeleteBuffer(selBuf)
+  let l:selBuf = a:selBuf + 0
+
+  let l:selBufName = bufname(l:selBuf)
+  call <SID>DEBUG('Selected buffer is <'.l:selBufName.'>['.l:selBuf.']',5)
+
+  " Don't want auto updates while we are processing a delete
+  " request.
+  let l:saveAutoUpdate = t:miniBufExplAutoUpdate
+  let t:miniBufExplAutoUpdate = 0
+
+  " Get the currently active buffer, so we can update the MBE
+  " correctly. If that is the buffer to be deleted, then get
+  " the window for that buffer, so we can find which buffer
+  " is in that window after the detaching.
+  let l:actBuf = <SID>GetActiveBuffer()
+  if l:actBuf == l:selBuf
+    let l:actBufWin = bufwinnr(l:actBuf)
+  endif
+
+  " Save previous window so that if we show a buffer after
+  " deleting. The show will come up in the correct window.
+  call s:SwitchWindow('p',1)
+  let l:prevWin    = winnr()
+  let l:prevWinBuf = winbufnr(winnr())
+  call <SID>DEBUG('Previous window: '.l:prevWin.' buffer in window: '.l:prevWinBuf,5)
+
+  " Detach the buffer from all the windows that holding it
+  " in every tab page.
+  tabdo call <SID>DetachBuffer(l:selBuf)
+
+  " Attempt to restore previous window
+  call <SID>DEBUG('Restoring previous window to: '.l:prevWin,5)
+  call s:SwitchWindow('w',1,l:prevWin)
+
+  " Try to get back to the -MiniBufExplorer- window
+  let l:winNum = bufwinnr(bufnr('-MiniBufExplorer-'))
+  if l:winNum != -1
+    call s:SwitchWindow('w',1,l:winNum)
+    call <SID>DEBUG('Got to -MiniBufExplorer- window: '.winnr(),5)
+  else
+    call <SID>DEBUG('Unable to get to -MiniBufExplorer- window',1)
+  endif
+
+  " Find which buffer is in the active window now
+  if l:actBuf == l:selBuf
+    let l:actBuf = winbufnr(l:actBufWin)
+  endif
+
+  " Delete the buffer selected.
+  call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
+
+  exec 'silent! bd '.l:selBuf
+
+  let t:miniBufExplAutoUpdate = l:saveAutoUpdate
+
+  call <SID>DisplayBuffers(l:actBuf)
+endfunction
+
+" }}}
 " DetachBuffer {{{
 "
 " Detach a buffer from all the windows in which it is displayed.
@@ -1963,62 +2027,7 @@ function! <SID>MBEDeleteBuffer()
   let l:selBuf = <SID>GetSelectedBuffer()
 
   if l:selBuf != -1
-
-    let l:selBufName = bufname(l:selBuf)
-    call <SID>DEBUG('Selected buffer is <'.l:selBufName.'>['.l:selBuf.']',5)
-
-    " Don't want auto updates while we are processing a delete
-    " request.
-    let l:saveAutoUpdate = t:miniBufExplAutoUpdate
-    let t:miniBufExplAutoUpdate = 0
-
-    " Get the currently active buffer, so we can update the MBE
-    " correctly. If that is the buffer to be deleted, then get
-    " the window for that buffer, so we can find which buffer
-    " is in that window after the detaching.
-    let l:actBuf = <SID>GetActiveBuffer()
-    if l:actBuf == l:selBuf
-        let l:actBufWin = bufwinnr(l:actBuf)
-    endif
-
-    " Save previous window so that if we show a buffer after
-    " deleting. The show will come up in the correct window.
-    call s:SwitchWindow('p',1)
-    let l:prevWin    = winnr()
-    let l:prevWinBuf = winbufnr(winnr())
-    call <SID>DEBUG('Previous window: '.l:prevWin.' buffer in window: '.l:prevWinBuf,5)
-
-    " Detach the buffer from all the windows that holding it
-    " in every tab page.
-    tabdo call <SID>DetachBuffer(l:selBuf)
-
-    " Attempt to restore previous window
-    call <SID>DEBUG('Restoring previous window to: '.l:prevWin,5)
-    call s:SwitchWindow('w',1,l:prevWin)
-
-    " Try to get back to the -MiniBufExplorer- window
-    let l:winNum = bufwinnr(bufnr('-MiniBufExplorer-'))
-    if l:winNum != -1
-        call s:SwitchWindow('w',1,l:winNum)
-        call <SID>DEBUG('Got to -MiniBufExplorer- window: '.winnr(),5)
-    else
-        call <SID>DEBUG('Unable to get to -MiniBufExplorer- window',1)
-    endif
-
-    " Find which buffer is in the active window now
-    if l:actBuf == l:selBuf
-        let l:actBuf = winbufnr(l:actBufWin)
-    endif
-
-    " Delete the buffer selected.
-    call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
-
-    exec 'silent! bd '.l:selBuf
-
-    let t:miniBufExplAutoUpdate = l:saveAutoUpdate
-
-    call <SID>DisplayBuffers(l:actBuf)
-
+    call <SID>DeleteBuffer(l:selBuf)
   endif
 
   call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
