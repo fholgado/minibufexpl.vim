@@ -1156,24 +1156,24 @@ endfunction
 "
 " Detach a buffer from all the windows in which it is displayed.
 "
-function! <SID>DetachBuffer(selBuf)
-  let l:selBuf = a:selBuf + 0
+function! <SID>DetachBuffer(bufNum)
+  let l:bufNum = a:bufNum + 0
 
-  let l:winNum = bufwinnr(l:selBuf)
+  let l:winNum = bufwinnr(l:bufNum)
   " while we have windows that contain our buffer
   while l:winNum != -1
-    call <SID>DEBUG('Buffer '.l:selBuf.' is being displayed in window: '.l:winNum,5)
+    call <SID>DEBUG('Buffer '.l:bufNum.' is being displayed in window: '.l:winNum,5)
 
     " move to window that contains our selected buffer
     call s:SwitchWindow('w',1,l:winNum)
 
     call <SID>DEBUG('We are now in window: '.winnr(),5)
 
-    call <SID>DEBUG('Window contains buffer: '.bufnr('%').' which should be: '.l:selBuf,5)
+    call <SID>DEBUG('Window contains buffer: '.bufnr('%').' which should be: '.l:bufNum,5)
     let l:origBuf = bufnr('%')
     call <SID>CycleBuffer(1)
     let l:currBuf = bufnr('%')
-    call <SID>DEBUG('Window now contains buffer: '.bufnr('%').' which should not be: '.l:selBuf,5)
+    call <SID>DEBUG('Window now contains buffer: '.bufnr('%').' which should not be: '.l:bufNum,5)
 
     if l:origBuf == l:currBuf
       " we wrapped so we are going to have to delete a buffer
@@ -1181,7 +1181,7 @@ function! <SID>DetachBuffer(selBuf)
       let l:winNum = -1
     else
       " see if we have anymore windows with our selected buffer
-      let l:winNum = bufwinnr(l:selBuf)
+      let l:winNum = bufwinnr(l:bufNum)
     endif
   endwhile
 endfunction
