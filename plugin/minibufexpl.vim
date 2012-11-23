@@ -1884,8 +1884,6 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     return
   endif
 
-  let l:curLine    = line('.')
-  let l:curCol     = virtcol('.')
   let l:selBuf     = <SID>GetSelectedBuffer()
   let l:selBufName = bufname(l:selBuf)
 
@@ -1959,7 +1957,6 @@ function! <SID>MBEDeleteBuffer(prevBufName)
 
     let t:miniBufExplAutoUpdate = l:saveAutoUpdate
     call <SID>DisplayBuffers(a:prevBufName)
-    call cursor(l:curLine, l:curCol)
 
   endif
 
