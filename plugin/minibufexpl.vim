@@ -1159,6 +1159,10 @@ endfunction
 function! <SID>DeleteBuffer(bufNum)
   let l:bufNum = a:bufNum + 0
 
+  if <SID>IsBufferIgnored(l:bufNum)
+    return
+  endif
+
   let l:bufName = bufname(l:bufNum)
   call <SID>DEBUG('Selected buffer is <'.l:bufName.'>['.l:bufNum.']',5)
 
