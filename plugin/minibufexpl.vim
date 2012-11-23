@@ -1988,8 +1988,9 @@ function! <SID>MBEDeleteBuffer()
     let l:prevWinBuf = winbufnr(winnr())
     call <SID>DEBUG('Previous window: '.l:prevWin.' buffer in window: '.l:prevWinBuf,5)
 
-    " Detach the buffer from all the windows that holding it.
-    call <SID>DetachBuffer(l:selBuf)
+    " Detach the buffer from all the windows that holding it
+    " in every tab page.
+    tabdo call <SID>DetachBuffer(l:selBuf)
 
     " Attempt to restore previous window
     call <SID>DEBUG('Restoring previous window to: '.l:prevWin,5)
