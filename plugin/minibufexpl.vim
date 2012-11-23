@@ -49,13 +49,22 @@ if !exists(':TMiniBufExplorer')
   command! TMiniBufExplorer echoe 'TMiniBufExplorer is depreciated, please use MBEToggle instead.'
 endif
 if !exists(':MBEOpen')
-  command! MBEOpen    call <SID>StartExplorer(bufnr("%"))
+  command! -bang MBEOpen      let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
+endif
+if !exists(':MBEOpenAll')
+  command! -bang MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
 endif
 if !exists(':MBEClose')
-  command! MBEClose   call <SID>StopExplorer()
+  command! -bang MBEClose     let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
+endif
+if !exists(':MBECloseAll')
+  command! -bang MBECloseAll  tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
 endif
 if !exists(':MBEToggle')
-  command! MBEToggle  call <SID>ToggleExplorer()
+  command! -bang MBEToggle    call <SID>ToggleExplorer(0,'<bang>'=='!')
+endif
+if !exists(':MBEToggleAll')
+  command! -bang MBEToggleAll call <SID>ToggleExplorer(1,'<bang>'=='!')
 endif
 if !exists(':MBEbn')
   command! MBEbn call <SID>CycleBuffer(1)
@@ -298,6 +307,10 @@ let s:debugIndex = 0
 " Variable used to pass maxTabWidth info between functions
 let s:maxTabWidth = 0
 
+" Variable used as a mutex to indicate the current state of MBEToggleAll
+let s:TabsMBEState = 0
+
+" List for all eligible buffers
 let s:BufList = []
 
 " List for tracking order of the buffer entering
@@ -323,7 +336,7 @@ let s:miniBufExplInAutoUpdate = 0
 
 " If MBE was opened manually, then we should skip eligible buffers checking,
 " open MBE window no matter what value 'g:miniBufExplBuffersNeeded' is set.
-let s:skipEligibleBuffersCheck = 0
+let t:skipEligibleBuffersCheck = 0
 
 " Dictionary used to keep track of the names we have seen.
 let s:bufNameDict = {}
@@ -348,7 +361,7 @@ let s:bufPathSignDict = {}
 
 "set update time for the CursorHold function so that it is called 100ms after
 "a key is pressed
-setlocal updatetime=300
+set updatetime=300
 
 augroup MiniBufExplorer
 autocmd MiniBufExplorer VimEnter       * nested call <SID>VimEnterHandler()
@@ -356,10 +369,10 @@ autocmd MiniBufExplorer TabEnter       * nested call <SID>TabEnterHandler()
 autocmd MiniBufExplorer BufAdd         *        call <SID>BufAddHandler()
 autocmd MiniBufExplorer BufEnter       * nested call <SID>BufEnterHandler()
 autocmd MiniBufExplorer BufDelete      *        call <SID>BufDeleteHandler()
-autocmd MiniBufExplorer CursorHoldI    *
-      \ call <SID>DEBUG('==> Entering CursorHoldI UpdateBufferStateDict', 10) |
+autocmd MiniBufExplorer CursorHold,CursorHoldI    *
+      \ call <SID>DEBUG('==> Entering CursorHold/CursorHoldI UpdateBufferStateDict', 10) |
       \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
-      \ call <SID>DEBUG('<== Leaving CursorHoldI UpdateBufferStateDict', 10)
+      \ call <SID>DEBUG('<== Leaving CursorHold/CursorHoldI UpdateBufferStateDict', 10)
 augroup END
 
 function! <SID>VimEnterHandler()
@@ -377,7 +390,10 @@ function! <SID>VimEnterHandler()
     let t:miniBufExplAutoUpdate = 1
   endif
 
-  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1 && <SID>HasEligibleBuffers() == 1
+  let t:skipEligibleBuffersCheck = 0
+
+  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
+        \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
     call <SID>StartExplorer(bufnr("%"))
   endif
 
@@ -391,7 +407,10 @@ function! <SID>TabEnterHandler()
     let t:miniBufExplAutoUpdate = 1
   endif
 
-  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1 && <SID>HasEligibleBuffers() == 1
+  let t:skipEligibleBuffersCheck = 0
+
+  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
+        \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
     call <SID>StartExplorer(bufnr("%"))
   endif
 
@@ -617,10 +636,12 @@ endfunction
 " }}}
 " StopExplorer - Looks for our explorer and closes the window if it is open {{{
 "
-function! <SID>StopExplorer()
+function! <SID>StopExplorer(force)
   call <SID>DEBUG('Entering StopExplorer()',10)
 
-  let t:miniBufExplAutoUpdate = 0
+  if a:force || <SID>HasEligibleBuffers()
+    let t:miniBufExplAutoUpdate = 0
+  endif
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
@@ -641,17 +662,32 @@ endfunction
 " }}}
 " ToggleExplorer - Looks for our explorer and opens/closes the window {{{
 "
-function! <SID>ToggleExplorer()
+" a:tabs, 0 no, 1 yes
+"   toggle MBE in all tabs
+" a:force, 0 no, 1 yes
+"   reopen MBE when it is already open
+"   close MBE with auto-updating disabled
+"
+function! <SID>ToggleExplorer(tabs,force)
   call <SID>DEBUG('Entering ToggleExplorer()',10)
 
-  let s:skipEligibleBuffersCheck = 1
-
-  let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
-
-  if l:winNum != -1
-    call <SID>StopExplorer()
+  if a:tabs
+    if s:TabsMBEState
+      tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer(a:force)
+    else
+      tabdo let t:skipEligibleBuffersCheck = 1 | if a:force | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
+    endif
+    let s:TabsMBEState = !s:TabsMBEState
   else
-    call <SID>StartExplorer(bufnr("%"))
+    let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
+
+    if l:winNum != -1
+      let t:skipEligibleBuffersCheck = 0
+      call <SID>StopExplorer(a:force)
+    else
+      let t:skipEligibleBuffersCheck = 1
+      call <SID>StartExplorer(bufnr("%"))
+    endif
   endif
 
   call <SID>DEBUG('Leaving ToggleExplorer()',10)
@@ -685,7 +721,7 @@ function! <SID>UpdateExplorer(curBufNum)
     let l:currWin = winnr()
     call s:SwitchWindow('p',1)
 
-    call s:SwitchWindow('w',1,l:winNum)
+    call s:SwitchWindow('w',0,l:winNum)
   endif
 
   call <SID>DisplayBuffers(a:curBufNum)
@@ -1572,10 +1608,13 @@ endfunction
 " }}}
 " UpdateBufferStateDict {{{
 function! <SID>UpdateBufferStateDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferStateDict()',5)
+
     let l:bufNum = 0 + a:bufNum
 
     if a:deleted && has_key(s:bufStateDict, l:bufNum)
         call filter(s:bufStateDict, 'v:key != '.l:bufNum)
+        call <SID>DEBUG('Leaving UpdateBufferStateDict()',5)
         return
     endif
 
@@ -1587,6 +1626,8 @@ function! <SID>UpdateBufferStateDict(bufNum,deleted)
     else
         let s:bufStateDict[l:bufNum] = getbufvar(a:bufNum, '&modified')
     endif
+
+    call <SID>DEBUG('Leaving UpdateBufferStateDict()',5)
 endfunction
 
 " }}}
@@ -1621,11 +1662,6 @@ endfunction
 "
 function! <SID>HasEligibleBuffers()
   call <SID>DEBUG('Entering HasEligibleBuffers()',10)
-
-  if s:skipEligibleBuffersCheck == 1
-    call <SID>DEBUG('Leaving HasEligibleBuffers()',10)
-    return 1
-  endif
 
   let l:found = len(s:BufList)
   let l:needed = g:miniBufExplBuffersNeeded
@@ -1688,7 +1724,7 @@ function! <SID>AutoUpdate(curBufNum)
     " if we don't have a window then create one
     let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-    if <SID>HasEligibleBuffers() == 1
+    if t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1
       if (l:winnr == -1)
         if g:miniBufExplAutoStart == 1
           call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
@@ -1711,7 +1747,7 @@ function! <SID>AutoUpdate(curBufNum)
         return
       else
         call <SID>DEBUG('Failed in eligible check', 9)
-        call <SID>StopExplorer()
+        call <SID>StopExplorer(0)
         " we do not want to turn auto-updating off
         let t:miniBufExplAutoUpdate = 1
       endif
@@ -1825,7 +1861,7 @@ function! <SID>MBESelectBuffer(split)
   let &showcmd = l:save_sc
 
   if g:miniBufExplCloseOnSelect == 1
-    call <SID>StopExplorer()
+    call <SID>StopExplorer(0)
   endif
 
   call <SID>DEBUG('Leaving MBESelectBuffer()',10)
