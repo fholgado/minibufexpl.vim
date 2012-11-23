@@ -1176,29 +1176,9 @@ function! <SID>DeleteBuffer(bufNum)
     let l:actBufWin = bufwinnr(l:actBuf)
   endif
 
-  " Save previous window so that if we show a buffer after
-  " deleting. The show will come up in the correct window.
-  call s:SwitchWindow('p',1)
-  let l:prevWin    = winnr()
-  let l:prevWinBuf = winbufnr(winnr())
-  call <SID>DEBUG('Previous window: '.l:prevWin.' buffer in window: '.l:prevWinBuf,5)
-
   " Detach the buffer from all the windows that holding it
   " in every tab page.
   tabdo call <SID>DetachBuffer(l:bufNum)
-
-  " Attempt to restore previous window
-  call <SID>DEBUG('Restoring previous window to: '.l:prevWin,5)
-  call s:SwitchWindow('w',1,l:prevWin)
-
-  " Try to get back to the -MiniBufExplorer- window
-  let l:winNum = bufwinnr(bufnr('-MiniBufExplorer-'))
-  if l:winNum != -1
-    call s:SwitchWindow('w',1,l:winNum)
-    call <SID>DEBUG('Got to -MiniBufExplorer- window: '.winnr(),5)
-  else
-    call <SID>DEBUG('Unable to get to -MiniBufExplorer- window',1)
-  endif
 
   " Find which buffer is in the active window now
   if l:actBuf == l:bufNum
@@ -1212,7 +1192,7 @@ function! <SID>DeleteBuffer(bufNum)
 
   let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
-  call <SID>DisplayBuffers(l:actBuf)
+  call <SID>UpdateExplorer(l:actBuf)
 endfunction
 
 " }}}
