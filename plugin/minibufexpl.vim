@@ -1084,9 +1084,9 @@ function! <SID>CycleBuffer(forward,...)
     let curBufIndex = index(s:MRUList, l:curBufNum)
     call <SID>DEBUG('curBufIndex is '.l:curBufIndex,1)
     let forBufIndex = l:curBufIndex - 1 < 0 ? len(s:MRUList) - 1 : l:curBufIndex - 1
-    call <SID>DEBUG('bacBufIndex is '.l:bacBufIndex,1)
-    let bacBufIndex = l:curBufIndex + 1 >= len(s:MRUList) ? 0 : l:curBufIndex + 1
     call <SID>DEBUG('forBufIndex is '.l:forBufIndex,1)
+    let bacBufIndex = l:curBufIndex + 1 >= len(s:MRUList) ? 0 : l:curBufIndex + 1
+    call <SID>DEBUG('bacBufIndex is '.l:bacBufIndex,1)
 
     if a:forward
       let l:moveCmd = 'b! '.s:MRUList[l:forBufIndex]
