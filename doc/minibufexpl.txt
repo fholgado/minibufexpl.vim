@@ -88,16 +88,72 @@ configuration of Vim.
 3. Commands                                              *MiniBufExplCommands*
 
 :MiniBufExplorer (depreciated)                              *:MiniBufExplorer*
-:MBEOpen                                                            *:MBEOpen*
-    Open and/or goto Explorer
+    Use :MBEOpen instead
 
 :CMiniBufExplorer (depreciated)                            *:CMiniBufExplorer*
-:MBEClose                                                          *:MBEClose*
-    Close the Explorer if it's open
+    Use :MBEClose instead
 
 :TMiniBufExplorer (depreciated)                            *:TMiniBufExplorer*
-:MBEToggle                                                        *:MBEToggle*
-    Toggle the Explorer window open and closed.
+    Use :MBEToggle instead
+
+:UMiniBufExplorer (Obsolete)                               *:UMiniBufExplorer*
+    Command has been removed
+
+:MBEOpen[!]                                                         *:MBEOpen*
+    Open the Explorer.
+    With '!' appended, MBE will be reopened if it is already open.
+
+:MBEOpenAll[!]                                                   *:MBEOpenAll*
+    Open the Explorer in every tab page.
+    With '!' appended, MBE will be reopened if it is already open.
+
+:MBEFocus                                                          *:MBEFocus*
+    Focus into the MBE window.
+
+:MBEFocusAll                                                    *:MBEFocusAll*
+    Focus into the MBE window in every tab page.
+
+:MBEClose[!]                                                       *:MBEClose*
+    Close the Explorer if it's open.
+    With '!' appended, auto-updating will be disabled even if it does not
+    meet the required numbers of eligible buffers. Otherwise, auto-updating
+    will only be disabled if the required numbers of eligible buffers has
+    been meet.
+
+:MBECloseAll[!]                                                 *:MBECloseAll*
+    Close the Explorer in every tab page if it's open.
+    With '!' appended, auto-updating will be disabled even if it does not
+    meet the required numbers of eligible buffers. Otherwise, auto-updating
+    will only be disabled if the required numbers of eligible buffers has
+    been meet.
+
+:MBEToggle[!]                                                     *:MBEToggle*
+    Toggle the Explorer open and closed.
+    With '!' appended: On the open action, it does not have any effect; On
+    the close action, auto-updating will be disabled even if it does not
+    meet the required numbers of eligible buffers, otherwise, auto-updating
+    will only be disabled if the required numbers of eligible buffers has
+    been meet.
+
+:MBEToggleAll[!]                                               *:MBEToggleAll*
+    Toggle the Explorer open and closed in every tab page.
+    With '!' appended: On the open action, MBE will be reopened if it is
+    already open; On the close action, auto-updating will be disabled even
+    if it does not meet the required numbers of eligible buffers, otherwise,
+    auto-updating will only be disabled if the required numbers of eligible
+    buffers has been meet.
+
+:MBEbn                                                                *:MBEbn*
+    Switch to next normal buffer in current window.
+
+:MBEbp                                                                *:MBEbp*
+    Switch to previous normal buffer in current window.
+
+:MBEbf                                                                *:MBEbf*
+    Move one buffer forward in the most recent used buffer list.
+
+:MBEbb                                                                *:MBEbb*
+    Move one buffer backward in the most recent used buffer list.
 
 ==============================================================================
 4. Options                                                *MiniBufExplOptions*
