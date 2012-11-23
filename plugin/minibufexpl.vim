@@ -481,18 +481,18 @@ function! <SID>StartExplorer(curBufNum)
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-  if l:winNum == -1
-    call <SID>CreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
-
-    let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
-
-    if l:winNum == -1
-      call <SID>DEBUG('Failed to create the MBE window, aborting...',1)
-      call <SID>DEBUG('Leaving StartExplorer()',10)
-      return
-    endif
-  else
+  if l:winNum != -1
     call <SID>DEBUG('There is already a MBE window, aborting...',1)
+    call <SID>DEBUG('Leaving StartExplorer()',10)
+    return
+  endif
+
+  call <SID>CreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
+
+  let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
+
+  if l:winNum == -1
+    call <SID>DEBUG('Failed to create the MBE window, aborting...',1)
     call <SID>DEBUG('Leaving StartExplorer()',10)
     return
   endif
@@ -651,15 +651,18 @@ function! <SID>StopExplorer(force)
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-  if l:winNum != -1
-    call s:SwitchWindow('w',1,l:winNum)
-    silent! close
-    call s:SwitchWindow('p',1)
+  if l:winNum == -1
+    call <SID>DEBUG('There is no MBE window, aborting...',1)
+    call <SID>DEBUG('Leaving StopExplorer()',10)
+    return
+  endif
 
-    " Work around a redraw bug in gVim (Confirmed present in 7.3.50)
-    if has('gui_gtk') && has('gui_running')
-        redraw!
-    endif
+  call s:SwitchWindow('w',1,l:winNum)
+  silent! close
+
+  " Work around a redraw bug in gVim (Confirmed present in 7.3.50)
+  if has('gui_gtk') && has('gui_running')
+      redraw!
   endif
 
   call <SID>DEBUG('Leaving StopExplorer()',10)
