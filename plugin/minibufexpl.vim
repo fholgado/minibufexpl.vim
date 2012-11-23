@@ -1073,7 +1073,7 @@ endfunction
 " are cycled forward.
 "
 function! <SID>CycleBuffer(forward,...)
-  if <SID>IgnoreBuffer(bufnr('%')) == 1
+  if <SID>IsBufferIgnored(bufnr('%')) == 1
     return
   endif
 
