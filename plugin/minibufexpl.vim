@@ -1825,19 +1825,22 @@ function! <SID>MBESelectBuffer(split)
   set noshowcmd
 
   let l:bufnr  = <SID>GetSelectedBuffer()
-  let l:resize = 0
 
   if(l:bufnr != -1)             " If the buffer exists.
     let l:saveAutoUpdate = t:miniBufExplAutoUpdate
     let t:miniBufExplAutoUpdate = 0
 
-    let l:winNum = <SID>NextNormalWindow()
-    if l:winNum != -1
-      call s:SwitchWindow('w',1,l:winNum)
-    else
-      call <SID>DEBUG('No elegible window avaliable',1)
-      call <SID>DEBUG('Leaving MBESelectBuffer()',10)
-      return
+    call s:SwitchWindow('p',1)
+
+    if <SID>IsBufferIgnored(bufnr('%'))
+      let l:winNum = <SID>NextNormalWindow()
+      if l:winNum != -1
+        call s:SwitchWindow('w',1,l:winNum)
+      else
+        call <SID>DEBUG('No elegible window avaliable',1)
+        call <SID>DEBUG('Leaving MBESelectBuffer()',10)
+        return
+      endif
     endif
 
     if a:split == 0
@@ -1846,10 +1849,6 @@ function! <SID>MBESelectBuffer(split)
 	    exec 'sb! '.l:bufnr
     elseif a:split == 2
 	    exec 'vertical sb! '.l:bufnr
-    endif
-
-    if (l:resize)
-      resize
     endif
 
     let t:miniBufExplAutoUpdate = l:saveAutoUpdate
