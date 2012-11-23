@@ -54,6 +54,12 @@ endif
 if !exists(':MBEOpenAll')
   command! -bang MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
 endif
+if !exists(':MBEFocus')
+  command! MBEFocus           call <SID>FocusExplorer()
+endif
+if !exists(':MBEFocusAll')
+  command! MBEFocusAll        tabdo call <SID>FocusExplorer()
+endif
 if !exists(':MBEClose')
   command! -bang MBEClose     let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
 endif
@@ -657,6 +663,27 @@ function! <SID>StopExplorer(force)
   endif
 
   call <SID>DEBUG('Leaving StopExplorer()',10)
+endfunction
+
+" }}}
+" FocusExplorer {{{
+"
+function! <SID>FocusExplorer()
+  call <SID>DEBUG('Entering FocusExplorer()',10)
+
+  let t:miniBufExplAutoUpdate = 1
+
+  let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
+
+  if l:winNum == -1
+    call <SID>DEBUG('There is no MBE window, aborting...',1)
+    call <SID>DEBUG('Leaving FocusExplorer()',10)
+    return
+  endif
+
+  call s:SwitchWindow('w',0,l:winNum)
+
+  call <SID>DEBUG('Leaving FocusExplorer()',10)
 endfunction
 
 " }}}

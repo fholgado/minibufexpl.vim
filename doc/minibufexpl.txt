@@ -107,6 +107,12 @@ configuration of Vim.
     Open the Explorer in every tab page.
     With '!' appended, MBE will be reopened if it is already open.
 
+:MBEFocus                                                          *:MBEFocus*
+    Focus into the MBE window.
+
+:MBEFocusAll                                                    *:MBEFocusAll*
+    Focus into the MBE window in every tab page.
+
 :MBEClose[!]                                                       *:MBEClose*
     Close the Explorer if it's open.
     With '!' appended, auto-updating will be disabled even if it does not
