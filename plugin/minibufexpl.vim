@@ -1786,6 +1786,11 @@ function! <SID>GetSelectedBuffer()
     return -1
   endif
 
+  let l:save_rep = &report
+  let l:save_sc  = &showcmd
+  let &report    = 10000
+  set noshowcmd
+
   let l:save_reg = @"
   let @" = ""
   normal ""yi[
@@ -1799,6 +1804,9 @@ function! <SID>GetSelectedBuffer()
     call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
     return -1
   endif
+
+  let &report  = l:save_rep
+  let &showcmd = l:save_sc
 endfunction
 
 " }}}
@@ -1818,11 +1826,6 @@ function! <SID>MBESelectBuffer(split)
     call <SID>DEBUG('Leaving MBESelectBuffer()',10)
     return
   endif
-
-  let l:save_rep = &report
-  let l:save_sc  = &showcmd
-  let &report    = 10000
-  set noshowcmd
 
   let l:bufnr  = <SID>GetSelectedBuffer()
 
@@ -1855,9 +1858,6 @@ function! <SID>MBESelectBuffer(split)
 
     call <SID>AutoUpdate(bufnr("%"))
   endif
-
-  let &report  = l:save_rep
-  let &showcmd = l:save_sc
 
   if g:miniBufExplCloseOnSelect == 1
     call <SID>StopExplorer(0)
@@ -1894,12 +1894,6 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
     return
   endif
-
-  let l:save_rep = &report
-  let l:save_sc  = &showcmd
-  let &report    = 10000
-  set noshowcmd
-
 
   if l:selBuf != -1
 
@@ -1968,9 +1962,6 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     call cursor(l:curLine, l:curCol)
 
   endif
-
-  let &report  = l:save_rep
-  let &showcmd = l:save_sc
 
   call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
 endfunction
