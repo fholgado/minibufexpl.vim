@@ -1152,6 +1152,41 @@ function! <SID>CycleBuffer(forward,...)
 endfunction
 
 " }}}
+" DetachBuffer {{{
+"
+" Detach a buffer from all the windows in which it is displayed.
+"
+function! <SID>DetachBuffer(selBuf)
+  let l:selBuf = a:selBuf + 0
+
+  let l:winNum = bufwinnr(l:selBuf)
+  " while we have windows that contain our buffer
+  while l:winNum != -1
+    call <SID>DEBUG('Buffer '.l:selBuf.' is being displayed in window: '.l:winNum,5)
+
+    " move to window that contains our selected buffer
+    call s:SwitchWindow('w',1,l:winNum)
+
+    call <SID>DEBUG('We are now in window: '.winnr(),5)
+
+    call <SID>DEBUG('Window contains buffer: '.bufnr('%').' which should be: '.l:selBuf,5)
+    let l:origBuf = bufnr('%')
+    call <SID>CycleBuffer(1)
+    let l:currBuf = bufnr('%')
+    call <SID>DEBUG('Window now contains buffer: '.bufnr('%').' which should not be: '.l:selBuf,5)
+
+    if l:origBuf == l:currBuf
+      " we wrapped so we are going to have to delete a buffer
+      " that is in an open window.
+      let l:winNum = -1
+    else
+      " see if we have anymore windows with our selected buffer
+      let l:winNum = bufwinnr(l:selBuf)
+    endif
+  endwhile
+endfunction
+
+" }}}
 " IsBufferIgnored - check to see if buffer should be ignored {{{
 "
 " Returns 0 if this buffer should be displayed in the list, 1 otherwise.
@@ -1953,34 +1988,8 @@ function! <SID>MBEDeleteBuffer()
     let l:prevWinBuf = winbufnr(winnr())
     call <SID>DEBUG('Previous window: '.l:prevWin.' buffer in window: '.l:prevWinBuf,5)
 
-    " If buffer is being displayed in a window then
-    " move window to a different buffer before
-    " deleting this one.
-    let l:winNum = bufwinnr(l:selBuf)
-    " while we have windows that contain our buffer
-    while l:winNum != -1
-        call <SID>DEBUG('Buffer '.l:selBuf.' is being displayed in window: '.l:winNum,5)
-
-        " move to window that contains our selected buffer
-        call s:SwitchWindow('w',1,l:winNum)
-
-        call <SID>DEBUG('We are now in window: '.winnr(),5)
-
-        call <SID>DEBUG('Window contains buffer: '.bufnr('%').' which should be: '.l:selBuf,5)
-        let l:origBuf = bufnr('%')
-        call <SID>CycleBuffer(1)
-        let l:currBuf = bufnr('%')
-        call <SID>DEBUG('Window now contains buffer: '.bufnr('%').' which should not be: '.l:selBuf,5)
-
-        if l:origBuf == l:currBuf
-            " we wrapped so we are going to have to delete a buffer
-            " that is in an open window.
-            let l:winNum = -1
-        else
-            " see if we have anymore windows with our selected buffer
-            let l:winNum = bufwinnr(l:selBuf)
-        endif
-    endwhile
+    " Detach the buffer from all the windows that holding it.
+    call <SID>DetachBuffer(l:selBuf)
 
     " Attempt to restore previous window
     call <SID>DEBUG('Restoring previous window to: '.l:prevWin,5)
