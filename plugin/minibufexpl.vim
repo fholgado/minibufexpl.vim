@@ -1914,10 +1914,12 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     return
   endif
 
-  let l:selBuf     = <SID>GetSelectedBuffer()
-  let l:selBufName = bufname(l:selBuf)
+  let l:selBuf = <SID>GetSelectedBuffer()
 
   if l:selBuf != -1
+
+    let l:selBufName = bufname(l:selBuf)
+    call <SID>DEBUG('Selected buffer is <'.l:selBufName.'>['.l:selBuf.']',5)
 
     " Don't want auto updates while we are processing a delete
     " request.
@@ -1929,14 +1931,12 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     call s:SwitchWindow('p',1)
     let l:prevWin    = winnr()
     let l:prevWinBuf = winbufnr(winnr())
-
     call <SID>DEBUG('Previous window: '.l:prevWin.' buffer in window: '.l:prevWinBuf,5)
-    call <SID>DEBUG('Selected buffer is <'.l:selBufName.'>['.l:selBuf.']',5)
 
     " If buffer is being displayed in a window then
     " move window to a different buffer before
     " deleting this one.
-    let l:winNum = (bufwinnr(l:selBufName) + 0)
+    let l:winNum = bufwinnr(l:selBuf)
     " while we have windows that contain our buffer
     while l:winNum != -1
         call <SID>DEBUG('Buffer '.l:selBuf.' is being displayed in window: '.l:winNum,5)
@@ -1944,21 +1944,21 @@ function! <SID>MBEDeleteBuffer(prevBufName)
         " move to window that contains our selected buffer
         call s:SwitchWindow('w',1,l:winNum)
 
-        call <SID>DEBUG('We are now in window: '.winnr().' which contains buffer: '.bufnr('%').' and should contain buffer: '.l:selBuf,5)
+        call <SID>DEBUG('We are now in window: '.winnr(),5)
 
+        call <SID>DEBUG('Window contains buffer: '.bufnr('%').' which should be: '.l:selBuf,5)
         let l:origBuf = bufnr('%')
         call <SID>CycleBuffer(1)
-        let l:curBuf  = bufnr('%')
-
+        let l:currBuf = bufnr('%')
         call <SID>DEBUG('Window now contains buffer: '.bufnr('%').' which should not be: '.l:selBuf,5)
 
-        if l:origBuf == l:curBuf
+        if l:origBuf == l:currBuf
             " we wrapped so we are going to have to delete a buffer
             " that is in an open window.
             let l:winNum = -1
         else
             " see if we have anymore windows with our selected buffer
-            let l:winNum = (bufwinnr(l:selBufName) + 0)
+            let l:winNum = bufwinnr(l:selBuf)
         endif
     endwhile
 
@@ -1977,9 +1977,11 @@ function! <SID>MBEDeleteBuffer(prevBufName)
 
     " Delete the buffer selected.
     call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
+
     exec 'silent! bd '.l:selBuf
 
     let t:miniBufExplAutoUpdate = l:saveAutoUpdate
+
     call <SID>DisplayBuffers(a:prevBufName)
 
   endif
