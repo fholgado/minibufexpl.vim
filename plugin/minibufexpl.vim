@@ -591,7 +591,7 @@ function! <SID>StartExplorer(curBufNum)
   nnoremap <buffer> v       :call <SID>MBESelectBuffer(2)<CR>:<BS>
   " If you press d in the -MiniBufExplorer- then try to
   " delete the selected buffer.
-  nnoremap <buffer> d       :call <SID>MBEDeleteBuffer(bufname("#"))<CR>:<BS>
+  nnoremap <buffer> d       :call <SID>MBEDeleteBuffer()<CR>:<BS>
   " The following allow us to use regular movement keys to
   " scroll in a wrapped single line buffer
   nnoremap <buffer> k       gk
@@ -1801,6 +1801,17 @@ function! <SID>AutoUpdate(curBufNum)
 endfunction
 
 " }}}
+" GetActiveBuffer {{{
+"
+function! <SID>GetActiveBuffer()
+  call <SID>DEBUG('Entering GetActiveBuffer()',10)
+  let l:bufNum = substitute(s:miniBufExplBufList,'\[\([0-9]*\):[^\]]*\][^\!]*!', '\1', '') + 0
+  call <SID>DEBUG('Currently active buffer is '.l:bufNum,10)
+  call <SID>DEBUG('Leaving GetActiveBuffer()',10)
+  return l:bufNum
+endfunction
+
+" }}}
 " GetSelectedBuffer - From the MBE window, return the bufnum for buf under cursor {{{
 "
 " If we are in our explorer window then return the buffer number
@@ -1904,7 +1915,7 @@ endfunction
 " window, this routine will attempt to get different buffers into the
 " windows that will be affected so that windows don't get removed.
 "
-function! <SID>MBEDeleteBuffer(prevBufName)
+function! <SID>MBEDeleteBuffer()
   call <SID>DEBUG('Entering MBEDeleteBuffer()',10)
 
   " Make sure we are in our window
@@ -1925,6 +1936,15 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     " request.
     let l:saveAutoUpdate = t:miniBufExplAutoUpdate
     let t:miniBufExplAutoUpdate = 0
+
+    " Get the currently active buffer, so we can update the MBE
+    " correctly. If that is the buffer to be deleted, then get
+    " the window for that buffer, so we can find which buffer
+    " is in that window after the detaching.
+    let l:actBuf = <SID>GetActiveBuffer()
+    if l:actBuf == l:selBuf
+        let l:actBufWin = bufwinnr(l:actBuf)
+    endif
 
     " Save previous window so that if we show a buffer after
     " deleting. The show will come up in the correct window.
@@ -1975,6 +1995,11 @@ function! <SID>MBEDeleteBuffer(prevBufName)
         call <SID>DEBUG('Unable to get to -MiniBufExplorer- window',1)
     endif
 
+    " Find which buffer is in the active window now
+    if l:actBuf == l:selBuf
+        let l:actBuf = winbufnr(l:actBufWin)
+    endif
+
     " Delete the buffer selected.
     call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
 
@@ -1982,7 +2007,7 @@ function! <SID>MBEDeleteBuffer(prevBufName)
 
     let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
-    call <SID>DisplayBuffers(a:prevBufName)
+    call <SID>DisplayBuffers(l:actBuf)
 
   endif
 
