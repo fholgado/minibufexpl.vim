@@ -1887,12 +1887,6 @@ function! <SID>MBEDeleteBuffer(prevBufName)
   let l:selBuf     = <SID>GetSelectedBuffer()
   let l:selBufName = bufname(l:selBuf)
 
-  if l:selBufName == 'MiniBufExplorer.DBG' && g:miniBufExplDebugLevel > 0
-    call <SID>DEBUG('MBEDeleteBuffer will not delete the debug window, when debugging is turned on.',1)
-    call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
-    return
-  endif
-
   if l:selBuf != -1
 
     " Don't want auto updates while we are processing a delete
