@@ -1171,19 +1171,26 @@ endfunction
 "   number of the buffer to be deleted
 "
 function! <SID>DeleteBuffer(action,bang,...)
+  call <SID>DEBUG('Entering DeleteBuffer('.a:action.','.a:bang.')',10)
+
   if a:0 == 0
+    call <SID>DEBUG('No buffer is given, use current buffer',5)
     let l:bufNums = [ bufnr('%') ]
   else
+    call <SID>DEBUG('Given buffers are '.string(a:000),5)
     let l:bufNums = map(copy(a:000),'v:val =~ "\d\+" ? bufnr(v:val + 0) : bufnr(v:val)')
   endif
 
+  call <SID>DEBUG('Buffers to be deleted are '.string(l:bufNums),5)
+
   for l:bufNum in l:bufNums
     if <SID>IsBufferIgnored(l:bufNum)
+      call <SID>DEBUG('Buffer '.l:bufNum.'is not a normal buffer, skip it',5)
       continue
     endif
 
     let l:bufName = bufname(l:bufNum)
-    call <SID>DEBUG('Selected buffer is <'.l:bufName.'>['.l:bufNum.']',5)
+    call <SID>DEBUG('Buffer to be deleted is <'.l:bufName.'>['.l:bufNum.']',5)
 
     " Don't want auto updates while we are processing a delete
     " request.
@@ -1223,12 +1230,17 @@ function! <SID>DeleteBuffer(action,bang,...)
       let l:cmd = l:cmd.'!'
     endif
 
-    exec 'silent! '.l:cmd.' '.l:bufNum
+    let l:cmd = 'silent! '.l:cmd.' '.l:bufNum
+    call <SID>DEBUG('About to execute the command "'.l:cmd.'"',5)
+
+    exec l:cmd
 
     let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
     call <SID>UpdateExplorer(l:actBuf)
   endfor
+
+  call <SID>DEBUG('Leaving DeleteBuffer()',10)
 endfunction
 
 " }}}
@@ -1237,6 +1249,10 @@ endfunction
 " Detach a buffer from all the windows in which it is displayed.
 "
 function! <SID>DetachBuffer(bufNum)
+  call <SID>DEBUG('Entering DetachBuffer('.a:bufNum.')',10)
+
+  call <SID>DEBUG('We are currently in tab page '.tabpagenr(),10)
+
   let l:bufNum = a:bufNum + 0
 
   let l:winNum = bufwinnr(l:bufNum)
@@ -1264,6 +1280,8 @@ function! <SID>DetachBuffer(bufNum)
       let l:winNum = bufwinnr(l:bufNum)
     endif
   endwhile
+
+  call <SID>DEBUG('Leaving DetachBuffer()',10)
 endfunction
 
 " }}}
