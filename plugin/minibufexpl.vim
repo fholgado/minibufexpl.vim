@@ -1178,7 +1178,7 @@ function! <SID>DeleteBuffer(action,bang,...)
     let l:bufNums = [ bufnr('%') ]
   else
     call <SID>DEBUG('Given buffers are '.string(a:000),5)
-    let l:bufNums = map(copy(a:000),'v:val =~ "\d\+" ? bufnr(v:val + 0) : bufnr(v:val)')
+    let l:bufNums = map(copy(a:000),'v:val =~ ''\d\+'' ? bufnr(v:val + 0) : bufnr(v:val)')
   endif
 
   call <SID>DEBUG('Buffers to be deleted are '.string(l:bufNums),5)
