@@ -85,13 +85,13 @@ if !exists(':MBEbb')
   command! MBEbb call <SID>CycleBuffer(0,1)
 endif
 if !exists(':MBEbd')
-  command! -nargs=? MBEbd call <SID>DeleteBuffer(0,'<args>')
+  command! -nargs=? MBEbd call <SID>DeleteBuffer(0,<args>)
 endif
 if !exists(':MBEbw')
-  command! -nargs=? MBEbw call <SID>DeleteBuffer(1,'<args>')
+  command! -nargs=? MBEbw call <SID>DeleteBuffer(1,<args>)
 endif
 if !exists(':MBEbun')
-  command! -nargs=? MBEbun call <SID>DeleteBuffer(2,'<args>')
+  command! -nargs=? MBEbun call <SID>DeleteBuffer(2,<args>)
 endif
 
 " }}}
@@ -1170,11 +1170,11 @@ endfunction
 " a:bufNum
 "   number of the buffer to be deleted
 "
-function! <SID>DeleteBuffer(action,bufNum)
-  if empty(a:bufNum)
+function! <SID>DeleteBuffer(action,...)
+  if a:0 == 0
     let l:bufNum = bufnr('%')
   else
-    let l:bufNum = a:bufNum + 0
+    let l:bufNum = bufnr(a:1)
   endif
 
   if <SID>IsBufferIgnored(l:bufNum)
