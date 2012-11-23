@@ -1156,11 +1156,11 @@ endfunction
 "
 " Delete a buffer but preserve the window it was in
 "
-function! <SID>DeleteBuffer(selBuf)
-  let l:selBuf = a:selBuf + 0
+function! <SID>DeleteBuffer(bufNum)
+  let l:bufNum = a:bufNum + 0
 
-  let l:selBufName = bufname(l:selBuf)
-  call <SID>DEBUG('Selected buffer is <'.l:selBufName.'>['.l:selBuf.']',5)
+  let l:bufName = bufname(l:bufNum)
+  call <SID>DEBUG('Selected buffer is <'.l:bufName.'>['.l:bufNum.']',5)
 
   " Don't want auto updates while we are processing a delete
   " request.
@@ -1172,7 +1172,7 @@ function! <SID>DeleteBuffer(selBuf)
   " the window for that buffer, so we can find which buffer
   " is in that window after the detaching.
   let l:actBuf = <SID>GetActiveBuffer()
-  if l:actBuf == l:selBuf
+  if l:actBuf == l:bufNum
     let l:actBufWin = bufwinnr(l:actBuf)
   endif
 
@@ -1185,7 +1185,7 @@ function! <SID>DeleteBuffer(selBuf)
 
   " Detach the buffer from all the windows that holding it
   " in every tab page.
-  tabdo call <SID>DetachBuffer(l:selBuf)
+  tabdo call <SID>DetachBuffer(l:bufNum)
 
   " Attempt to restore previous window
   call <SID>DEBUG('Restoring previous window to: '.l:prevWin,5)
@@ -1201,14 +1201,14 @@ function! <SID>DeleteBuffer(selBuf)
   endif
 
   " Find which buffer is in the active window now
-  if l:actBuf == l:selBuf
+  if l:actBuf == l:bufNum
     let l:actBuf = winbufnr(l:actBufWin)
   endif
 
   " Delete the buffer selected.
-  call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
+  call <SID>DEBUG('About to delete buffer: '.l:bufNum,5)
 
-  exec 'silent! bd '.l:selBuf
+  exec 'silent! bd '.l:bufNum
 
   let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
