@@ -155,6 +155,21 @@ configuration of Vim.
 :MBEbb                                                                *:MBEbb*
     Move one buffer backward in the most recent used buffer list.
 
+:MBEbd [N]                                                            *:MBEbd*
+    Delete a buffer but preserve the window that holding it.
+    [N] is the buffer's number to be deleted. If no [N] is given,
+    then current buffer will be deleted.
+
+:MBEbw [N]                                                            *:MBEbw*
+    Wipe out a buffer but preserve the window that holding it.
+    [N] is the buffer's number to be wiped out. If no [N] is given,
+    then current buffer will be deleted.
+
+:MBEbun [N]                                                          *:MBEbun*
+    Unload a buffer but preserve the window that holding it.
+    [N] is the buffer's number to be unloaded. If no [N] is given,
+    then current buffer will be deleted.
+
 ==============================================================================
 4. Options                                                *MiniBufExplOptions*
 

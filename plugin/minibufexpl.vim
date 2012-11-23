@@ -84,6 +84,15 @@ endif
 if !exists(':MBEbb')
   command! MBEbb call <SID>CycleBuffer(0,1)
 endif
+if !exists(':MBEbd')
+  command! -nargs=? MBEbd call <SID>DeleteBuffer(0,'<args>')
+endif
+if !exists(':MBEbw')
+  command! -nargs=? MBEbw call <SID>DeleteBuffer(1,'<args>')
+endif
+if !exists(':MBEbun')
+  command! -nargs=? MBEbun call <SID>DeleteBuffer(2,'<args>')
+endif
 
 " }}}
 "
@@ -1154,10 +1163,19 @@ endfunction
 " }}}
 " DeleteBuffer {{{
 "
-" Delete a buffer but preserve the window it was in
+" Delete/Unload/Wipeout a buffer but preserve the window it was in
 "
-function! <SID>DeleteBuffer(bufNum)
-  let l:bufNum = a:bufNum + 0
+" a:action 0 bd, 1 bw, 2 bun
+"   delete/wipeout/unload a buffer
+" a:bufNum
+"   number of the buffer to be deleted
+"
+function! <SID>DeleteBuffer(action,bufNum)
+  if empty(a:bufNum)
+    let l:bufNum = bufnr('%')
+  else
+    let l:bufNum = a:bufNum + 0
+  endif
 
   if <SID>IsBufferIgnored(l:bufNum)
     return
@@ -1192,7 +1210,15 @@ function! <SID>DeleteBuffer(bufNum)
   " Delete the buffer selected.
   call <SID>DEBUG('About to delete buffer: '.l:bufNum,5)
 
-  exec 'silent! bd '.l:bufNum
+  if a:action == 2
+    let l:cmd = 'bun'
+  elseif a:action == 1
+    let l:cmd = 'bw'
+  else
+    let l:cmd = 'bd'
+  endif
+
+  exec 'silent! '.l:cmd.' '.l:bufNum
 
   let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
@@ -2011,7 +2037,7 @@ function! <SID>MBEDeleteBuffer()
   let l:selBuf = <SID>GetSelectedBuffer()
 
   if l:selBuf != -1
-    call <SID>DeleteBuffer(l:selBuf)
+    call <SID>DeleteBuffer(0,l:selBuf)
   endif
 
   call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
