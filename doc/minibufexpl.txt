@@ -155,20 +155,23 @@ configuration of Vim.
 :MBEbb                                                                *:MBEbb*
     Move one buffer backward in the most recent used buffer list.
 
-:MBEbd[!] [N]                                                         *:MBEbd*
-    Delete a buffer but preserve the window that holding it.
-    [N] is the buffer's number or name to be deleted. If no [N] is given,
-    then current buffer will be deleted.
+:MBEbd[!] [N1] [N2] ...                                               *:MBEbd*
+    Delete buffers but preserve the window that holding them.
+    [N*] is the buffer's number or name to be deleted. If no [N*] is given,
+    then current buffer will be deleted. Multiple buffers could be deleted
+    at the same time.
 
-:MBEbw[!] [N]                                                         *:MBEbw*
-    Wipe out a buffer but preserve the window that holding it.
-    [N] is the buffer's number or name to be wiped out. If no [N] is given,
-    then current buffer will be deleted.
+:MBEbw[!] [N1] [N2] ...                                               *:MBEbw*
+    Wipe out buffers but preserve the window that holding them.
+    [N*] is the buffer's number or name to be wiped out. If no [N*] is given,
+    then current buffer will be deleted. Multiple buffers could be unloaded
+    at the same time.
 
-:MBEbun[!] [N]                                                       *:MBEbun*
-    Unload a buffer but preserve the window that holding it.
-    [N] is the buffer's number or name to be unloaded. If no [N] is given,
-    then current buffer will be deleted.
+:MBEbun[!] [N1] [N2] ...                                             *:MBEbun*
+    Unload buffers but preserve the window that holding them.
+    [N*] is the buffer's number or name to be unloaded. If no [N*] is given,
+    then current buffer will be deleted. Multiple buffers could be wiped out
+    at the same time.
 
 ==============================================================================
 4. Options                                                *MiniBufExplOptions*

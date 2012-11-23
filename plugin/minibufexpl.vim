@@ -85,13 +85,13 @@ if !exists(':MBEbb')
   command! MBEbb call <SID>CycleBuffer(0,1)
 endif
 if !exists(':MBEbd')
-  command! -bang -nargs=? MBEbd call <SID>DeleteBuffer(0,'<bang>'=='!',<args>)
+  command! -bang -nargs=* MBEbd call <SID>DeleteBuffer(0,'<bang>'=='!',<f-args>)
 endif
 if !exists(':MBEbw')
-  command! -bang -nargs=? MBEbw call <SID>DeleteBuffer(1,'<bang>'=='!',<args>)
+  command! -bang -nargs=* MBEbw call <SID>DeleteBuffer(1,'<bang>'=='!',<f-args>)
 endif
 if !exists(':MBEbun')
-  command! -bang -nargs=? MBEbun call <SID>DeleteBuffer(2,'<bang>'=='!',<args>)
+  command! -bang -nargs=* MBEbun call <SID>DeleteBuffer(2,'<bang>'=='!',<f-args>)
 endif
 
 " }}}
@@ -1172,61 +1172,63 @@ endfunction
 "
 function! <SID>DeleteBuffer(action,bang,...)
   if a:0 == 0
-    let l:bufNum = bufnr('%')
+    let l:bufNums = [ bufnr('%') ]
   else
-    let l:bufNum = bufnr(a:1)
+    let l:bufNums = map(copy(a:000),'v:val =~ "\d\+" ? bufnr(v:val + 0) : bufnr(v:val)')
   endif
 
-  if <SID>IsBufferIgnored(l:bufNum)
-    return
-  endif
+  for l:bufNum in l:bufNums
+    if <SID>IsBufferIgnored(l:bufNum)
+      continue
+    endif
 
-  let l:bufName = bufname(l:bufNum)
-  call <SID>DEBUG('Selected buffer is <'.l:bufName.'>['.l:bufNum.']',5)
+    let l:bufName = bufname(l:bufNum)
+    call <SID>DEBUG('Selected buffer is <'.l:bufName.'>['.l:bufNum.']',5)
 
-  " Don't want auto updates while we are processing a delete
-  " request.
-  let l:saveAutoUpdate = t:miniBufExplAutoUpdate
-  let t:miniBufExplAutoUpdate = 0
+    " Don't want auto updates while we are processing a delete
+    " request.
+    let l:saveAutoUpdate = t:miniBufExplAutoUpdate
+    let t:miniBufExplAutoUpdate = 0
 
-  " Get the currently active buffer, so we can update the MBE
-  " correctly. If that is the buffer to be deleted, then get
-  " the window for that buffer, so we can find which buffer
-  " is in that window after the detaching.
-  let l:actBuf = <SID>GetActiveBuffer()
-  if l:actBuf == l:bufNum
-    let l:actBufWin = bufwinnr(l:actBuf)
-  endif
+    " Get the currently active buffer, so we can update the MBE
+    " correctly. If that is the buffer to be deleted, then get
+    " the window for that buffer, so we can find which buffer
+    " is in that window after the detaching.
+    let l:actBuf = <SID>GetActiveBuffer()
+    if l:actBuf == l:bufNum
+      let l:actBufWin = bufwinnr(l:actBuf)
+    endif
 
-  " Detach the buffer from all the windows that holding it
-  " in every tab page.
-  tabdo call <SID>DetachBuffer(l:bufNum)
+    " Detach the buffer from all the windows that holding it
+    " in every tab page.
+    tabdo call <SID>DetachBuffer(l:bufNum)
 
-  " Find which buffer is in the active window now
-  if l:actBuf == l:bufNum
-    let l:actBuf = winbufnr(l:actBufWin)
-  endif
+    " Find which buffer is in the active window now
+    if l:actBuf == l:bufNum
+      let l:actBuf = winbufnr(l:actBufWin)
+    endif
 
-  " Delete the buffer selected.
-  call <SID>DEBUG('About to delete buffer: '.l:bufNum,5)
+    " Delete the buffer selected.
+    call <SID>DEBUG('About to delete buffer: '.l:bufNum,5)
 
-  if a:action == 2
-    let l:cmd = 'bun'
-  elseif a:action == 1
-    let l:cmd = 'bw'
-  else
-    let l:cmd = 'bd'
-  endif
+    if a:action == 2
+      let l:cmd = 'bun'
+    elseif a:action == 1
+      let l:cmd = 'bw'
+    else
+      let l:cmd = 'bd'
+    endif
 
-  if a:bang
-    let l:cmd = l:cmd.'!'
-  endif
+    if a:bang
+      let l:cmd = l:cmd.'!'
+    endif
 
-  exec 'silent! '.l:cmd.' '.l:bufNum
+    exec 'silent! '.l:cmd.' '.l:bufNum
 
-  let t:miniBufExplAutoUpdate = l:saveAutoUpdate
+    let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
-  call <SID>UpdateExplorer(l:actBuf)
+    call <SID>UpdateExplorer(l:actBuf)
+  endfor
 endfunction
 
 " }}}
