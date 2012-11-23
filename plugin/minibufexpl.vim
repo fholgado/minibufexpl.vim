@@ -1830,13 +1830,17 @@ function! <SID>MBESelectBuffer(split)
     let l:saveAutoUpdate = t:miniBufExplAutoUpdate
     let t:miniBufExplAutoUpdate = 0
 
-    let l:winNum = <SID>NextNormalWindow()
-    if l:winNum != -1
-      call s:SwitchWindow('w',1,l:winNum)
-    else
-      call <SID>DEBUG('No elegible window avaliable',1)
-      call <SID>DEBUG('Leaving MBESelectBuffer()',10)
-      return
+    call s:SwitchWindow('p',1)
+
+    if <SID>IsBufferIgnored(bufnr('%'))
+      let l:winNum = <SID>NextNormalWindow()
+      if l:winNum != -1
+        call s:SwitchWindow('w',1,l:winNum)
+      else
+        call <SID>DEBUG('No elegible window avaliable',1)
+        call <SID>DEBUG('Leaving MBESelectBuffer()',10)
+        return
+      endif
     endif
 
     if a:split == 0
