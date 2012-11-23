@@ -1825,7 +1825,6 @@ function! <SID>MBESelectBuffer(split)
   set noshowcmd
 
   let l:bufnr  = <SID>GetSelectedBuffer()
-  let l:resize = 0
 
   if(l:bufnr != -1)             " If the buffer exists.
     let l:saveAutoUpdate = t:miniBufExplAutoUpdate
@@ -1846,10 +1845,6 @@ function! <SID>MBESelectBuffer(split)
 	    exec 'sb! '.l:bufnr
     elseif a:split == 2
 	    exec 'vertical sb! '.l:bufnr
-    endif
-
-    if (l:resize)
-      resize
     endif
 
     let t:miniBufExplAutoUpdate = l:saveAutoUpdate
