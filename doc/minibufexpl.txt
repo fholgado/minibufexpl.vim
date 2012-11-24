@@ -72,16 +72,16 @@ configuration of Vim.
     <up>                                            *MiniBufExpl-Mapping-<up>*
                                             Move one line up in the MBE window
 
-    h                                                  *MiniBufExpl-Mapping-h*
+    j                                                  *MiniBufExpl-Mapping-j*
     <down>                                        *MiniBufExpl-Mapping-<down>*
                                           Move one line down in the MBE window
 
     l                                                  *MiniBufExpl-Mapping-l*
-    <TAB>                                          *MiniBufExpl-Mapping-<TAB>*
+    <right>                                      *MiniBufExpl-Mapping-<right>*
                                      Move one buffer forward in the MBE window
 
-    j                                                  *MiniBufExpl-Mapping-j*
-    <S-TAB>                                      *MiniBufExpl-Mapping-<S-TAB>*
+    h                                                  *MiniBufExpl-Mapping-h*
+    <left>                                        *MiniBufExpl-Mapping-<left>*
                                     Move one buffer backward in the MBE window
 
 ==============================================================================
