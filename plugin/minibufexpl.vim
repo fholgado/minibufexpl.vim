@@ -515,6 +515,9 @@ function! <SID>StartExplorer(curBufNum)
     return
   endif
 
+  " Set filetype for MBE buffer
+  set filetype=minibufexpl
+
   " !!! We may want to make the following optional -- Bindu
   " New windows don't cause all windows to be resized to equal sizes
   set noequalalways
