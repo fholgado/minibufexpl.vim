@@ -458,7 +458,7 @@ function! <SID>BufEnterHandler()
     endif
   endfor
 
-  call <SID>AutoUpdate(bufnr("%"))
+  call <SID>AutoUpdate(bufnr("%"),0)
 
   call <SID>DEBUG('<== Leaving BufEnter Handler', 10)
 endfunction
@@ -471,7 +471,7 @@ function! <SID>BufDeleteHandler()
 
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 
-  call <SID>AutoUpdate(bufnr("%"))
+  call <SID>AutoUpdate(bufnr("%"),1)
 
   call <SID>DEBUG('<== Leaving BufDelete Handler', 10)
 endfunction
@@ -1787,7 +1787,7 @@ function! <SID>UpdateBufferStateDict(bufNum,deleted)
     if has_key(s:bufStateDict, l:bufNum)
         if s:bufStateDict[l:bufNum] != getbufvar(a:bufNum, '&modified')
             let s:bufStateDict[l:bufNum] = getbufvar(a:bufNum, '&modified')
-            call <SID>AutoUpdate(bufnr(a:bufNum))
+            call <SID>AutoUpdate(bufnr(a:bufNum),0)
         endif
     else
         let s:bufStateDict[l:bufNum] = getbufvar(a:bufNum, '&modified')
@@ -1853,7 +1853,7 @@ endfunction
 " buffer, in which case we will want to close
 " the MBE window.
 "
-function! <SID>AutoUpdate(curBufNum)
+function! <SID>AutoUpdate(curBufNum,force)
   call <SID>DEBUG('Entering AutoUpdate('.a:curBufNum.')',10)
 
   call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
@@ -1873,7 +1873,7 @@ function! <SID>AutoUpdate(curBufNum)
   endif
 
   " Skip windows holding ignored buffer
-  if <SID>IsBufferIgnored(a:curBufNum) == 1
+  if !a:force && <SID>IsBufferIgnored(a:curBufNum) == 1
     call <SID>DEBUG('Leaving AutoUpdate()',10)
 
     let s:miniBufExplInAutoUpdate = 0
@@ -2033,7 +2033,7 @@ function! <SID>MBESelectBuffer(split)
 
     let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
-    call <SID>AutoUpdate(bufnr("%"))
+    call <SID>AutoUpdate(bufnr("%"),0)
   endif
 
   if g:miniBufExplCloseOnSelect == 1
