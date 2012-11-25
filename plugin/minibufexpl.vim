@@ -84,6 +84,15 @@ endif
 if !exists(':MBEbb')
   command! MBEbb call <SID>CycleBuffer(0,1)
 endif
+if !exists(':MBEbd')
+  command! -bang -nargs=* MBEbd call <SID>DeleteBuffer(0,'<bang>'=='!',<f-args>)
+endif
+if !exists(':MBEbw')
+  command! -bang -nargs=* MBEbw call <SID>DeleteBuffer(1,'<bang>'=='!',<f-args>)
+endif
+if !exists(':MBEbun')
+  command! -bang -nargs=* MBEbun call <SID>DeleteBuffer(2,'<bang>'=='!',<f-args>)
+endif
 
 " }}}
 "
@@ -506,6 +515,9 @@ function! <SID>StartExplorer(curBufNum)
     return
   endif
 
+  " Set filetype for MBE buffer
+  set filetype=minibufexpl
+
   " !!! We may want to make the following optional -- Bindu
   " New windows don't cause all windows to be resized to equal sizes
   set noequalalways
@@ -591,7 +603,7 @@ function! <SID>StartExplorer(curBufNum)
   nnoremap <buffer> v       :call <SID>MBESelectBuffer(2)<CR>:<BS>
   " If you press d in the -MiniBufExplorer- then try to
   " delete the selected buffer.
-  nnoremap <buffer> d       :call <SID>MBEDeleteBuffer(bufname("#"))<CR>:<BS>
+  nnoremap <buffer> d       :call <SID>MBEDeleteBuffer()<CR>:<BS>
   " The following allow us to use regular movement keys to
   " scroll in a wrapped single line buffer
   nnoremap <buffer> k       gk
@@ -603,8 +615,8 @@ function! <SID>StartExplorer(curBufNum)
   " and restores it.
   nnoremap <buffer> l       :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
   nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
-  nnoremap <buffer> <TAB>   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
-  nnoremap <buffer> <S-TAB> :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  nnoremap <buffer> <right> :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+  nnoremap <buffer> <left>  :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
 
   " Attempt to perform single click mapping
   " It would be much nicer if we could 'nnoremap <buffer> ...', however
@@ -1149,6 +1161,130 @@ function! <SID>CycleBuffer(forward,...)
   exec l:moveCmd
 
   let s:MRUEnable = 1
+endfunction
+
+" }}}
+" DeleteBuffer {{{
+"
+" Delete/Unload/Wipeout a buffer but preserve the window it was in
+"
+" a:action 0 bd, 1 bw, 2 bun
+"   delete/wipeout/unload a buffer
+" a:bufNum
+"   number of the buffer to be deleted
+"
+function! <SID>DeleteBuffer(action,bang,...)
+  call <SID>DEBUG('Entering DeleteBuffer('.a:action.','.a:bang.')',10)
+
+  if a:0 == 0
+    call <SID>DEBUG('No buffer is given, use current buffer',5)
+    let l:bufNums = [ bufnr('%') ]
+  else
+    call <SID>DEBUG('Given buffers are '.string(a:000),5)
+    let l:bufNums = map(copy(a:000),'v:val =~ ''\d\+'' ? bufnr(v:val + 0) : bufnr(v:val)')
+  endif
+
+  call <SID>DEBUG('Buffers to be deleted are '.string(l:bufNums),5)
+
+  for l:bufNum in l:bufNums
+    if <SID>IsBufferIgnored(l:bufNum)
+      call <SID>DEBUG('Buffer '.l:bufNum.'is not a normal buffer, skip it',5)
+      continue
+    endif
+
+    let l:bufName = bufname(l:bufNum)
+    call <SID>DEBUG('Buffer to be deleted is <'.l:bufName.'>['.l:bufNum.']',5)
+
+    " Don't want auto updates while we are processing a delete
+    " request.
+    let l:saveAutoUpdate = t:miniBufExplAutoUpdate
+    let t:miniBufExplAutoUpdate = 0
+
+    " Get the currently active buffer, so we can update the MBE
+    " correctly. If that is the buffer to be deleted, then get
+    " the window for that buffer, so we can find which buffer
+    " is in that window after the detaching.
+    let l:actBuf = <SID>GetActiveBuffer()
+    if l:actBuf == l:bufNum
+      let l:actBufWin = bufwinnr(l:actBuf)
+    endif
+
+    " Detach the buffer from all the windows that holding it
+    " in every tab page.
+    tabdo call <SID>DetachBuffer(l:bufNum)
+
+    " Find which buffer is in the active window now
+    if l:actBuf == l:bufNum
+      let l:actBuf = winbufnr(l:actBufWin)
+    endif
+
+    " Delete the buffer selected.
+    call <SID>DEBUG('About to delete buffer: '.l:bufNum,5)
+
+    if a:action == 2
+      let l:cmd = 'bun'
+    elseif a:action == 1
+      let l:cmd = 'bw'
+    else
+      let l:cmd = 'bd'
+    endif
+
+    if a:bang
+      let l:cmd = l:cmd.'!'
+    endif
+
+    let l:cmd = 'silent! '.l:cmd.' '.l:bufNum
+    call <SID>DEBUG('About to execute the command "'.l:cmd.'"',5)
+
+    exec l:cmd
+
+    let t:miniBufExplAutoUpdate = l:saveAutoUpdate
+
+    call <SID>UpdateExplorer(l:actBuf)
+  endfor
+
+  call <SID>DEBUG('Leaving DeleteBuffer()',10)
+endfunction
+
+" }}}
+" DetachBuffer {{{
+"
+" Detach a buffer from all the windows in which it is displayed.
+"
+function! <SID>DetachBuffer(bufNum)
+  call <SID>DEBUG('Entering DetachBuffer('.a:bufNum.')',10)
+
+  call <SID>DEBUG('We are currently in tab page '.tabpagenr(),10)
+
+  let l:bufNum = a:bufNum + 0
+
+  let l:winNum = bufwinnr(l:bufNum)
+  " while we have windows that contain our buffer
+  while l:winNum != -1
+    call <SID>DEBUG('Buffer '.l:bufNum.' is being displayed in window: '.l:winNum,5)
+
+    " move to window that contains our selected buffer
+    call s:SwitchWindow('w',1,l:winNum)
+
+    call <SID>DEBUG('We are now in window: '.winnr(),5)
+
+    call <SID>DEBUG('Window contains buffer: '.bufnr('%').' which should be: '.l:bufNum,5)
+    let l:origBuf = bufnr('%')
+    call <SID>CycleBuffer(0,1)
+    let l:currBuf = bufnr('%')
+    call <SID>DEBUG('Window now contains buffer: '.bufnr('%').' which should not be: '.l:bufNum,5)
+
+    if l:origBuf == l:currBuf
+      " we wrapped so we are going to have to delete a buffer
+      " that is in an open window.
+      let l:winNum = -1
+    else
+      " see if we have anymore windows with our selected buffer
+      let l:winNum = bufwinnr(l:bufNum)
+    endif
+  endwhile
+
+  call <SID>DEBUG('Leaving DetachBuffer()',10)
 endfunction
 
 " }}}
@@ -1801,6 +1937,17 @@ function! <SID>AutoUpdate(curBufNum)
 endfunction
 
 " }}}
+" GetActiveBuffer {{{
+"
+function! <SID>GetActiveBuffer()
+  call <SID>DEBUG('Entering GetActiveBuffer()',10)
+  let l:bufNum = substitute(s:miniBufExplBufList,'\[\([0-9]*\):[^\]]*\][^\!]*!', '\1', '') + 0
+  call <SID>DEBUG('Currently active buffer is '.l:bufNum,10)
+  call <SID>DEBUG('Leaving GetActiveBuffer()',10)
+  return l:bufNum
+endfunction
+
+" }}}
 " GetSelectedBuffer - From the MBE window, return the bufnum for buf under cursor {{{
 "
 " If we are in our explorer window then return the buffer number
@@ -1904,7 +2051,7 @@ endfunction
 " window, this routine will attempt to get different buffers into the
 " windows that will be affected so that windows don't get removed.
 "
-function! <SID>MBEDeleteBuffer(prevBufName)
+function! <SID>MBEDeleteBuffer()
   call <SID>DEBUG('Entering MBEDeleteBuffer()',10)
 
   " Make sure we are in our window
@@ -1914,74 +2061,10 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     return
   endif
 
-  let l:selBuf     = <SID>GetSelectedBuffer()
-  let l:selBufName = bufname(l:selBuf)
+  let l:selBuf = <SID>GetSelectedBuffer()
 
   if l:selBuf != -1
-
-    " Don't want auto updates while we are processing a delete
-    " request.
-    let l:saveAutoUpdate = t:miniBufExplAutoUpdate
-    let t:miniBufExplAutoUpdate = 0
-
-    " Save previous window so that if we show a buffer after
-    " deleting. The show will come up in the correct window.
-    call s:SwitchWindow('p',1)
-    let l:prevWin    = winnr()
-    let l:prevWinBuf = winbufnr(winnr())
-
-    call <SID>DEBUG('Previous window: '.l:prevWin.' buffer in window: '.l:prevWinBuf,5)
-    call <SID>DEBUG('Selected buffer is <'.l:selBufName.'>['.l:selBuf.']',5)
-
-    " If buffer is being displayed in a window then
-    " move window to a different buffer before
-    " deleting this one.
-    let l:winNum = (bufwinnr(l:selBufName) + 0)
-    " while we have windows that contain our buffer
-    while l:winNum != -1
-        call <SID>DEBUG('Buffer '.l:selBuf.' is being displayed in window: '.l:winNum,5)
-
-        " move to window that contains our selected buffer
-        call s:SwitchWindow('w',1,l:winNum)
-
-        call <SID>DEBUG('We are now in window: '.winnr().' which contains buffer: '.bufnr('%').' and should contain buffer: '.l:selBuf,5)
-
-        let l:origBuf = bufnr('%')
-        call <SID>CycleBuffer(1)
-        let l:curBuf  = bufnr('%')
-
-        call <SID>DEBUG('Window now contains buffer: '.bufnr('%').' which should not be: '.l:selBuf,5)
-
-        if l:origBuf == l:curBuf
-            " we wrapped so we are going to have to delete a buffer
-            " that is in an open window.
-            let l:winNum = -1
-        else
-            " see if we have anymore windows with our selected buffer
-            let l:winNum = (bufwinnr(l:selBufName) + 0)
-        endif
-    endwhile
-
-    " Attempt to restore previous window
-    call <SID>DEBUG('Restoring previous window to: '.l:prevWin,5)
-    call s:SwitchWindow('w',1,l:prevWin)
-
-    " Try to get back to the -MiniBufExplorer- window
-    let l:winNum = bufwinnr(bufnr('-MiniBufExplorer-'))
-    if l:winNum != -1
-        call s:SwitchWindow('w',1,l:winNum)
-        call <SID>DEBUG('Got to -MiniBufExplorer- window: '.winnr(),5)
-    else
-        call <SID>DEBUG('Unable to get to -MiniBufExplorer- window',1)
-    endif
-
-    " Delete the buffer selected.
-    call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
-    exec 'silent! bd '.l:selBuf
-
-    let t:miniBufExplAutoUpdate = l:saveAutoUpdate
-    call <SID>DisplayBuffers(a:prevBufName)
-
+    call <SID>DeleteBuffer(0,0,l:selBuf)
   endif
 
   call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
