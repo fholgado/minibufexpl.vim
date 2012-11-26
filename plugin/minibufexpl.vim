@@ -506,6 +506,13 @@ function! <SID>StartExplorer(curBufNum)
     return
   endif
 
+  " Save current window number and switch to previous
+  " window before entering MBE window so that the later
+  " `wincmd p` command will get into this window, then
+  " we can preserve a one level window movement history.
+  let l:currWin = winnr()
+  call s:SwitchWindow('p',1)
+
   " Switch into MBE allowing autocmd to run will
   " make the syntax highlight in MBE window working
   call s:SwitchWindow('w',0,l:winNum)
@@ -650,6 +657,11 @@ function! <SID>StartExplorer(curBufNum)
   " trigger PowerLine's BufLeave event handler
   call s:SwitchWindow('p',0)
 
+  " Now we are in the previous window, let's enter
+  " the window current window, this will preserve
+  " one-level backwards window movement history.
+  call s:SwitchWindow('w',1,l:currWin)
+
   call <SID>DEBUG('Leaving StartExplorer()',10)
 endfunction
 
@@ -762,6 +774,10 @@ function! <SID>UpdateExplorer(curBufNum)
   if l:winNum != winnr()
     let l:winChanged = 1
 
+    " Save current window number and switch to previous
+    " window before entering MBE window so that the later
+    " `wincmd p` command will get into this window, then
+    " we can preserve a one level window movement history.
     let l:currWin = winnr()
     call s:SwitchWindow('p',1)
 
@@ -776,6 +792,10 @@ function! <SID>UpdateExplorer(curBufNum)
     " Switch away from MBE allowing autocmd to run which will
     " trigger PowerLine's BufLeave event handler
     call s:SwitchWindow('p',0)
+
+    " Now we are in the previous window, let's enter
+    " the window current window, this will preserve
+    " one-level backwards window movement history.
     call s:SwitchWindow('w',1,l:currWin)
   endif
 
@@ -831,6 +851,15 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
     call <SID>DEBUG('Entering CreateWindow('.a:bufName.','.a:vSplit.','.a:brSplit.','.a:forceEdge.','.a:isPluginWindow.','.a:doDebug.')',10)
   endif
 
+  " Window number will change after creating a new window,
+  " we need to save both current and previous window number
+  " so that we can canculate theire correct window number
+  " after the new window creating.
+  let l:currWin = winnr()
+  call s:SwitchWindow('p',1)
+  let l:prevWin = winnr()
+  call s:SwitchWindow('p',1)
+
   " Save the user's split setting.
   let l:saveSplitBelow = &splitbelow
   let l:saveSplitRight = &splitright
@@ -884,8 +913,15 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
     setlocal bufhidden=delete
   endif
 
-  " Return to the previous window.
-  call s:SwitchWindow('p',1)
+  " Canculate the correct window number, for those whose window
+  " number before the creating is greater than or equal to the
+  " number of the newly created window, their window number should
+  " increase by one.
+  let l:prevWin = l:prevWin >= winnr() ? l:prevWin + 1 : l:prevWin
+  let l:currWin = l:currWin >= winnr() ? l:currWin + 1 : l:currWin
+  " This will preserve one-level backwards window movement history.
+  call s:SwitchWindow('w',1,l:prevWin)
+  call s:SwitchWindow('w',1,l:currWin)
 
   if a:doDebug
     call <SID>DEBUG('Leaving CreateWindow()',10)
