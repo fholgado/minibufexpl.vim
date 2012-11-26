@@ -1,25 +1,34 @@
 # MiniBufExpl
 
-I've been working on improving [MiniBufExpl][], a plugin for [Vim][].
+This is a fork of [Bindu Wavell][]'s [MiniBufExpl][] plugin for [Vim][].
+
+[Federico Holgado][] started this fork and made lots of improvements. It is
+currently maintained by [Techlive Zheng][], the development has been moved to
+[@techlivezheng's repo][], only new version will be relased to [@fholgado's
+repo][].
 
 [Vim]: http://vim.org
 [MiniBufExpl]: http://www.vim.org/scripts/script.php?script_id=159
+[Techlive Zheng]: https://techlivezheng.me
+[Federico Holgado]: http://www.fholgado.com
+[@fholgado's repo]:https://github.com/fholgado/minibufexpl.vim
+[@techlivezheng's repo]: https://github.com/techlivezheng/vim-plugin-minibufexpl
 
-## The story: Why am I doing this?
+## The Story
 
-The reason why I took it upon myself to improve MiniBufExplorer is a matter of
+>The reason why I took it upon myself to improve MiniBufExplorer is a matter of
 need. I am a User Interface designer who spends a lot of time writing front-
 end code. I recently found Vim and fell in love with it. During my search for
 the plugins that would help me the most, I came across MBE. I loved it
 initially, but quickly saw that it had some major flaws.
 
-After using MBE for some time, I have been able to identify some areas that
+>After using MBE for some time, I have been able to identify some areas that
 needed some dire attention from a usability standpoint. I am doing my best to
 fix those issues without adding "feature bloat" or other unnecessary things to
 MBE. I am always open to suggestions and discussion as to what we can do to
 improve this great plugin.
 
-I would also like to thank [Bindu Wavell][], who is the plugin's original
+>I would also like to thank [Bindu Wavell][], who is the plugin's original
 creator and [Oliver Uvman][], who like myself has been hacking at MBE to make
 needed improvements. My goal is to consolidate the code and act as the
 maintainer so that any further changes from contributors can be found in a
@@ -28,7 +37,78 @@ single location.
 [Bindu Wavell]: http://www.wavell.net
 [Oliver Uvman]: https://github.com/OliverUv
 
-## Improvements
+-- Federico Holgado
+
+>This is a very useful plugin, being able to see the buffer status in a
+tab-like fashion while you are working with mutiple buffers is very pleasant.
+Since @fholgado began to improve this plugin, lots of new features has been
+added, it's great. Meanwhile, there are still some annoying bugs that haven't
+been fixed for a long time, so I decide to step out and do something.
+
+-- Techlive Zheng
+
+## Improvements in Version 6.5.0
+
+### Bugfixes
+
+Squashed almost every known bugs due to the relase of version 6.5.0, for more
+details, please check out the 6.5.0 milestones.
+
+* https://github.com/fholgado/minibufexpl.vim/issues?milestone=1&page=1&state=closed
+* https://github.com/techlivezheng/vim-plugin-minibufexpl/issues?milestone=1&page=1&state=closed
+
+### Buffer With No Name
+
+Buffer without a name would be shown as `[1:--NO NAME--<timestamp>]` now.
+
+### User Interface Change
+
+Options, commands and key bindings have some changes, please see changelog for
+more details.
+
+### Cycle Buffer in MRU Fashion
+
+As a long expected feature, command ':MBEbf' or ':MBEbb' could be used to cycle
+the buffer forwards or backwards in the most recently used order.
+
+### Handle Buffers with Duplicate Name
+
+Mechanism for checking buffers with duplicate name has been totally refactored,
+it is now more efficient.
+
+Mechanism for generating unique name for these buffers has been refactored too,
+each buffer should be uniquely identified now.
+
+    ./test             -->  test
+    ./alpha/foo/test   -->  alpha/foo/test
+    ./alpha/bar/test   -->  alpha/bar/test
+    ./beta/new/test    -->  beta/-/test
+    ./omega/old/test   -->  omega/old/test
+    ./omega/test       -->  omega/test
+
+### MBE Window is Local to Tab Page
+
+Open or close MBE window in one tab page would not interfere another. Commands
+':MBEOpenAll', ':MBECloseAll' and ':MBEToggleAll' have been introduced to mani-
+pulate MBEs in all tab pags.
+
+### Preserve Window Entering History
+
+Previous versions of MBE will interfere the window entering history on updating,
+this behavior has caused many incompatibilities with other plugins. It should
+be fixed now, 'wincmd p' would work as usual.
+
+### Quit MBE if No More Normal Window Open
+
+MBE now will be closed if all the other open windows are plugin windows.
+
+### Delete/Wipeout/Unload Buffers Preserving the Window
+
+Commnad ':MBEbd', ':MBEbw' or ':MBEbun' could be used to delete/wipeout/unload
+buffers just as ':bd', ':bw' or ':bun', but the window that previously holding
+them will be preserved.
+
+## Improvements in Previous Versions
 
 ### Current Buffer Highlighting
 

@@ -469,20 +469,9 @@ NOTE: If you set a colorscheme in your .vimrc you should do it
 ==============================================================================
 6. Known Issues                                       *MiniBufExplKnownIssues*
 
-When debugging is turned on and set to output to a window, there
-are some cases where the window is opened more than once, there
-are other cases where an old debug window can be lost.
-
-Several MBE commands can break the window history so <C-W>[pnw]
-might not take you to the expected window.
-
 ==============================================================================
 6. Todo                                                      *MiniBufExplTodo*
 
-- Add context to tab titles so that multiple tabs show the
-  root folder names. Useful for working with MVC frameworks
-  where multiple files have the same name but are in different
-  locations.
 - Add the ability to specify a regexp for eligible buffers
   allowing the ability to filter out certain buffers that
   you don't want to control from MBE.
@@ -495,6 +484,8 @@ might not take you to the expected window.
                Copyright (C) 2010 Danielle Church
                Copyright (C) 2010 Stephan Sokolow
                Copyright (C) 2010 & 2011 Federico Holgado
+               Copyright (C) 2012 & 2013 Techlive Zheng
+
                Permission is hereby granted to use and distribute this code,
                with or without modifications, provided that this copyright
                notice is copied with it. Like anything else that's free,
@@ -504,22 +495,314 @@ might not take you to the expected window.
                resulting from the use of this software.
 
   Description: Mini Buffer Explorer Vim Plugin
-   Maintainer: Federico Holgado <fholgado@gmail.com>
- Last Updated: Federico Holgado <fholgado@gmail.com>
+   Maintainer: Techlive Zheng <techlivezheng@gmail.com>
+ Last Updated: Techlive Zheng <techlivezheng@gmail.com>
           URL: http://vim.sourceforge.net/scripts/script.php?script_id=159
-   GitHub URL: https://github.com/fholgado/minibufexpl.vim
-  Last Change: Sunday, February 26, 2012
-      Version: 6.4.4
-               Derived from Jeff Lanzarotta's bufexplorer.vim version 6.0.7
-               Jeff can be reached at (jefflanzarotta@yahoo.com) and the
-               original plugin can be found at:
-               http://lanzarotta.tripod.com/vim/plugin/6/bufexplorer.vim.zip
-               [NO LONGER AVAILABLE]
-
+   GitHub URL: https://github.com/techlivezheng/vim-plugin-minibufexpl
+      Version: 6.5.0
 
 ==============================================================================
 8. Changelog                                            *MiniBufExplChangelog*
 
+6.5.0
+
+    - Configuration variables changing:
+
+        * 'g:miniBufExplModSelTarget' is absolete.
+          MBE will try to avoid using any other plugin's winow.
+          (cba0147)
+
+        * 'g:miniBufExplCheckDupeBufs' is obsolete.
+          (176cf27,fd737d3)
+
+        * 'g:miniBufExplorerAutoUpdate' is obsolete.
+          (3cee9f9)
+
+        * 'g:miniBufExplForceSyntaxEnable' is obsolete.
+          (373691f)
+
+        * Several configuration variables have been renamed.
+          (48f2934)
+
+            - 'g:miniBufExplorerAutoStart'    -> 'g:miniBufExplAutoStart'
+            - 'g:miniBufExplorerDebugMode'    -> 'g:miniBufExplDebugMode'
+            - 'g:miniBufExplorerDebugLevel'   -> 'g:miniBufExplDebugLevel'
+            - 'g:miniBufExplorerDebugOutput'  -> 'g:miniBufExplDebugOutput'
+            - 'g:miniBufExplorerHideWhenDiff' -> 'g:miniBufExplHideWhenDiff'
+
+        * 'g:statusLineText' is depreciated by 'g:miniBufExplStatusLineText'.
+          (1aeb012)
+
+        * 'g:miniBufExplSplitBelow' is depreciated by 'g:miniBufExplBRSplit'.
+          Window spliting is now controled by '&splitbelow' and '&splitright'
+          settings.
+          (282025e)
+
+        * 'g:miniBufExplorerAutoStart' could be used to control whether MBE
+          should be startd at the startup or not.
+          (f581428)
+
+        * 'g:miniBufExplorerMoreThanOne' is depreciated by 'g:miniBufExplBuffersNeeded'.
+          (4e4acec)
+
+        * New configuration option 'g:miniBufExplCycleArround' to control
+          whether buffer list should be cycled arround if hits the start of
+          the end.
+          (2df9b2b)
+
+    - Commands and mappings interface changing:
+
+        * Key binding 'p' in MBE window has been removed.
+          (b45cd77)
+
+        * New commands ':MBEbf' and ':MBEbb' now could be used to go forward
+          or backward the buffer entering history, aka in MRU fashion.
+          (b7d2ad5,a4e9ce9)
+
+        * Command ':UMiniBufExplorer' has been removed, function
+          'AutoUpdate()' is not supposed to be triggered manually.
+          (9c12f71)
+
+        * Several main commands have been renamed.
+          (8d88b9a)
+
+            * ':MiniBufExplorer' is depreciated by ':MBEOpen'
+            * ':CMiniBufExplorer' is depreciated by ':MBEClose'
+            * ':TMiniBufExplorer' is depreciated by ':MBEToggle'
+
+        * Introduce commands ':MBEOpenAll', ':MBECloseAll',
+          ':MBEToggleAll' to manage MBEs in all tabs.
+          (e839c1d)
+
+        * Introduce ':MBEFocus' and ':MBEFocusAll' to focus into
+          the MBE window.
+          (fa9e5d5)
+
+        * Introduce commands ':MBEbd', ':MBEbw' and
+          ':MBEbun' to delete buffer but preserve the window that it
+          was in.
+          (e4f9294,9b7635e)
+
+        * Key bindings '<TAB>' and '<S-TAB>' in MBE window have been changed
+          to '<right>' and '<left>' to avoid unnecessary conflict with some
+          system's key bindings.
+          (ca0cc8d,d788c7a)
+
+        * MBE has no longer provide the key-bindings for switching
+          between buffers and windows, this should be up to the user.
+          (417e952)
+
+        * MBE has no longer provide the default mappings for MBE's
+          management, this should be up to the user.
+          (a0977cd)
+
+        * Introduce command 'MBEToggleMRU' to change the MBE listing order.
+          (8a7baaa)
+
+    - Bugfixes, Enhancements, Closed Issues, Merged Pull Requests:
+
+      See https://github.com/fholgado/minibufexpl.vim/issues?milestone=1&page=1&state=closed
+      and https://github.com/techlivezheng/vim-plugin-minibufexpl/issues?milestone=1&page=1&state=closed
+
+        * Quit MBE if there is no more normal window open.
+          (cea185b,7ebc049,b0d4c4a)
+
+            - Fix fholgado/minibufexpl.vim#1
+            - Fix fholgado/minibufexpl.vim#41
+            - Fix fholgado/minibufexpl.vim#78
+
+          These changes should also fix the following issues which state the remaining
+          buffer's syntax highlighting gets lost. More details please refer to
+          https://github.com/fholgado/minibufexpl.vim/issues/71#issuecomment-17781092.
+
+            - Fix fholgado/minibufexpl.vim#24
+            - Fix fholgado/minibufexpl.vim#71
+            - Fix fholgado/minibufexpl.vim#73
+
+        * Update MBE will no longer interfere window entering history.
+          (3add236,4155048)
+
+            - Fix fholgado/minibufexpl.vim#3
+            - Fix fholgado/minibufexpl.vim#7
+            - Fix fholgado/minibufexpl.vim#17
+            - Fix fholgado/minibufexpl.vim#21
+            - Fix fholgado/minibufexpl.vim#44
+            - Fix fholgado/minibufexpl.vim#48
+            - Fix fholgado/minibufexpl.vim#75
+
+        * Mechanism for checking buffers with duplicate name and generating a
+          unique name for each of these buffers have been completely refactored,
+          it is more efficient now and each buffer should be uniquely identified.
+          Thanks to jmnas@github for the orginal work.
+          (f3723aa,5715dd9,950a81a,763a623)
+
+            - Fix fholgado/minibufexpl.vim#5
+            - Fix fholgado/minibufexpl.vim#6
+            - Fix fholgado/minibufexpl.vim#9
+            - Fix fholgado/minibufexpl.vim#13
+            - Fix fholgado/minibufexpl.vim#61
+            - Fix fholgado/minibufexpl.vim#77
+
+        * Buffer now could be cycled in a MRU fashion
+          (b7d2ad5,a4e9ce9)
+
+            - Fix fholgado/minibufexpl.vim#20.
+
+        * Prevent duplicate MBE window from opening.
+          (bfd4b9a)
+
+            - Fix fholgado/minibufexpl.vim#31
+            - Fix fholgado/minibufexpl.vim#37
+            - Fix fholgado/minibufexpl.vim#82
+            - Fix fholgado/minibufexpl.vim#83
+
+        * Use "very nomagic" in search() function.
+          (9474294)
+
+            - Fix fholgado/minibufexpl.vim#33
+            - Merge fholgado/minibufexpl.vim#67 -- By mr-vinn@github
+
+        * Removing trailing whitespace
+          (6fd9d11)
+
+            - Merge fholgado/minibufexpl.vim#35 -- By ubunatic@github
+
+        * Avoid MBE window being affected by 'relativenumber' option.
+          (adbac4d,eba2fc5)
+
+            - Merge fholgado/minibufexpl.vim#43 -- By hoopes@github
+            - Fix techlivezheng/vim-plugin-minibufexpl#7
+            - Merge techlivezheng/vim-plugin-minibufexpl#9 -- By chadburrus@github
+
+        * Improve documentation.
+          (ed9c12f,a9d7810,ccd5f14)
+
+            - Merge fholgado/minibufexpl.vim#45 -- By Inkane@github
+            - Merge fholgado/minibufexpl.vim#53 -- By jesboat@github
+            - Merge fholgado/minibufexpl.vim#57 -- By hfs@github
+            - Fix techlivezheng/vim-plugin-minibufexpl#10
+
+        * Fix a bug that a buffer with no name would be force closed.
+          (c06f82d)
+
+            - Fix fholgado/minibufexpl.vim#47
+            - Fix fholgado/minibufexpl.vim#79
+
+        * Fix a bug that switching between buffers is unfunctional when
+          'g:miniBufExplShowBufNumbers' is set to 0.
+          (51fb73c,40ffb01)
+
+            - Fix fholgado/minibufexpl.vim#49
+            - Merge fholgado/minibufexpl.vim#69
+
+        * Make Powerline plugin be happy with MBE.
+          (9410d5c,7584a7a)
+
+            - Fix fholgado/minibufexpl.vim#50
+            - Partially merge fholgado/minibufexpl.vim#64 -- By s5unty@github
+
+        * Cooperate with Windows machine.
+
+            - Fix fholgado/minibufexpl.vim#51
+            - Fix fholgado/minibufexpl.vim#70
+            - Fix fholgado/minibufexpl.vim#74
+
+        * Handle buffers without a name correctly.
+          (8fad45b)
+
+            - Fix fholgado/minibufexpl.vim#54
+            - Fix techlivezheng/vim-plugin-minibufexpl#1
+
+        * No startup on diff mode.
+          (391a9b2,ff9fcfe)
+
+            - Merge fholgado/minibufexpl.vim#55 -- By dccmx@github
+
+        * Fix focusing current buffer in vsplit MBE window.
+          (917d4dc)
+
+            - Merge fholgado/minibufexpl.vim#56 -- By tyamaz@github
+
+        * Suppress "-- no lines in buffer --" message.
+          (dcec2d1)
+
+            - Merge fholgado/minibufexpl.vim#58 -- By tyamaz@github
+
+        * Respect user's 'updatetime' setting, only change it when instructed
+          and the original setting is not changed.
+          (c99ea42,87543bc)
+
+            - Fix fholgado/minibufexpl.vim#59
+            - Fix fholgado/minibufexpl.vim#62
+
+        * MBE buffer now has its filetype set to 'minibufexpl'.
+          (02c1fa8)
+
+            - Fix fholgado/minibufexpl.vim#60.
+
+        * Fix bufname('%') and bufnr('%') mixing up.
+          (984cffb,dd2124d,b2c692e)
+
+            - Merge fholgado/minibufexpl.vim#63 -- By doublemarked@github
+
+        * Toggle MBE will not affect the size of the currently opened windows.
+          (bb1d90e)
+
+            - Fix fholgado/minibufexpl.vim#80
+
+        * Fix for &winminheight setting
+          (731fca2,879c1f5)
+
+            - Merge fholgado/minibufexpl.vim#81 -- By zhaocai@github
+
+        * Set syntax on FileType event
+          (0985c01)
+
+            - Fix techlivezheng/vim-plugin-minibufexpl#3.
+
+        * Fix a wrongly defined highlight group
+          (572346d,452265c,fd6992a,43a019a)
+
+            - Fix techlivezheng/vim-plugin-minibufexpl#4
+
+        * Add the ability to manually control the start of MBE
+          (f921a35)
+
+            - Fix techlivezheng/vim-plugin-minibufexpl#5
+
+        * Make MBE window temporarily modifiable during the resizing
+          (08c9c4a,88e3924)
+
+            - Fix techlivezheng/vim-plugin-minibufexpl#6
+            - Merge techlviezheng/vim-plugin-minibufexpl#8 -- By whitelynx@github
+
+        * Open MBE manually will ignore 'g:miniBufExplBuffersNeeded'.
+          (8ac7f45)
+
+        * Annoying "No Lines in Buffer" messages have been suppressed.
+          (0126c7fc,f6f654d)
+
+        * If a MBE buffer already exists, it will be used instead of creating
+          a new one.
+          (3153ffd)
+
+        * MBE window is local to tab page. Open or close MBE window in one
+          tab page would not interfere another.
+          (b8deb38,7247d52)
+
+        * Fix a bug that color highlighting gets lost in MBE window.
+          (e5e6d15,362f2d8)
+
+        * Auto updating will run inside any window if a buffers gets deleted.
+          (5d6e445)
+
+        * Open buffer in MBE will try to use the previous window first, then
+          the next normal window.
+          (4f9c957)
+
+        * If the eligible buffers requirement has been meet, closing MBE will
+          disable auto updating.
+          (876b771)
 
 6.4.4
     - Set up proper documentation. Thanks to Claytron :)
