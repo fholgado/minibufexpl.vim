@@ -506,7 +506,9 @@ function! <SID>StartExplorer(curBufNum)
     return
   endif
 
-  call s:SwitchWindow('w',1,l:winNum)
+  " Switch into MBE allowing autocmd to run will
+  " make the syntax highlight in MBE window working
+  call s:SwitchWindow('w',0,l:winNum)
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
@@ -763,6 +765,8 @@ function! <SID>UpdateExplorer(curBufNum)
     let l:currWin = winnr()
     call s:SwitchWindow('p',1)
 
+    " Switch into MBE allowing autocmd to run will
+    " make the syntax highlight in MBE window working
     call s:SwitchWindow('w',0,l:winNum)
   endif
 
