@@ -457,6 +457,8 @@ endfunction
 function! <SID>BufEnterHandler()
   call <SID>DEBUG('==> Entering BufEnter Handler', 10)
 
+  call <SID>QuitIfLastOpen()
+
   for l:i in s:BufList
     if <SID>IsBufferIgnored(l:i)
         call <SID>ListPop(s:BufList,l:i)
@@ -1913,12 +1915,6 @@ function! <SID>AutoUpdate(curBufNum,force)
     let s:miniBufExplInAutoUpdate = 1
   endif
 
-  " Quit MBE if no more mormal window left
-  if (bufname(a:curBufNum) == '-MiniBufExplorer-') && (<SID>NextNormalWindow() == -1)
-    call <SID>DEBUG('MBE is the last open window, quit it', 9)
-    quit
-  endif
-
   " Skip windows holding ignored buffer
   if !a:force && <SID>IsBufferIgnored(a:curBufNum) == 1
     call <SID>DEBUG('Leaving AutoUpdate()',10)
@@ -1981,6 +1977,36 @@ function! <SID>AutoUpdate(curBufNum,force)
   call <SID>DEBUG('Leaving AutoUpdate()',10)
 
   let s:miniBufExplInAutoUpdate = 0
+endfunction
+
+" }}}
+" QuitIfLastOpen {{{
+"
+function! <SID>QuitIfLastOpen()
+  if !exists('s:errcount')
+    let s:errcount = 0
+  endif
+
+  " Quit MBE if no more mormal window left
+  if (bufname('%') == '-MiniBufExplorer-') && (<SID>NextNormalWindow() == -1)
+    try
+      call <SID>DEBUG('MBE is the last open window, quit it', 9)
+      " Before quitting Vim, delete the MBE buffer so that
+      " the '0 mark is correctly set to the previous buffer.
+      " Also disable autocmd on this command to avoid unnecessary
+      " autocmd nesting.
+      noautocmd bdelete
+      quit
+    catch /^Vim\%((\a\+)\)\=:E173/
+      let s:errcount = s:errcount + 1
+      if s:errcount < 2
+        call <SID>StartExplorer(bufnr('%'))
+        echoe v:exception
+      else
+        quit!
+      endif
+    endtry
+  endif
 endfunction
 
 " }}}
@@ -2129,7 +2155,7 @@ function! <SID>NextNormalWindow()
   let l:i = 1
   while(l:i <= l:winSum)
     call <SID>DEBUG('window: '.l:i.', buffer: ('.winbufnr(l:i).':'.bufname(winbufnr(l:i)).')',9)
-    if (!<SID>IsBufferIgnored(winbufnr(l:i)))
+    if !<SID>IsBufferIgnored(winbufnr(l:i)) && l:i != winnr()
         call <SID>DEBUG('Found window '.l:i,8)
         call <SID>DEBUG('Leaving NextNormalWindow()',10)
         return l:i
