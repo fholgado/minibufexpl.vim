@@ -388,16 +388,17 @@ if g:miniBufExplSetUT && &ut == 4000
   set updatetime=1000
 endif
 
-augroup MiniBufExplorer
-autocmd MiniBufExplorer VimEnter       * nested call <SID>VimEnterHandler()
-autocmd MiniBufExplorer TabEnter       * nested call <SID>TabEnterHandler()
-autocmd MiniBufExplorer BufAdd         *        call <SID>BufAddHandler()
-autocmd MiniBufExplorer BufEnter       * nested call <SID>BufEnterHandler()
-autocmd MiniBufExplorer BufDelete      *        call <SID>BufDeleteHandler()
-autocmd MiniBufExplorer CursorHold,CursorHoldI    *
-      \ call <SID>DEBUG('==> Entering CursorHold/CursorHoldI UpdateBufferStateDict', 10) |
-      \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
-      \ call <SID>DEBUG('<== Leaving CursorHold/CursorHoldI UpdateBufferStateDict', 10)
+augroup MiniBufExpl
+  autocmd!
+  autocmd VimEnter       * nested call <SID>VimEnterHandler()
+  autocmd TabEnter       * nested call <SID>TabEnterHandler()
+  autocmd BufAdd         *        call <SID>BufAddHandler()
+  autocmd BufEnter       * nested call <SID>BufEnterHandler()
+  autocmd BufDelete      *        call <SID>BufDeleteHandler()
+  autocmd CursorHold,CursorHoldI    *
+    \ call <SID>DEBUG('==> Entering CursorHold/CursorHoldI UpdateBufferStateDict', 10) |
+    \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
+    \ call <SID>DEBUG('<== Leaving CursorHold/CursorHoldI UpdateBufferStateDict', 10)
 augroup END
 
 function! <SID>VimEnterHandler()
