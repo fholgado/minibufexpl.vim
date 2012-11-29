@@ -34,24 +34,22 @@ automatically sourced. If not, you must manually source this file using
 ------------------------------------------------------------------------------
 2.1 Global Mappings                               *MiniBufExplMappings-Global*
 
-You may use the default keymappings of
+MBE has no longer provide default key bindings for controling MBE window.
 
-  <Leader>mbe - Opens MiniBufExplorer
+You may want to add something like the following to your .vimrc file:
 
-or you may want to add something like the following key mapping to your
-_vimrc/.vimrc file.
+  map <Leader>mbe :MBEOpen<cr>
+  map <Leader>mbc :MBEClose<cr>
+  map <Leader>mbt :MBEToggle<cr>
 
-  map <Leader>b :MiniBufExplorer<cr>
+Or, much shorter form:
 
-However, in most cases you won't need any key-bindings at all.
+  map <Leader>e :MBEOpen<cr>
+  map <Leader>c :MBEClose<cr>
+  map <Leader>t :MBEToggle<cr>
 
-<Leader> is usually backslash so type "\mbe" (quickly) to open the
--MiniBufExplorer- window.
-
-Other keymappings include: <Leader>mbc to close the Explorer window,
-<Leader>mbu to force the Explorer to Update and <Leader>mbt to toggle the
-Explorer window; it will open if closed or close if open. Each of these key
-bindings can be overridden (see the notes on <Leader>mbe above.)
+Either way, the key bindings used in these mappings should fit with your
+configuration of Vim.
 
 ------------------------------------------------------------------------------
 2.2 Window Mappings                               *MiniBufExplMappings-Window*
@@ -74,44 +72,106 @@ bindings can be overridden (see the notes on <Leader>mbe above.)
     <up>                                            *MiniBufExpl-Mapping-<up>*
                                             Move one line up in the MBE window
 
-    h                                                  *MiniBufExpl-Mapping-h*
+    j                                                  *MiniBufExpl-Mapping-j*
     <down>                                        *MiniBufExpl-Mapping-<down>*
                                           Move one line down in the MBE window
 
     l                                                  *MiniBufExpl-Mapping-l*
-    <TAB>                                          *MiniBufExpl-Mapping-<TAB>*
+    <right>                                      *MiniBufExpl-Mapping-<right>*
                                      Move one buffer forward in the MBE window
 
-    j                                                  *MiniBufExpl-Mapping-j*
-    <S-TAB>                                      *MiniBufExpl-Mapping-<S-TAB>*
+    h                                                  *MiniBufExpl-Mapping-h*
+    <left>                                        *MiniBufExpl-Mapping-<left>*
                                     Move one buffer backward in the MBE window
 
 ==============================================================================
 3. Commands                                              *MiniBufExplCommands*
 
-You can map these additional commands as follows:
+:MiniBufExplorer (depreciated)                              *:MiniBufExplorer*
+    Use :MBEOpen instead
 
-  map <Leader>c :CMiniBufExplorer<cr>
-  map <Leader>u :UMiniBufExplorer<cr>
-  map <Leader>t :TMiniBufExplorer<cr>
+:CMiniBufExplorer (depreciated)                            *:CMiniBufExplorer*
+    Use :MBEClose instead
 
-NOTE: you can change the key binding used in these mappings
-so that they fit with your configuration of Vim.
+:TMiniBufExplorer (depreciated)                            *:TMiniBufExplorer*
+    Use :MBEToggle instead
 
-You can also call each of these features by typing the following in command
-mode:
+:UMiniBufExplorer (Obsolete)                               *:UMiniBufExplorer*
+    Command has been removed
 
-:MiniBufExplorer                                           *:MiniBufExplorer*
-    Open and/or goto Explorer
+:MBEOpen[!]                                                         *:MBEOpen*
+    Open the Explorer.
+    With '!' appended, MBE will be reopened if it is already open.
 
-:CMiniBufExplorer                                         *:CMiniBufExplorer*
-    Close the Explorer if it's open
+:MBEOpenAll[!]                                                   *:MBEOpenAll*
+    Open the Explorer in every tab page.
+    With '!' appended, MBE will be reopened if it is already open.
 
-:UMiniBufExplorer                                         *:UMiniBufExplorer*
-    Update Explorer without navigating
+:MBEFocus                                                          *:MBEFocus*
+    Focus into the MBE window.
 
-:TMiniBufExplorer                                         *:TMiniBufExplorer*
-    Toggle the Explorer window open and closed.
+:MBEFocusAll                                                    *:MBEFocusAll*
+    Focus into the MBE window in every tab page.
+
+:MBEClose[!]                                                       *:MBEClose*
+    Close the Explorer if it's open.
+    With '!' appended, auto-updating will be disabled even if it does not
+    meet the required numbers of eligible buffers. Otherwise, auto-updating
+    will only be disabled if the required numbers of eligible buffers has
+    been meet.
+
+:MBECloseAll[!]                                                 *:MBECloseAll*
+    Close the Explorer in every tab page if it's open.
+    With '!' appended, auto-updating will be disabled even if it does not
+    meet the required numbers of eligible buffers. Otherwise, auto-updating
+    will only be disabled if the required numbers of eligible buffers has
+    been meet.
+
+:MBEToggle[!]                                                     *:MBEToggle*
+    Toggle the Explorer open and closed.
+    With '!' appended: On the open action, it does not have any effect; On
+    the close action, auto-updating will be disabled even if it does not
+    meet the required numbers of eligible buffers, otherwise, auto-updating
+    will only be disabled if the required numbers of eligible buffers has
+    been meet.
+
+:MBEToggleAll[!]                                               *:MBEToggleAll*
+    Toggle the Explorer open and closed in every tab page.
+    With '!' appended: On the open action, MBE will be reopened if it is
+    already open; On the close action, auto-updating will be disabled even
+    if it does not meet the required numbers of eligible buffers, otherwise,
+    auto-updating will only be disabled if the required numbers of eligible
+    buffers has been meet.
+
+:MBEbn                                                                *:MBEbn*
+    Switch to next normal buffer in current window.
+
+:MBEbp                                                                *:MBEbp*
+    Switch to previous normal buffer in current window.
+
+:MBEbf                                                                *:MBEbf*
+    Move one buffer forward in the most recent used buffer list.
+
+:MBEbb                                                                *:MBEbb*
+    Move one buffer backward in the most recent used buffer list.
+
+:MBEbd[!] [N1] [N2] ...                                               *:MBEbd*
+    Delete buffers but preserve the window that holding them.
+    [N*] is the buffer's number or name to be deleted. If no [N*] is given,
+    then current buffer will be deleted. Multiple buffers could be deleted
+    at the same time.
+
+:MBEbw[!] [N1] [N2] ...                                               *:MBEbw*
+    Wipe out buffers but preserve the window that holding them.
+    [N*] is the buffer's number or name to be wiped out. If no [N*] is given,
+    then current buffer will be deleted. Multiple buffers could be unloaded
+    at the same time.
+
+:MBEbun[!] [N1] [N2] ...                                             *:MBEbun*
+    Unload buffers but preserve the window that holding them.
+    [N*] is the buffer's number or name to be unloaded. If no [N*] is given,
+    then current buffer will be deleted. Multiple buffers could be wiped out
+    at the same time.
 
 ==============================================================================
 4. Options                                                *MiniBufExplOptions*
@@ -248,38 +308,53 @@ This option has been depreciated by 'g:miniBufExplHideWhenDiff'.
 4.4 Keyboard Control                                     *MiniBufExplKeyboard*
 
                                               *'g:miniBufExplMapWindowNavVim'*
-To enable the optional mapping of Control + Vim Direction Keys [hjkl] to
-window movement commands, you can put the following into your .vimrc:
-
-  let g:miniBufExplMapWindowNavVim = 1
-
                                            *'g:miniBufExplMapWindowNavArrows'*
-To enable the optional mapping of Control + Arrow Keys to window movement
-commands, you can put the following into your .vimrc:
-
-  let g:miniBufExplMapWindowNavArrows = 1
-
                                             *'g:miniBufExplMapCTabSwitchBufs'*
-To enable the optional mapping of <C-TAB> and <C-S-TAB> to a function that
-will bring up the next or previous buffer in the current window, you can put
-the following into your .vimrc:
-
-  let g:miniBufExplMapCTabSwitchBufs = 1
-
                                          *'g:miniBufExplMapCTabSwitchWindows'*
-To enable the optional mapping of <C-TAB> and <C-S-TAB> to mappings that will
-move to the next and previous (respectively) window, you can put the following
-into your .vimrc:
+These configuration variabes have been obsolete, MBE does no longer provide
+this functionality any more. If you'd like them be back, please add the
+following mappings to your .vimrc file.
 
-  let g:miniBufExplMapCTabSwitchWindows = 1
+    " If you like control + vim direction key to navigate
+    " windows then perform the remapping
+    "
+    noremap <C-J>     <C-W>j
+    noremap <C-K>     <C-W>k
+    noremap <C-H>     <C-W>h
+    noremap <C-L>     <C-W>l
 
+    " If you like control + arrow key to navigate windows
+    " then perform the remapping
+    "
+    noremap <C-Down>  <C-W>j
+    noremap <C-Up>    <C-W>k
+    noremap <C-Left>  <C-W>h
+    noremap <C-Right> <C-W>l
 
-NOTE: If you set the ...TabSwitchBufs AND ...TabSwitchWindows,
-      ...TabSwitchBufs will be enabled and ...TabSwitchWindows
-      will not.
+    " If you like <C-TAB> and <C-S-TAB> to switch buffers
+    " in the current window then perform the remapping
+    "
+    noremap <C-TAB>   :MBEbn<CR>
+    noremap <C-S-TAB> :MBEbp<CR>
+    "
+    " Or, in MRU fashion
+    "
+    noremap <C-TAB>   :MBEbf<CR>
+    noremap <C-S-TAB> :MBEbb<CR>
+
+    "
+    " If you like <C-TAB> and <C-S-TAB> to switch windows
+    " then perform the remapping
+    "
+    noremap <C-TAB>   <C-W>w
+    noremap <C-S-TAB> <C-W>W
+
 
 ------------------------------------------------------------------------------
 4.5 Misc                                                     *MiniBufExplMisc*
+
+                                                        *'g:miniBufExplSetUT'*
+Set the 'updatetime' to a proper value.
 
                                                *'g:miniBufExplStatusLineText'*
 MBE window status line text.
