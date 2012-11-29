@@ -535,11 +535,6 @@ function! <SID>StartExplorer(curBufNum)
   " We don't want the mouse to change focus without a click
   set nomousefocus
 
-  " Set shellslash for Windows/DOS Vim for dupeBufName checking to Work
-  if (has("win32") || has("win64"))
-      set shellslash
-  endif
-
   if g:miniBufExplVSplit == 0
     setlocal wrap
   else
