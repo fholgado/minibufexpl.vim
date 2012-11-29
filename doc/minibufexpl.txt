@@ -353,6 +353,9 @@ following mappings to your .vimrc file.
 ------------------------------------------------------------------------------
 4.5 Misc                                                     *MiniBufExplMisc*
 
+                                                        *'g:miniBufExplSetUT'*
+Set the 'updatetime' to a proper value.
+
                                                *'g:miniBufExplStatusLineText'*
 MBE window status line text.
 
