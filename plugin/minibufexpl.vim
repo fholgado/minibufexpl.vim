@@ -685,6 +685,7 @@ function! <SID>StopExplorer(force)
 
   call s:SwitchWindow('w',1,l:winNum)
   silent! close
+  call s:SwitchWindow('p',1)
 
   " Work around a redraw bug in gVim (Confirmed present in 7.3.50)
   if has('gui_gtk') && has('gui_running')
