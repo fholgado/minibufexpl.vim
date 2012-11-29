@@ -185,6 +185,12 @@ if !exists('g:miniBufExplBuffersNeeded')
 endif
 
 " }}}
+" Set the updatetime? {{{
+if !exists('g:miniBufExplSetUT')
+    let g:miniBufExplSetUT = 1
+endif
+
+" }}}
 " Horizontal or Vertical explorer? {{{
 " For folks that like vertical explorers, I'm caving in and providing for
 " veritcal splits. If this is set to 0 then the current horizontal
@@ -374,9 +380,13 @@ let s:bufPathSignDict = {}
 " that keep our explorer updated automatically.
 "
 
-"set update time for the CursorHold function so that it is called 100ms after
-"a key is pressed
-set updatetime=300
+" Set a lower value to 'updatetime' for the CursorHold/CursorHoldI event, so
+" that the MBE could be updated in time. It can not be set too low, otherwise
+" might breaks many things, 1000ms should be a reasonable value.
+" We only change it if we are allowed to and it has not been changed yet.
+if g:miniBufExplSetUT && &ut == 4000
+  set updatetime=1000
+endif
 
 augroup MiniBufExplorer
 autocmd MiniBufExplorer VimEnter       * nested call <SID>VimEnterHandler()
