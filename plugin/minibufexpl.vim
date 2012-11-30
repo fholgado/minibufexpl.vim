@@ -2138,7 +2138,7 @@ function! <SID>NextNormalWindow()
   call <SID>DEBUG('Entering NextNormalWindow()',10)
 
   let l:winSum = winnr('$')
-  call <SID>DEBUG('Total number of open windows are'.l:winSum,9)
+  call <SID>DEBUG('Total number of open windows are '.l:winSum,9)
 
   let l:i = 1
   while(l:i <= l:winSum)
