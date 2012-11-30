@@ -454,7 +454,7 @@ function! <SID>BufAddHandler()
   call <SID>DEBUG('<== Leaving BufAdd Handler', 10)
 endfunction
 
-function! <SID>BufEnterHandler()
+function! <SID>BufEnterHandler() abort
   call <SID>DEBUG('==> Entering BufEnter Handler', 10)
 
   call <SID>QuitIfLastOpen()
@@ -1982,30 +1982,18 @@ endfunction
 " }}}
 " QuitIfLastOpen {{{
 "
-function! <SID>QuitIfLastOpen()
-  if !exists('s:errcount')
-    let s:errcount = 0
-  endif
-
+function! <SID>QuitIfLastOpen() abort
   " Quit MBE if no more mormal window left
   if (bufname('%') == '-MiniBufExplorer-') && (<SID>NextNormalWindow() == -1)
-    try
-      call <SID>DEBUG('MBE is the last open window, quit it', 9)
-      " Before quitting Vim, delete the MBE buffer so that
-      " the '0 mark is correctly set to the previous buffer.
-      " Also disable autocmd on this command to avoid unnecessary
-      " autocmd nesting.
+    call <SID>DEBUG('MBE is the last open window, quit it', 9)
+    " Before quitting Vim, delete the MBE buffer so that
+    " the '0 mark is correctly set to the previous buffer.
+    " Also disable autocmd on this command to avoid unnecessary
+    " autocmd nesting.
+    if winnr('$') == 1
       noautocmd bdelete
-      quit
-    catch /^Vim\%((\a\+)\)\=:E173/
-      let s:errcount = s:errcount + 1
-      if s:errcount < 2
-        call <SID>StartExplorer(bufnr('%'))
-        echoe v:exception
-      else
-        quit!
-      endif
-    endtry
+    endif
+    quit
   endif
 endfunction
 
