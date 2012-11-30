@@ -388,6 +388,10 @@ augroup MiniBufExpl
     \ call <SID>DEBUG('==> Entering UpdateBufferStateDict AutoCmd', 10) |
     \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
     \ call <SID>DEBUG('<== Leaving UpdateBufferStateDict AutoCmd', 10)
+if exists('##QuitPre')
+  autocmd QuitPre        *
+    \ if <SID>NextNormalWindow() == -1 | call <SID>StopExplorer(0) | endif
+endif
 augroup END
 
 function! <SID>VimEnterHandler()
