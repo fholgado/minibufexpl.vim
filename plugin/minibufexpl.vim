@@ -395,10 +395,10 @@ augroup MiniBufExpl
   autocmd BufAdd         *        call <SID>BufAddHandler()
   autocmd BufEnter       * nested call <SID>BufEnterHandler()
   autocmd BufDelete      *        call <SID>BufDeleteHandler()
-  autocmd CursorHold,CursorHoldI    *
-    \ call <SID>DEBUG('==> Entering CursorHold/CursorHoldI UpdateBufferStateDict', 10) |
+  autocmd CursorHold,CursorHoldI,BufWritePost    *
+    \ call <SID>DEBUG('==> Entering UpdateBufferStateDict AutoCmd', 10) |
     \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
-    \ call <SID>DEBUG('<== Leaving CursorHold/CursorHoldI UpdateBufferStateDict', 10)
+    \ call <SID>DEBUG('<== Leaving UpdateBufferStateDict AutoCmd', 10)
 augroup END
 
 function! <SID>VimEnterHandler()
