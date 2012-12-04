@@ -1432,7 +1432,11 @@ function! <SID>GetSelectedBuffer()
   let @" = ""
   normal ""yi[
   if @" != ""
-    let l:retv = substitute(@",'\([0-9]*\):.*', '\1', '') + 0
+    if !g:miniBufExplShowBufNumbers
+      let l:retv = bufnr(@")
+    else
+      let l:retv = substitute(@",'\([0-9]*\):.*', '\1', '') + 0
+    endif
     let @" = l:save_reg
     return l:retv
   else
