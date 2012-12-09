@@ -1996,14 +1996,18 @@ function! <SID>QuitIfLastOpen() abort
   " Quit MBE if no more mormal window left
   if (bufname('%') == '-MiniBufExplorer-') && (<SID>NextNormalWindow() == -1)
     call <SID>DEBUG('MBE is the last open window, quit it', 9)
-    " Before quitting Vim, delete the MBE buffer so that
-    " the '0 mark is correctly set to the previous buffer.
-    " Also disable autocmd on this command to avoid unnecessary
-    " autocmd nesting.
-    if winnr('$') == 1
-      noautocmd bdelete
+    if tabpagenr('$') == 1
+      " Before quitting Vim, delete the MBE buffer so that
+      " the '0 mark is correctly set to the previous buffer.
+      " Also disable autocmd on this command to avoid unnecessary
+      " autocmd nesting.
+      if winnr('$') == 1
+        noautocmd bdelete
+      endif
+      quit
+    else
+      close
     endif
-    quit
   endif
 endfunction
 
