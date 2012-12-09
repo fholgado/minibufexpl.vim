@@ -410,6 +410,18 @@ function! <SID>VimEnterHandler()
   let s:BufList = range(1, bufnr('$'))
   let s:MRUList = range(1, bufnr('$'))
 
+  for l:i in s:BufList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>ListPop(s:BufList,l:i)
+    endif
+  endfor
+
+  for l:i in s:MRUList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>ListPop(s:MRUList,l:i)
+    endif
+  endfor
+
   call <SID>BuildAllBufferDicts()
 
   if g:miniBufExplHideWhenDiff!=1 || !&diff
