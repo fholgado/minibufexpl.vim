@@ -1898,6 +1898,7 @@ function! <SID>HasEligibleBuffers()
   let l:found = len(s:BufList)
   let l:needed = g:miniBufExplBuffersNeeded
 
+  call <SID>DEBUG('Eligible buffers are '.string(s:BufList),6)
   call <SID>DEBUG('Found '.l:found.' eligible buffers of '.l:needed.' needed',6)
 
   call <SID>DEBUG('Leaving HasEligibleBuffers()',10)
@@ -2181,25 +2182,31 @@ endfunction
 " ListAdd {{{
 "
 function! <SID>ListAdd(list,val)
+  call <SID>DEBUG('Entering ListAdd('.string(a:list).','.a:val.')',10)
   call add(a:list, a:val)
+  call <SID>DEBUG('Leaving ListAdd()',10)
 endfunction
 
 " }}}
 " ListPop {{{
 "
 function! <SID>ListPop(list,val)
+  call <SID>DEBUG('Entering ListPop('.string(a:list).','.a:val.')',10)
   call filter(a:list, 'v:val != '.a:val)
+  call <SID>DEBUG('Leaving ListPop()',10)
 endfunction
 
 " }}}
 " ListPush {{{
 "
 function! <SID>ListPush(list,val)
+  call <SID>DEBUG('Entering ListPush('.string(a:list).','.a:val.')',10)
   " Remove the buffer number from the list if it already exists.
   call <SID>ListPop(a:list,a:val)
 
   " Add the buffer number to the head of the list.
   call insert(a:list,a:val)
+  call <SID>DEBUG('Leaving ListPush()',10)
 endfunction
 
 " }}}
