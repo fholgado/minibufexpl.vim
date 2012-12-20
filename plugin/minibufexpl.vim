@@ -1646,7 +1646,7 @@ function! <SID>BuildBufferPathSignDict(bufnrs, ...)
         endif
 
         " If some buffers' path does not have this index, we skip it
-        if empty(get(s:bufPathDict[bufnr],index))
+        if len(s:bufPathDict[bufnr]) < index
             continue
         endif
 
@@ -1655,6 +1655,10 @@ function! <SID>BuildBufferPathSignDict(bufnrs, ...)
 
         " Get requested part of the path
         let part = get(s:bufPathDict[bufnr],index)
+
+        if empty(part)
+            let part = '--EMPTY--'
+        endif
 
         " Group the buffers using dictionary by this part
         if(!has_key(partDict, part))
