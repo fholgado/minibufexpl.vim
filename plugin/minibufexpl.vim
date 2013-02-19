@@ -2216,8 +2216,15 @@ endfunction
 " for Decho.vim which was the inspiration for this enhanced debugging
 " capability.
 "
+let g:miniBufExplFuncCallDepth = 0
 function! <SID>DEBUG(msg, level)
   if g:miniBufExplDebugLevel >= a:level
+
+    if a:level == 10 && a:msg =~ '^Entering'
+      let g:miniBufExplFuncCallDepth += 1
+    endif
+
+    let l:msg = repeat('| ',g:miniBufExplFuncCallDepth).a:msg
 
     " Prevent a report of our actions from showing up.
     let l:save_rep    = &report
@@ -2289,10 +2296,14 @@ function! <SID>DEBUG(msg, level)
             let g:miniBufExplDebugLevel = 0
         endif
     elseif g:miniBufExplDebugMode == 3
-        let g:miniBufExplDebugOutput = g:miniBufExplDebugOutput."\n".s:debugIndex.':'.a:level.':'.a:msg
+        let g:miniBufExplDebugOutput = g:miniBufExplDebugOutput."\n".s:debugIndex."\t".':'.a:level."\t".':'.l:msg
     endif
 
     let s:debugIndex = s:debugIndex + 1
+
+    if a:level == 10 && a:msg =~ '^Leaving'
+      let g:miniBufExplFuncCallDepth -= 1
+    endif
 
     let &report  = l:save_rep
     let &showcmd = l:save_sc
