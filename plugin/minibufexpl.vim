@@ -583,7 +583,7 @@ function! <SID>StartExplorer(curBufNum)
     syn clear
     syn match MBENormal                   '\[[^\]]*\]'
     syn match MBEChanged                  '\[[^\]]*\]+'
-    syn match MBEVisibleNormal            '\[[^\]]*\]\*+\='
+    syn match MBEVisibleNormal            '\[[^\]]*\]\*'
     syn match MBEVisibleChanged           '\[[^\]]*\]\*+'
     syn match MBEVisibleActive            '\[[^\]]*\]\*!'
     syn match MBEVisibleChangedActive     '\[[^\]]*\]\*+!'
