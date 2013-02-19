@@ -602,7 +602,7 @@ function! <SID>StartExplorer(curBufNum)
       hi def link MBEChanged               String
       hi def link MBEVisibleNormal         Special
       hi def link MBEVisibleChanged        Special
-      hi def link MBEVisibleActiveNormal   Boolean
+      hi def link MBEVisibleActiveNormal   Underlined
       hi def link MBEVisibleActiveChanged  Error
     endif
   endif
