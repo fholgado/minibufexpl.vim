@@ -462,7 +462,11 @@ function! <SID>StartExplorer(sticky,delBufNum,curBufNum)
   " them off for the MBE window
   setlocal foldcolumn=0
   setlocal nonumber
-  setlocal norelativenumber
+  if exists("&norelativenumber")
+    " relativenumber was introduced in Vim 7.3 - this provides compatibility
+    " for older versions of Vim
+    setlocal norelativenumber
+  endif
   "don't highlight matching parentheses, etc.
   setlocal matchpairs=
   "Depending on what type of split, make sure the MBE buffer is not
