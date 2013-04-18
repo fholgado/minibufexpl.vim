@@ -833,7 +833,15 @@ function! <SID>ResizeWindow()
   
     call <SID>DEBUG('ResizeWindow to '.l:height.' lines',9)
   
-    exec('resize '.l:height)
+
+    if &winminheight > l:height
+        let saved_winminheight = &winminheight
+        let &winminheight = 1
+        exec('resize '.l:height)
+        let &winminheight = saved_winminheight
+    else
+        exec('resize '.l:height)
+    endif
   
   " Vertical Resize
   else 
