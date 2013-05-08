@@ -395,10 +395,10 @@ augroup MiniBufExpl
   autocmd BufAdd         *        call <SID>BufAddHandler()
   autocmd BufEnter       * nested call <SID>BufEnterHandler()
   autocmd BufDelete      *        call <SID>BufDeleteHandler()
-  autocmd CursorHold,CursorHoldI    *
-    \ call <SID>DEBUG('==> Entering CursorHold/CursorHoldI UpdateBufferStateDict', 10) |
+  autocmd CursorHold,CursorHoldI,BufWritePost    *
+    \ call <SID>DEBUG('==> Entering UpdateBufferStateDict AutoCmd', 10) |
     \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
-    \ call <SID>DEBUG('<== Leaving CursorHold/CursorHoldI UpdateBufferStateDict', 10)
+    \ call <SID>DEBUG('<== Leaving UpdateBufferStateDict AutoCmd', 10)
 augroup END
 
 function! <SID>VimEnterHandler()
@@ -559,7 +559,11 @@ function! <SID>StartExplorer(curBufNum)
   " them off for the MBE window
   setlocal foldcolumn=0
   setlocal nonumber
-  setlocal norelativenumber
+  if exists("&norelativenumber")
+    " relativenumber was introduced in Vim 7.3 - this provides compatibility
+    " for older versions of Vim
+    setlocal norelativenumber
+  endif
   "don't highlight matching parentheses, etc.
   setlocal matchpairs=
   "Depending on what type of split, make sure the MBE buffer is not
@@ -1056,12 +1060,18 @@ function! <SID>ResizeWindow()
         endif
       endif
     else
+      " We need to be able to modify the buffer
+      setlocal modifiable
+
       exec "setlocal textwidth=".l:width
       normal gg
       normal gq}
       normal G
       let l:height = line('.')
       normal gg
+
+      " Prevent the buffer from being modified.
+      setlocal nomodifiable
     endif
 
     " enforce max window height
