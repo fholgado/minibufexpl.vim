@@ -1056,12 +1056,18 @@ function! <SID>ResizeWindow()
         endif
       endif
     else
+      " We need to be able to modify the buffer
+      setlocal modifiable
+
       exec "setlocal textwidth=".l:width
       normal gg
       normal gq}
       normal G
       let l:height = line('.')
       normal gg
+
+      " Prevent the buffer from being modified.
+      setlocal nomodifiable
     endif
 
     " enforce max window height
