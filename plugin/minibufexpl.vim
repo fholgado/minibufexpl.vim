@@ -1109,6 +1109,12 @@ function! <SID>ResizeWindow()
         exec 'resize '.l:height
     endif
 
+    let saved_ead = &ead
+    let &ead = 'ver'
+    set equalalways
+    let &ead = saved_ead
+    set noequalalways
+
   " Vertical Resize
   else
 
@@ -1128,6 +1134,12 @@ function! <SID>ResizeWindow()
       call <SID>DEBUG('ResizeWindow to '.l:newWidth.' columns',9)
       exec 'vertical resize '.l:newWidth
     endif
+
+    let saved_ead = &ead
+    let &ead = 'hor'
+    set equalalways
+    let &ead = saved_ead
+    set noequalalways
 
   endif
 
