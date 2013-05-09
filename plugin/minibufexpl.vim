@@ -635,10 +635,17 @@ function! <SID>StartExplorer(curBufNum)
   " The following allows for quicker moving between buffer
   " names in the [MBE] window it also saves the last-pattern
   " and restores it.
-  nnoremap <buffer> l       :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
-  nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
-  nnoremap <buffer> <right> :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
-  nnoremap <buffer> <left>  :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  if !g:miniBufExplShowBufNumbers
+    nnoremap <buffer> l       :call search('\[[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> h       :call search('\[[^\]]*\]','b')<CR>:<BS>
+    nnoremap <buffer> <right> :call search('\[[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> <left>  :call search('\[[^\]]*\]','b')<CR>:<BS>
+  else
+    nnoremap <buffer> l       :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+    nnoremap <buffer> <right> :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> <left>  :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  endif
 
   " Attempt to perform single click mapping
   " It would be much nicer if we could 'nnoremap <buffer> ...', however
