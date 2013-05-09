@@ -1971,11 +1971,11 @@ function! <SID>AutoUpdate(curBufNum,force)
 
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
-  if t:miniBufExplAutoUpdate == 1
+  if exists('t:miniBufExplAutoUpdate') && t:miniBufExplAutoUpdate == 1
     " if we don't have a window then create one
     let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-    if t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1
+    if (exists('t:skipEligibleBuffersCheck') && t:skipEligibleBuffersCheck == 1) || <SID>HasEligibleBuffers() == 1
       if (l:winnr == -1)
         if g:miniBufExplAutoStart == 1
           call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
