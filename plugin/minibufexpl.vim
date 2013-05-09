@@ -2079,7 +2079,11 @@ function! <SID>GetSelectedBuffer()
   normal ""yi[
   if @" != ""
     if !g:miniBufExplShowBufNumbers
-      let l:retv = bufnr(@")
+      " This is a bit ugly, but it works, unless we come up with a
+      " better way to get the key for a dictionary by its value.
+      let l:bufUniqNameDictKeys = keys(s:bufUniqNameDict)
+      let l:bufUniqNameDictValues = values(s:bufUniqNameDict)
+      let l:retv = l:bufUniqNameDictKeys[match(l:bufUniqNameDictValues,substitute(@",'[0-9]*:\(.*\)', '\1', ''))]
     else
       let l:retv = substitute(@",'\([0-9]*\):.*', '\1', '') + 0
     endif
