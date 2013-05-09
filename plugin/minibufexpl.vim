@@ -1898,6 +1898,7 @@ function! <SID>HasEligibleBuffers()
   let l:found = len(s:BufList)
   let l:needed = g:miniBufExplBuffersNeeded
 
+  call <SID>DEBUG('Eligible buffers are '.string(s:BufList),6)
   call <SID>DEBUG('Found '.l:found.' eligible buffers of '.l:needed.' needed',6)
 
   call <SID>DEBUG('Leaving HasEligibleBuffers()',10)
@@ -2181,25 +2182,31 @@ endfunction
 " ListAdd {{{
 "
 function! <SID>ListAdd(list,val)
+  call <SID>DEBUG('Entering ListAdd('.string(a:list).','.a:val.')',10)
   call add(a:list, a:val)
+  call <SID>DEBUG('Leaving ListAdd()',10)
 endfunction
 
 " }}}
 " ListPop {{{
 "
 function! <SID>ListPop(list,val)
+  call <SID>DEBUG('Entering ListPop('.string(a:list).','.a:val.')',10)
   call filter(a:list, 'v:val != '.a:val)
+  call <SID>DEBUG('Leaving ListPop()',10)
 endfunction
 
 " }}}
 " ListPush {{{
 "
 function! <SID>ListPush(list,val)
+  call <SID>DEBUG('Entering ListPush('.string(a:list).','.a:val.')',10)
   " Remove the buffer number from the list if it already exists.
   call <SID>ListPop(a:list,a:val)
 
   " Add the buffer number to the head of the list.
   call insert(a:list,a:val)
+  call <SID>DEBUG('Leaving ListPush()',10)
 endfunction
 
 " }}}
@@ -2209,8 +2216,15 @@ endfunction
 " for Decho.vim which was the inspiration for this enhanced debugging
 " capability.
 "
+let g:miniBufExplFuncCallDepth = 0
 function! <SID>DEBUG(msg, level)
   if g:miniBufExplDebugLevel >= a:level
+
+    if a:level == 10 && a:msg =~ '^Entering'
+      let g:miniBufExplFuncCallDepth += 1
+    endif
+
+    let l:msg = repeat('| ',g:miniBufExplFuncCallDepth).a:msg
 
     " Prevent a report of our actions from showing up.
     let l:save_rep    = &report
@@ -2282,10 +2296,14 @@ function! <SID>DEBUG(msg, level)
             let g:miniBufExplDebugLevel = 0
         endif
     elseif g:miniBufExplDebugMode == 3
-        let g:miniBufExplDebugOutput = g:miniBufExplDebugOutput."\n".s:debugIndex.':'.a:level.':'.a:msg
+        let g:miniBufExplDebugOutput = g:miniBufExplDebugOutput."\n".s:debugIndex."\t".':'.a:level."\t".':'.l:msg
     endif
 
     let s:debugIndex = s:debugIndex + 1
+
+    if a:level == 10 && a:msg =~ '^Leaving'
+      let g:miniBufExplFuncCallDepth -= 1
+    endif
 
     let &report  = l:save_rep
     let &showcmd = l:save_sc
