@@ -426,6 +426,7 @@ function! <SID>VimEnterHandler()
   if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
         \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
     call <SID>StartExplorer(bufnr("%"))
+    let s:TabsMBEState = 1
   endif
 
   call <SID>DEBUG('<== Leaving VimEnter Handler', 10)
@@ -435,7 +436,7 @@ function! <SID>TabEnterHandler()
   call <SID>DEBUG('==> Entering TabEnter Handler', 10)
 
   if !exists('t:miniBufExplAutoUpdate')
-    let t:miniBufExplAutoUpdate = 1
+    let t:miniBufExplAutoUpdate = s:TabsMBEState
   endif
 
   let t:skipEligibleBuffersCheck = 0
