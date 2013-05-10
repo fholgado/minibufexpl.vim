@@ -1494,6 +1494,8 @@ function! <SID>CreateBufferUniqName(bufNum)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
+    " Remove []'s & ()'s, these chars are preserved for buffer name locating
+    let l:bufName = substitute(l:bufName, '[][()]', '', 'g')
 
     " Create a unique name for unamed buffer
     if empty(l:bufName)
