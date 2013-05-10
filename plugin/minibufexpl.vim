@@ -23,7 +23,7 @@
 "
 "=============================================================================
 " }}}
-
+"
 " Startup Check
 "
 " Has this plugin already been loaded? {{{
@@ -32,76 +32,117 @@ if exists('loaded_minibufexplorer')
   finish
 endif
 let loaded_minibufexplorer = 1
-" }}}
 
+" }}}
+"
 " Mappings and Commands
 "
-" MBE Keyboard Mappings {{{
-" If we don't already have keyboard mappings for MBE then create them
-"
-if !hasmapto('<Plug>MiniBufExplorer')
-  map <unique> <Leader>mbe <Plug>MiniBufExplorer
-endif
-if !hasmapto('<Plug>CMiniBufExplorer')
-  map <unique> <Leader>mbc <Plug>CMiniBufExplorer
-endif
-if !hasmapto('<Plug>UMiniBufExplorer')
-  map <unique> <Leader>mbu <Plug>UMiniBufExplorer
-endif
-if !hasmapto('<Plug>TMiniBufExplorer')
-  map <unique> <Leader>mbt <Plug>TMiniBufExplorer
-endif
-if !hasmapto('<Plug>MBEMarkCurrent')
-  map <unique> <Leader>mq <Plug>MBEMarkCurrent
-endif
-" }}}
-" MBE <Script> internal map {{{
-"
-noremap <unique> <script> <Plug>MiniBufExplorer  :call <SID>StartExplorer(-1, bufnr("%"))<CR>:<BS>
-noremap <unique> <script> <Plug>CMiniBufExplorer :call <SID>StopExplorer()<CR>:<BS>
-noremap <unique> <script> <Plug>UMiniBufExplorer :call <SID>AutoUpdate(-1,bufnr("%"))<CR>:<BS>
-noremap <unique> <script> <Plug>TMiniBufExplorer :call <SID>ToggleExplorer()<CR>:<BS>
-noremap <unique> <script> <Plug>MBEMarkCurrent :call <SID>MarkCurrentBuffer(bufname("%"),1)<CR>:<BS>
-
-" }}}
 " MBE commands {{{
 "
 if !exists(':MiniBufExplorer')
-  command! MiniBufExplorer  call <SID>StartExplorer(-1, bufnr("%"))
+  command! MiniBufExplorer echoe 'MiniBufExplorer is depreciated, please use MBEOpen instead.'
 endif
 if !exists(':CMiniBufExplorer')
-  command! CMiniBufExplorer  call <SID>StopExplorer()
-endif
-if !exists(':UMiniBufExplorer')
-  command! UMiniBufExplorer  call <SID>AutoUpdate(-1,bufnr("%"))
+  command! CMiniBufExplorer echoe 'CMiniBufExplorer is depreciated, please use MBEClose instead.'
 endif
 if !exists(':TMiniBufExplorer')
-  command! TMiniBufExplorer  call <SID>ToggleExplorer()
+  command! TMiniBufExplorer echoe 'TMiniBufExplorer is depreciated, please use MBEToggle instead.'
+endif
+if !exists(':MBEOpen')
+  command! -bang MBEOpen      let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
+endif
+if !exists(':MBEOpenAll')
+  command! -bang MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
+endif
+if !exists(':MBEFocus')
+  command! MBEFocus           call <SID>FocusExplorer()
+endif
+if !exists(':MBEFocusAll')
+  command! MBEFocusAll        tabdo call <SID>FocusExplorer()
+endif
+if !exists(':MBEClose')
+  command! -bang MBEClose     let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
+endif
+if !exists(':MBECloseAll')
+  command! -bang MBECloseAll  tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
+endif
+if !exists(':MBEToggle')
+  command! -bang MBEToggle    call <SID>ToggleExplorer(0,'<bang>'=='!')
+endif
+if !exists(':MBEToggleAll')
+  command! -bang MBEToggleAll call <SID>ToggleExplorer(1,'<bang>'=='!')
 endif
 if !exists(':MBEbn')
   command! MBEbn call <SID>CycleBuffer(1)
 endif
 if !exists(':MBEbp')
   command! MBEbp call <SID>CycleBuffer(0)
-endif " }}}
+endif
+if !exists(':MBEbf')
+  command! MBEbf call <SID>CycleBuffer(1,1)
+endif
+if !exists(':MBEbb')
+  command! MBEbb call <SID>CycleBuffer(0,1)
+endif
+if !exists(':MBEbd')
+  command! -bang -nargs=* MBEbd call <SID>DeleteBuffer(0,'<bang>'=='!',<f-args>)
+endif
+if !exists(':MBEbw')
+  command! -bang -nargs=* MBEbw call <SID>DeleteBuffer(1,'<bang>'=='!',<f-args>)
+endif
+if !exists(':MBEbun')
+  command! -bang -nargs=* MBEbun call <SID>DeleteBuffer(2,'<bang>'=='!',<f-args>)
+endif
 
+" }}}
+"
+" Global Configuration Variables - Depreciated
+"
+" {{{
+if exists('g:miniBufExplSplitBelow')
+  let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
+endif
+
+if exists('g:miniBufExplMaxHeight')
+  let g:miniBufExplMaxSize = g:miniBufExplMaxHeight
+endif
+
+if exists('g:miniBufExplMinHeight')
+  let g:miniBufExplMinSize = g:miniBufExplMinHeight
+endif
+
+if exists('g:miniBufExplorerMoreThanOne')
+  let g:miniBufExplBuffersNeeded = g:miniBufExplorerMoreThanOne
+endif
+
+if exists('g:miniBufExplorerAutoStart')
+  let g:miniBufExplAutoStart = g:miniBufExplorerAutoStart
+endif
+
+if exists('g:miniBufExplorerDebugMode')
+  let g:miniBufExplDebugMode = g:miniBufExplorerDebugMode
+endif
+
+if exists('g:miniBufExplorerDebugLevel')
+  let g:miniBufExplDebugLevel = g:miniBufExplorerDebugLevel
+endif
+
+if exists('g:miniBufExplorerDebugOutput')
+  let g:miniBufExplDebugOutput = g:miniBufExplorerDebugOutput
+endif
+
+if exists('g:miniBufExplorerHideWhenDiff')
+  let g:miniBufExplHideWhenDiff = g:miniBufExplorerHideWhenDiff
+endif
+
+" }}}
+"
 " Global Configuration Variables
 "
 " Start MBE automatically ? {{{
 "
-if !exists('g:miniBufExplorerAutoStart')
-  let g:miniBufExplorerAutoStart = 1
-endif
-
-" }}}
-" Debug Level {{{
-"
-" 0 = no logging
-" 1=5 = errors ; 1 is the most important
-" 5-9 = info ; 5 is the most important
-" 10 = Entry/Exit
-if !exists('g:miniBufExplorerDebugLevel')
-  let g:miniBufExplorerDebugLevel = 1
+if !exists('g:miniBufExplAutoStart')
+  let g:miniBufExplAutoStart = 1
 endif
 
 " }}}
@@ -112,24 +153,41 @@ endif
 " 2 = write to a file named MiniBufExplorer.DBG
 "     in the directory where vim was started
 "     THIS IS VERY SLOW
-" 3 = Write into g:miniBufExplorerDebugOutput
+" 3 = Write into g:miniBufExplDebugOutput
 "     global variable [This is the default]
-if !exists('g:miniBufExplorerDebugMode')
-  let g:miniBufExplorerDebugMode = 3
+if !exists('g:miniBufExplDebugMode')
+  let g:miniBufExplDebugMode = 3
+endif
+
+" }}}
+" Debug Level {{{
+"
+" 0 = no logging
+" 1=5 = errors ; 1 is the most important
+" 5-9 = info ; 5 is the most important
+" 10 = Entry/Exit
+if !exists('g:miniBufExplDebugLevel')
+  let g:miniBufExplDebugLevel = 1
 endif
 
 " }}}
 " Stop auto starting MBE in diff mode? {{{
-if !exists('g:miniBufExplorerHideWhenDiff')
-    let g:miniBufExplorerHideWhenDiff = 0
+if !exists('g:miniBufExplHideWhenDiff')
+    let g:miniBufExplHideWhenDiff = 0
 endif
 
 " }}}
 " MoreThanOne? {{{
 " Display Mini Buf Explorer when there are 'More Than One' eligible buffers
 "
-if !exists('g:miniBufExplorerMoreThanOne')
-  let g:miniBufExplorerMoreThanOne = 2
+if !exists('g:miniBufExplBuffersNeeded')
+  let g:miniBufExplBuffersNeeded = 2
+endif
+
+" }}}
+" Set the updatetime? {{{
+if !exists('g:miniBufExplSetUT')
+    let g:miniBufExplSetUT = 1
 endif
 
 " }}}
@@ -148,10 +206,6 @@ endif
 " When opening a new -MiniBufExplorer- window, split the new windows below or
 " above the current window?  1 = below, 0 = above.
 "
-if exists('g:miniBufExplSplitBelow') "Depreciated
-  let g:miniBufExplBRSplit = g:miniBufExplSplitBelow
-endif
-
 if !exists('g:miniBufExplBRSplit')
   let g:miniBufExplBRSplit = g:miniBufExplVSplit ? &splitright : &splitbelow
 endif
@@ -166,34 +220,13 @@ if !exists('g:miniBufExplSplitToEdge')
 endif
 
 " }}}
-" MaxHeight (depreciated) {{{
-" When sizing the -MiniBufExplorer- window, assign a maximum window height.
-" 0 = size to fit all buffers, otherwise the value is number of lines for
-" buffer. [Depreciated use g:miniBufExplMaxSize]
-"
-if !exists('g:miniBufExplMaxHeight')
-  let g:miniBufExplMaxHeight = 0
-endif
-
-" }}}
 " MaxSize {{{
 " Same as MaxHeight but also works for vertical splits if specified with a
 " vertical split then vertical resizing will be performed. If left at 0
 " then the number of columns in g:miniBufExplVSplit will be used as a
 " static window width.
 if !exists('g:miniBufExplMaxSize')
-  let g:miniBufExplMaxSize = g:miniBufExplMaxHeight
-endif
-
-" }}}
-" MinHeight (depreciated) {{{
-" When sizing the -MiniBufExplorer- window, assign a minumum window height.
-" the value is minimum number of lines for buffer. Setting this to zero can
-" cause strange height behavior. The default value is 1 [Depreciated use
-" g:miniBufExplMinSize]
-"
-if !exists('g:miniBufExplMinHeight')
-  let g:miniBufExplMinHeight = 1
+  let g:miniBufExplMaxSize = 0
 endif
 
 " }}}
@@ -201,7 +234,7 @@ endif
 " Same as MinHeight but also works for vertical splits. For vertical splits,
 " this is ignored unless g:miniBufExplMax(Size|Height) are specified.
 if !exists('g:miniBufExplMinSize')
-  let g:miniBufExplMinSize = g:miniBufExplMinHeight
+  let g:miniBufExplMinSize = 1
 endif
 
 " }}}
@@ -223,74 +256,6 @@ if !exists('g:miniBufExplShowBufNumbers')
   let g:miniBufExplShowBufNumbers = 1
 endif
 
-" }}}
-" Extended window navigation commands? {{{
-" Global flag to turn extended window navigation commands on or off
-" enabled = 1, dissabled = 0
-"
-if !exists('g:miniBufExplMapWindowNav')
-  " This is for backwards compatibility and may be removed in a
-  " later release, please use the ...NavVim and/or ...NavArrows
-  " settings.
-  let g:miniBufExplMapWindowNav = 0
-endif
-if !exists('g:miniBufExplMapWindowNavVim')
-  let g:miniBufExplMapWindowNavVim = 0
-endif
-if !exists('g:miniBufExplMapWindowNavArrows')
-  let g:miniBufExplMapWindowNavArrows = 0
-endif
-if !exists('g:miniBufExplMapCTabSwitchBufs')
-  let g:miniBufExplMapCTabSwitchBufs = 0
-endif
-" Notice: that if CTabSwitchBufs is turned on then
-" we turn off CTabSwitchWindows.
-if g:miniBufExplMapCTabSwitchBufs == 1 || !exists('g:miniBufExplMapCTabSwitchWindows')
-  let g:miniBufExplMapCTabSwitchWindows = 0
-endif
-
-"
-" If we have enabled control + vim direction key remapping
-" then perform the remapping
-"
-" Notice: I left g:miniBufExplMapWindowNav in for backward
-" compatibility. Eventually this mapping will be removed so
-" please use the newer g:miniBufExplMapWindowNavVim setting.
-if g:miniBufExplMapWindowNavVim || g:miniBufExplMapWindowNav
-  noremap <C-J> <C-W>j
-  noremap <C-K> <C-W>k
-  noremap <C-H> <C-W>h
-  noremap <C-L> <C-W>l
-endif
-
-"
-" If we have enabled control + arrow key remapping
-" then perform the remapping
-"
-if g:miniBufExplMapWindowNavArrows
-  noremap <C-Down>  <C-W>j
-  noremap <C-Up>    <C-W>k
-  noremap <C-Left>  <C-W>h
-  noremap <C-Right> <C-W>l
-endif
-
-" If we have enabled <C-TAB> and <C-S-TAB> to switch buffers
-" in the current window then perform the remapping
-"
-if g:miniBufExplMapCTabSwitchBufs
-  noremap <C-TAB>   :call <SID>CycleBuffer(1)<CR>:<BS>
-  noremap <C-S-TAB> :call <SID>CycleBuffer(0)<CR>:<BS>
-endif
-
-"
-" If we have enabled <C-TAB> and <C-S-TAB> to switch windows
-" then perform the remapping
-"
-if g:miniBufExplMapCTabSwitchWindows
-  noremap <C-TAB>   <C-W>w
-  noremap <C-S-TAB> <C-W>W
-endif
-
 "}}}
 " Force Syntax Enable {{{
 "
@@ -303,38 +268,21 @@ endif
 " flag that can be set to 1 in a users .vimrc to allow
 " single click switching of tabs. By default we use
 " double click for tab selection.
-
+"
 if !exists('g:miniBufExplUseSingleClick')
   let g:miniBufExplUseSingleClick = 0
 endif
 
-"
-" attempt to perform single click mapping, it would be much
-" nicer if we could nnoremap <buffer> ... however vim does
-" not fire the <buffer> <leftmouse> when you use the mouse
-" to enter a buffer.
-"
-if g:miniBufExplUseSingleClick == 1
-  let s:clickmap = ':if bufname("%") == "-MiniBufExplorer-" <bar> call <SID>MBEClick() <bar> endif <CR>'
-  if maparg('<LEFTMOUSE>', 'n') == ''
-    " no mapping for leftmouse
-    exec ':nnoremap <silent> <LEFTMOUSE> <LEFTMOUSE>' . s:clickmap
-  else
-    " we have a mapping
-    let  g:miniBufExplDoneClickSave = 1
-    let  s:m = ':nnoremap <silent> <LEFTMOUSE> <LEFTMOUSE>'
-    let  s:m = s:m . substitute(substitute(maparg('<LEFTMOUSE>', 'n'), '|', '<bar>', 'g'), '\c^<LEFTMOUSE>', '', '')
-    let  s:m = s:m . s:clickmap
-    exec s:m
-  endif
-endif " }}}
+" }}}
 " Close on Select? {{{
 " Flag that can be set to 1 in a users .vimrc to hide
 " the explorer when a user selects a buffer.
 "
 if !exists('g:miniBufExplCloseOnSelect')
   let g:miniBufExplCloseOnSelect = 0
-endif " }}}
+endif
+
+" }}}
 " Check for duplicate buffer names? {{{
 " Flag that can be set to 0 in a users .vimrc to turn off
 " the explorer's feature that differentiates similar buffer names by
@@ -343,40 +291,29 @@ endif " }}}
 "
 if !exists('g:miniBufExplCheckDupeBufs')
   let g:miniBufExplCheckDupeBufs = 1
-endif " }}}
+endif
 
-" Variables used internally
+" }}}
+" Status Line Text for MBE window {{{
 "
-" Script/Global variables {{{
-" Global used to store the buffer list so we don't update the
-" UI unless the list has changed.
-if !exists('g:miniBufExplBufList')
-  let g:miniBufExplBufList = ''
+if !exists('g:miniBufExplStatusLineText')
+  let g:miniBufExplStatusLineText = "-MiniBufExplorer-"
 endif
 
-" Variable used as a mutex so that we don't do lots
-" of AutoUpdates at the same time.
-if !exists('g:miniBufExplInAutoUpdate')
-  let g:miniBufExplInAutoUpdate = 0
-endif
-
-" In debug mode 3 this variable will hold the debug output
-if !exists('g:miniBufExplorerDebugOutput')
-  let g:miniBufExplorerDebugOutput = ''
-endif
-
-" In debug mode 3 this variable will hold the debug output
-if !exists('g:miniBufExplForceDisplay')
-  let g:miniBufExplForceDisplay = 0
-endif
-
+" }}}
+" How to sort the buffers in MBE window {{{
+"
 if !exists('g:miniBufExplSortBy')
   let g:miniBufExplSortBy = "number"
 endif
 
-if !exists('g:statusLineText')
-  let g:statusLineText = "-MiniBufExplorer-"
-endif
+" }}}
+"
+" Variables used internally
+"
+" Script/Global variables {{{
+" In debug mode 3 this variable will hold the debug output
+let g:miniBufExplDebugOutput = ''
 
 " check to see what platform we are in
 if (has('unix'))
@@ -385,24 +322,42 @@ else
     let s:PathSeparator = '\'
 endif
 
-" Variable used to pass maxTabWidth info between functions
-let s:maxTabWidth = 0
-
 " Variable used to count debug output lines
 let s:debugIndex = 0
 
-" Build initial MRUList. This makes sure all the files specified on the
-" command line are picked up correctly.
-let s:MRUList = range(1, bufnr('$'))
+" Variable used to pass maxTabWidth info between functions
+let s:maxTabWidth = 0
+
+" Variable used as a mutex to indicate the current state of MBEToggleAll
+let s:TabsMBEState = 0
+
+" List for all eligible buffers
+let s:BufList = []
+
+" List for tracking order of the buffer entering
+let s:MRUList = []
+
+" Whether MRU List should be updated.
+let s:MRUEnable = 1
+
+" Dictionary used to keep track of the modification state of buffers
+let s:bufStateDict = {}
+
+" Global used to store the buffer list so that we don't update the MBE
+" unless the list has changed.
+let s:miniBufExplBufList = ''
 
 " We start out with this off for startup, but once vim is running we
 " turn this on. This prevent any BufEnter event from being triggered
 " before VimEnter event.
-let s:miniBufExplAutoUpdate = 0
+let t:miniBufExplAutoUpdate = 0
+
+" Variable used as a mutex so that AutoUpdates would not get nested.
+let s:miniBufExplInAutoUpdate = 0
 
 " If MBE was opened manually, then we should skip eligible buffers checking,
-" open MBE window no matter what value 'g:miniBufExplorerMoreThanOne' is set.
-let s:skipEligibleBuffersCheck = 0
+" open MBE window no matter what value 'g:miniBufExplBuffersNeeded' is set.
+let t:skipEligibleBuffersCheck = 0
 
 " Dictionary used to keep track of the names we have seen.
 let s:bufNameDict = {}
@@ -418,61 +373,174 @@ let s:bufPathDict = {}
 let s:bufPathSignDict = {}
 
 " }}}
-
+"
 " Auto Commands
 "
 " Setup an autocommand group and some autocommands {{{
 " that keep our explorer updated automatically.
 "
 
-"set update time for the CursorHold function so that it is called 100ms after
-"a key is pressed
-setlocal updatetime=300
+" Set a lower value to 'updatetime' for the CursorHold/CursorHoldI event, so
+" that the MBE could be updated in time. It can not be set too low, otherwise
+" might breaks many things, 1000ms should be a reasonable value.
+" We only change it if we are allowed to and it has not been changed yet.
+if g:miniBufExplSetUT && &ut == 4000
+  set updatetime=1000
+endif
 
-augroup MiniBufExplorer
-autocmd MiniBufExplorer BufNew         * call <SID>DEBUG('-=> BufNew Updating All Buffer Dicts', 5) |call <SID>UpdateAllBufferDicts(expand("<abuf>"))
-autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete AutoCmd', 10) |call <SID>AutoUpdate(expand('<abuf>'),bufnr("%"))
-autocmd MiniBufExplorer BufDelete      * call <SID>DEBUG('-=> BufDelete ModTrackingListClean AutoCmd for buffer '.bufnr("%"), 10) |call <SID>CleanModTrackingList(bufnr("%"))
-autocmd MiniBufExplorer BufEnter       * call <SID>DEBUG('-=> BufEnter AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
-autocmd MiniBufExplorer BufWritePost   * call <SID>DEBUG('-=> BufWritePost AutoCmd', 10) |call <SID>AutoUpdate(-1,bufnr("%"))
-autocmd MiniBufExplorer CursorHold     * call <SID>DEBUG('-=> CursroHold AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
-autocmd MiniBufExplorer CursorHoldI    * call <SID>DEBUG('-=> CursorHoldI AutoCmd', 10) |call <SID>AutoUpdateCheck(bufnr("%"))
-autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter Building All Buffer Dicts', 5) |call <SID>BuildAllBufferDicts()
-autocmd MiniBufExplorer VimEnter       * call <SID>DEBUG('-=> VimEnter AutoCmd', 10) |
-            \ if g:miniBufExplorerHideWhenDiff!=1 || !&diff |let s:miniBufExplAutoUpdate = 1 |endif
+augroup MiniBufExpl
+  autocmd!
+  autocmd VimEnter       * nested call <SID>VimEnterHandler()
+  autocmd TabEnter       * nested call <SID>TabEnterHandler()
+  autocmd BufAdd         *        call <SID>BufAddHandler()
+  autocmd BufEnter       * nested call <SID>BufEnterHandler()
+  autocmd BufDelete      *        call <SID>BufDeleteHandler()
+  autocmd CursorHold,CursorHoldI,BufWritePost    *
+    \ call <SID>DEBUG('==> Entering UpdateBufferStateDict AutoCmd', 10) |
+    \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
+    \ call <SID>DEBUG('<== Leaving UpdateBufferStateDict AutoCmd', 10)
 augroup END
-" }}}
 
+function! <SID>VimEnterHandler()
+  call <SID>DEBUG('==> Entering VimEnter Handler', 10)
+
+  " Build initial MRUList.
+  " This makes sure all the files specified on the command
+  " line are picked up correctly.
+  let s:BufList = range(1, bufnr('$'))
+  let s:MRUList = range(1, bufnr('$'))
+
+  for l:i in s:BufList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>ListPop(s:BufList,l:i)
+    endif
+  endfor
+
+  for l:i in s:MRUList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>ListPop(s:MRUList,l:i)
+    endif
+  endfor
+
+  call <SID>BuildAllBufferDicts()
+
+  if g:miniBufExplHideWhenDiff!=1 || !&diff
+    let t:miniBufExplAutoUpdate = 1
+  endif
+
+  let t:skipEligibleBuffersCheck = 0
+
+  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
+        \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
+    call <SID>StartExplorer(bufnr("%"))
+  endif
+
+  call <SID>DEBUG('<== Leaving VimEnter Handler', 10)
+endfunction
+
+function! <SID>TabEnterHandler()
+  call <SID>DEBUG('==> Entering TabEnter Handler', 10)
+
+  if !exists('t:miniBufExplAutoUpdate')
+    let t:miniBufExplAutoUpdate = 1
+  endif
+
+  let t:skipEligibleBuffersCheck = 0
+
+  if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
+        \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
+    call <SID>StartExplorer(bufnr("%"))
+  endif
+
+  call <SID>DEBUG('<== Leaving TabEnter Handler', 10)
+endfunction
+
+function! <SID>BufAddHandler()
+  call <SID>DEBUG('==> Entering BufAdd Handler', 10)
+
+  call <SID>ListAdd(s:BufList,str2nr(expand("<abuf>")))
+  call <SID>ListAdd(s:MRUList,str2nr(expand("<abuf>")))
+
+  call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
+
+  call <SID>DEBUG('<== Leaving BufAdd Handler', 10)
+endfunction
+
+function! <SID>BufEnterHandler() abort
+  call <SID>DEBUG('==> Entering BufEnter Handler', 10)
+
+  call <SID>QuitIfLastOpen()
+
+  for l:i in s:BufList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>ListPop(s:BufList,l:i)
+    endif
+  endfor
+
+  for l:i in s:MRUList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>ListPop(s:MRUList,l:i)
+    endif
+  endfor
+
+  call <SID>AutoUpdate(bufnr("%"),0)
+
+  call <SID>DEBUG('<== Leaving BufEnter Handler', 10)
+endfunction
+
+function! <SID>BufDeleteHandler()
+  call <SID>DEBUG('==> Entering BufDelete Handler', 10)
+
+  call <SID>ListPop(s:BufList,str2nr(expand("<abuf>")))
+  call <SID>ListPop(s:MRUList,str2nr(expand("<abuf>")))
+
+  call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
+
+  call <SID>AutoUpdate(bufnr("%"),1)
+
+  call <SID>DEBUG('<== Leaving BufDelete Handler', 10)
+endfunction
+" }}}
+"
 " Functions
 "
 " StartExplorer - Sets up our explorer and causes it to be displayed {{{
 "
-function! <SID>StartExplorer(delBufNum,curBufNum)
-  call <SID>DEBUG('Entering StartExplorer('.a:delBufNum.','.a:curBufNum.')',10)
+function! <SID>StartExplorer(curBufNum)
+  call <SID>DEBUG('Entering StartExplorer('.a:curBufNum.')',10)
 
   call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
 
-  let s:miniBufExplAutoUpdate = 1
+  let t:miniBufExplAutoUpdate = 1
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-  if l:winNum == -1
-    call <SID>CreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
-
-    let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
-
-    if l:winNum == -1
-      call <SID>DEBUG('Failed to create the MBE window, aborting...',1)
-      call <SID>DEBUG('Leaving StartExplorer()',10)
-      return
-    endif
-  else
+  if l:winNum != -1
     call <SID>DEBUG('There is already a MBE window, aborting...',1)
     call <SID>DEBUG('Leaving StartExplorer()',10)
     return
   endif
 
-  exec l:winNum.'wincmd w'
+  call <SID>CreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
+
+  let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
+
+  if l:winNum == -1
+    call <SID>DEBUG('Failed to create the MBE window, aborting...',1)
+    call <SID>DEBUG('Leaving StartExplorer()',10)
+    return
+  endif
+
+  " Save current window number and switch to previous
+  " window before entering MBE window so that the later
+  " `wincmd p` command will get into this window, then
+  " we can preserve a one level window movement history.
+  let l:currWin = winnr()
+  call s:SwitchWindow('p',1)
+
+  " Switch into MBE allowing autocmd to run will
+  " make the syntax highlight in MBE window working
+  call s:SwitchWindow('w',0,l:winNum)
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
@@ -481,7 +549,8 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
     return
   endif
 
-  let g:miniBufExplForceDisplay = 1
+  " Set filetype for MBE buffer
+  set filetype=minibufexpl
 
   " !!! We may want to make the following optional -- Bindu
   " New windows don't cause all windows to be resized to equal sizes
@@ -490,11 +559,6 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
   " !!! We may want to make the following optional -- Bindu
   " We don't want the mouse to change focus without a click
   set nomousefocus
-
-  " Set shellslash for Windows/DOS Vim for dupeBufName checking to Work
-  if (has("win32") || has("win64"))
-      set shellslash
-  endif
 
   if g:miniBufExplVSplit == 0
     setlocal wrap
@@ -507,7 +571,11 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
   " them off for the MBE window
   setlocal foldcolumn=0
   setlocal nonumber
-  setlocal norelativenumber
+  if exists("&norelativenumber")
+    " relativenumber was introduced in Vim 7.3 - this provides compatibility
+    " for older versions of Vim
+    setlocal norelativenumber
+  endif
   "don't highlight matching parentheses, etc.
   setlocal matchpairs=
   "Depending on what type of split, make sure the MBE buffer is not
@@ -517,7 +585,7 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
 
   " Set the text of the statusline for the MBE buffer. See help:stl for
   " many options
-  setlocal stl=%!g:statusLineText
+  exec 'setlocal statusline='.g:miniBufExplStatusLineText
 
   " No spell check
   setlocal nospell
@@ -531,67 +599,92 @@ function! <SID>StartExplorer(delBufNum,curBufNum)
     syn clear
     syn match MBENormal                   '\[[^\]]*\]'
     syn match MBEChanged                  '\[[^\]]*\]+'
-    syn match MBEVisibleNormal            '\[[^\]]*\]\*+\='
+    syn match MBEVisibleNormal            '\[[^\]]*\]\*'
     syn match MBEVisibleChanged           '\[[^\]]*\]\*+'
-    syn match MBEVisibleActive            '\[[^\]]*\]\*!'
-    syn match MBEVisibleChangedActive     '\[[^\]]*\]\*+!'
+    syn match MBEVisibleActiveNormal      '\[[^\]]*\]\*!'
+    syn match MBEVisibleActiveChanged     '\[[^\]]*\]\*+!'
 
     "MiniBufExpl Color Examples
-    " hi MBEVisibleActive guifg=#A6DB29 guibg=fg
-    " hi MBEVisibleChangedActive guifg=#F1266F guibg=fg
-    " hi MBEVisibleChanged guifg=#F1266F guibg=fg
-    " hi MBEVisibleNormal guifg=#5DC2D6 guibg=fg
-    " hi MBEChanged guifg=#CD5907 guibg=fg
-    " hi MBENormal guifg=#808080 guibg=fg
+    " hi MBENormal               guifg=#808080 guibg=fg
+    " hi MBEChanged              guifg=#CD5907 guibg=fg
+    " hi MBEVisibleNormal        guifg=#5DC2D6 guibg=fg
+    " hi MBEVisibleChanged       guifg=#F1266F guibg=fg
+    " hi MBEVisibleActiveNormal  guifg=#A6DB29 guibg=fg
+    " hi MBEVisibleActiveChanged guifg=#F1266F guibg=fg
 
     if !exists("g:did_minibufexplorer_syntax_inits")
       let g:did_minibufexplorer_syntax_inits = 1
       hi def link MBENormal                Comment
       hi def link MBEChanged               String
       hi def link MBEVisibleNormal         Special
-      hi def link MBEVisibleActive         Boolean
       hi def link MBEVisibleChanged        Special
-      hi def link MBEVisibleChangedActive  Error
+      hi def link MBEVisibleActiveNormal   Underlined
+      hi def link MBEVisibleActiveChanged  Error
     endif
   endif
 
   " If you press return, o or e in the -MiniBufExplorer- then try
   " to open the selected buffer in the previous window.
-  nnoremap <buffer> <CR> :call <SID>MBESelectBuffer(0)<CR>:<BS>
-  nnoremap <buffer> o :call <SID>MBESelectBuffer(0)<CR>:<BS>
-  nnoremap <buffer> e :call <SID>MBESelectBuffer(0)<CR>:<BS>
+  nnoremap <buffer> o       :call <SID>MBESelectBuffer(0)<CR>:<BS>
+  nnoremap <buffer> e       :call <SID>MBESelectBuffer(0)<CR>:<BS>
+  nnoremap <buffer> <CR>    :call <SID>MBESelectBuffer(0)<CR>:<BS>
   " If you press s in the -MiniBufExplorer- then try
   " to open the selected buffer in a split in the previous window.
-  nnoremap <buffer> s :call <SID>MBESelectBuffer(1)<CR>:<BS>
+  nnoremap <buffer> s       :call <SID>MBESelectBuffer(1)<CR>:<BS>
   " If you press j in the -MiniBufExplorer- then try
   " to open the selected buffer in a vertical split in the previous window.
-  nnoremap <buffer> v :call <SID>MBESelectBuffer(2)<CR>:<BS>
-  " If you DoubleClick in the -MiniBufExplorer- then try
-  " to open the selected buffer in the previous window.
-  nnoremap <buffer> <2-LEFTMOUSE> :call <SID>MBEDoubleClick()<CR>:<BS>
+  nnoremap <buffer> v       :call <SID>MBESelectBuffer(2)<CR>:<BS>
   " If you press d in the -MiniBufExplorer- then try to
   " delete the selected buffer.
-  nnoremap <buffer> d :call <SID>MBEDeleteBuffer(bufname("#"))<CR>:<BS>
-  " If you press w in the -MiniBufExplorer- then switch back
-  " to the previous window.
-  nnoremap <buffer> p :wincmd p<CR>:<BS>
+  nnoremap <buffer> d       :call <SID>MBEDeleteBuffer()<CR>:<BS>
   " The following allow us to use regular movement keys to
   " scroll in a wrapped single line buffer
-  nnoremap <buffer> j gj
-  nnoremap <buffer> k gk
-  nnoremap <buffer> <down> gj
-  nnoremap <buffer> <up> gk
+  nnoremap <buffer> k       gk
+  nnoremap <buffer> j       gj
+  nnoremap <buffer> <up>    gk
+  nnoremap <buffer> <down>  gj
   " The following allows for quicker moving between buffer
   " names in the [MBE] window it also saves the last-pattern
   " and restores it.
-  nnoremap <buffer> <TAB>   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
-  nnoremap <buffer> <S-TAB> :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
-  nnoremap <buffer> l   :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
-  nnoremap <buffer> h :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  nnoremap <buffer> l       :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+  nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  nnoremap <buffer> <right> :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+  nnoremap <buffer> <left>  :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
 
-  call <SID>DisplayBuffers(a:delBufNum,a:curBufNum)
+  " Attempt to perform single click mapping
+  " It would be much nicer if we could 'nnoremap <buffer> ...', however
+  " vim does not fire the '<buffer> <leftmouse>' when you use the mouse
+  " to enter a buffer.
+  if g:miniBufExplUseSingleClick == 1
+    let l:mapcmd = ':nnoremap <silent> <LEFTMOUSE> <LEFTMOUSE>'
+    let l:clickcmd = ':if bufname("%") == "-MiniBufExplorer-" <bar> call <SID>MBESelectBuffer(0) <bar> endif <CR>'
+    " no mapping for leftmouse
+    if maparg('<LEFTMOUSE>', 'n') == ''
+      exec l:mapcmd . l:clickcmd
+    " we have a mapping
+    else
+      let  l:mapcmd = l:mapcmd . substitute(substitute(maparg('<LEFTMOUSE>', 'n'), '|', '<bar>', 'g'), '\c^<LEFTMOUSE>', '', '')
+      let  l:mapcmd = l:mapcmd . l:clickcmd
+      exec l:mapcmd
+    endif
+  " If you DoubleClick in the MBE window then try to open the selected
+  " buffer in the previous window.
+  else
+    nnoremap <buffer> <2-LEFTMOUSE> :call <SID>MBESelectBuffer(0)<CR>:<BS>
+  endif
 
-  wincmd p
+  call <SID>BuildBufferList(a:curBufNum)
+
+  call <SID>DisplayBuffers(a:curBufNum)
+
+  " Switch away from MBE allowing autocmd to run which will
+  " trigger PowerLine's BufLeave event handler
+  call s:SwitchWindow('p',0)
+
+  " Now we are in the previous window, let's enter
+  " the window current window, this will preserve
+  " one-level backwards window movement history.
+  call s:SwitchWindow('w',1,l:currWin)
 
   call <SID>DEBUG('Leaving StartExplorer()',10)
 endfunction
@@ -599,42 +692,83 @@ endfunction
 " }}}
 " StopExplorer - Looks for our explorer and closes the window if it is open {{{
 "
-function! <SID>StopExplorer()
+function! <SID>StopExplorer(force)
   call <SID>DEBUG('Entering StopExplorer()',10)
 
-  let s:miniBufExplAutoUpdate = 0
+  if a:force || <SID>HasEligibleBuffers()
+    let t:miniBufExplAutoUpdate = 0
+  endif
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-  if l:winNum != -1
-    exec l:winNum.' wincmd w'
-    silent! close
-    wincmd p
+  if l:winNum == -1
+    call <SID>DEBUG('There is no MBE window, aborting...',1)
+    call <SID>DEBUG('Leaving StopExplorer()',10)
+    return
+  endif
 
-    " Work around a redraw bug in gVim (Confirmed present in 7.3.50)
-    if has('gui_gtk') && has('gui_running')
-        redraw!
-    endif
+  call s:SwitchWindow('w',1,l:winNum)
+  silent! close
+  call s:SwitchWindow('p',1)
+
+  " Work around a redraw bug in gVim (Confirmed present in 7.3.50)
+  if has('gui_gtk') && has('gui_running')
+      redraw!
   endif
 
   call <SID>DEBUG('Leaving StopExplorer()',10)
 endfunction
 
 " }}}
-" ToggleExplorer - Looks for our explorer and opens/closes the window {{{
+" FocusExplorer {{{
 "
-function! <SID>ToggleExplorer()
-  call <SID>DEBUG('Entering ToggleExplorer()',10)
+function! <SID>FocusExplorer()
+  call <SID>DEBUG('Entering FocusExplorer()',10)
 
-  let s:skipEligibleBuffersCheck = 1
+  let t:miniBufExplAutoUpdate = 1
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-  if l:winNum != -1
-    call <SID>StopExplorer()
+  if l:winNum == -1
+    call <SID>DEBUG('There is no MBE window, aborting...',1)
+    call <SID>DEBUG('Leaving FocusExplorer()',10)
+    return
+  endif
+
+  call s:SwitchWindow('w',0,l:winNum)
+
+  call <SID>DEBUG('Leaving FocusExplorer()',10)
+endfunction
+
+" }}}
+" ToggleExplorer - Looks for our explorer and opens/closes the window {{{
+"
+" a:tabs, 0 no, 1 yes
+"   toggle MBE in all tabs
+" a:force, 0 no, 1 yes
+"   reopen MBE when it is already open
+"   close MBE with auto-updating disabled
+"
+function! <SID>ToggleExplorer(tabs,force)
+  call <SID>DEBUG('Entering ToggleExplorer()',10)
+
+  if a:tabs
+    if s:TabsMBEState
+      tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer(a:force)
+    else
+      tabdo let t:skipEligibleBuffersCheck = 1 | if a:force | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
+    endif
+    let s:TabsMBEState = !s:TabsMBEState
   else
-    call <SID>StartExplorer(-1, bufnr("%"))
-    wincmd p
+    let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
+
+    if l:winNum != -1
+      let t:skipEligibleBuffersCheck = 0
+      call <SID>StopExplorer(a:force)
+    else
+      let t:skipEligibleBuffersCheck = 1
+      call <SID>StartExplorer(bufnr("%"))
+    endif
   endif
 
   call <SID>DEBUG('Leaving ToggleExplorer()',10)
@@ -643,10 +777,16 @@ endfunction
 " }}}
 " UpdateExplorer {{{
 "
-function! <SID>UpdateExplorer(delBufNum,curBufNum)
-  call <SID>DEBUG('Entering UpdateExplorer('.a:delBufNum.','.a:curBufNum.')',10)
+function! <SID>UpdateExplorer(curBufNum)
+  call <SID>DEBUG('Entering UpdateExplorer('.a:curBufNum.')',10)
 
   call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
+
+  if !<SID>BuildBufferList(a:curBufNum)
+    call <SID>DEBUG('Buffer List have not changed, aborting...',10)
+    call <SID>DEBUG('Leaving UpdateExplorer()',10)
+    return
+  endif
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
@@ -658,13 +798,30 @@ function! <SID>UpdateExplorer(delBufNum,curBufNum)
 
   if l:winNum != winnr()
     let l:winChanged = 1
-    exec l:winNum.' wincmd w'
+
+    " Save current window number and switch to previous
+    " window before entering MBE window so that the later
+    " `wincmd p` command will get into this window, then
+    " we can preserve a one level window movement history.
+    let l:currWin = winnr()
+    call s:SwitchWindow('p',1)
+
+    " Switch into MBE allowing autocmd to run will
+    " make the syntax highlight in MBE window working
+    call s:SwitchWindow('w',0,l:winNum)
   endif
 
-  call <SID>DisplayBuffers(a:delBufNum,a:curBufNum)
+  call <SID>DisplayBuffers(a:curBufNum)
 
   if exists('l:winChanged')
-    wincmd p
+    " Switch away from MBE allowing autocmd to run which will
+    " trigger PowerLine's BufLeave event handler
+    call s:SwitchWindow('p',0)
+
+    " Now we are in the previous window, let's enter
+    " the window current window, this will preserve
+    " one-level backwards window movement history.
+    call s:SwitchWindow('w',1,l:currWin)
   endif
 
   call <SID>DEBUG('Leaving UpdateExplorer()',10)
@@ -719,6 +876,15 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
     call <SID>DEBUG('Entering CreateWindow('.a:bufName.','.a:vSplit.','.a:brSplit.','.a:forceEdge.','.a:isPluginWindow.','.a:doDebug.')',10)
   endif
 
+  " Window number will change after creating a new window,
+  " we need to save both current and previous window number
+  " so that we can canculate theire correct window number
+  " after the new window creating.
+  let l:currWin = winnr()
+  call s:SwitchWindow('p',1)
+  let l:prevWin = winnr()
+  call s:SwitchWindow('p',1)
+
   " Save the user's split setting.
   let l:saveSplitBelow = &splitbelow
   let l:saveSplitRight = &splitright
@@ -740,22 +906,22 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
 
     if l:edge
       if a:vSplit == 0
-        silent exec 'bo '.l:spCmd.' '.a:bufName
+        silent exec 'noautocmd bo '.l:spCmd.' '.a:bufName
       else
-        silent exec 'bo vert '.l:spCmd.' '.a:bufName
+        silent exec 'noautocmd bo vert '.l:spCmd.' '.a:bufName
       endif
     else
       if a:vSplit == 0
-        silent exec 'to '.l:spCmd.' '.a:bufName
+        silent exec 'noautocmd to '.l:spCmd.' '.a:bufName
       else
-        silent exec 'to vert '.l:spCmd.' '.a:bufName
+        silent exec 'noautocmd to vert '.l:spCmd.' '.a:bufName
       endif
     endif
   else
     if a:vSplit == 0
-      silent exec l:spCmd.' '.a:bufName
+      silent exec 'noautocmd '.l:spCmd.' '.a:bufName
     else
-      silent exec 'vert '.l:spCmd.' '.a:bufName
+      silent exec 'noautocmd vert '.l:spCmd.' '.a:bufName
     endif
   endif
 
@@ -772,8 +938,15 @@ function! <SID>CreateWindow(bufName, vSplit, brSplit, forceEdge, isPluginWindow,
     setlocal bufhidden=delete
   endif
 
-  " Return to the previous window.
-  wincmd p
+  " Canculate the correct window number, for those whose window
+  " number before the creating is greater than or equal to the
+  " number of the newly created window, their window number should
+  " increase by one.
+  let l:prevWin = l:prevWin >= winnr() ? l:prevWin + 1 : l:prevWin
+  let l:currWin = l:currWin >= winnr() ? l:currWin + 1 : l:currWin
+  " This will preserve one-level backwards window movement history.
+  call s:SwitchWindow('w',1,l:prevWin)
+  call s:SwitchWindow('w',1,l:currWin)
 
   if a:doDebug
     call <SID>DEBUG('Leaving CreateWindow()',10)
@@ -841,8 +1014,8 @@ endfunction
 " Makes sure we are in our explorer, then erases the current buffer and turns
 " it into a mini buffer explorer window.
 "
-function! <SID>DisplayBuffers(delBufNum,curBufNum)
-  call <SID>DEBUG('Entering DisplayExplorer('.a:delBufNum.','.a:curBufNum.')',10)
+function! <SID>DisplayBuffers(curBufNum)
+  call <SID>DEBUG('Entering DisplayExplorer('.a:curBufNum.')',10)
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
@@ -850,9 +1023,11 @@ function! <SID>DisplayBuffers(delBufNum,curBufNum)
     return
   endif
 
-  call <SID>ShowBuffers(a:delBufNum,a:curBufNum)
+  call <SID>ShowBuffers()
   call <SID>ResizeWindow()
-  call <SID>FocusCurrentBuffer(a:curBufNum)
+
+  " Place cursor at current buffer in MBE
+  call search('\V['.a:curBufNum.':'.expand('#'.a:curBufNum.':t').']', 'w')
 
   call <SID>DEBUG('Leaving DisplayExplorer()',10)
 endfunction
@@ -897,12 +1072,18 @@ function! <SID>ResizeWindow()
         endif
       endif
     else
+      " We need to be able to modify the buffer
+      setlocal modifiable
+
       exec "setlocal textwidth=".l:width
       normal gg
       normal gq}
       normal G
       let l:height = line('.')
       normal gg
+
+      " Prevent the buffer from being modified.
+      setlocal nomodifiable
     endif
 
     " enforce max window height
@@ -919,7 +1100,20 @@ function! <SID>ResizeWindow()
 
     call <SID>DEBUG('ResizeWindow to '.l:height.' lines',9)
 
-    exec 'resize '.l:height
+    if &winminheight > l:height
+        let l:saved_winminheight = &winminheight
+        let &winminheight = 1
+        exec 'resize '.l:height
+        let &winminheight = l:saved_winminheight
+    else
+        exec 'resize '.l:height
+    endif
+
+    let saved_ead = &ead
+    let &ead = 'ver'
+    set equalalways
+    let &ead = saved_ead
+    set noequalalways
 
   " Vertical Resize
   else
@@ -941,6 +1135,12 @@ function! <SID>ResizeWindow()
       exec 'vertical resize '.l:newWidth
     endif
 
+    let saved_ead = &ead
+    let &ead = 'hor'
+    set equalalways
+    let &ead = saved_ead
+    set noequalalways
+
   endif
 
   normal! zz
@@ -958,8 +1158,8 @@ endfunction
 " buffers to the current buffer. Special marks are added for buffers that
 " are in one or more windows (*) and buffers that have been modified (+)
 "
-function! <SID>ShowBuffers(delBufNum,curBufNum)
-  call <SID>DEBUG('Entering ShowExplorer('.a:delBufNum.','.a:curBufNum.')',10)
+function! <SID>ShowBuffers()
+  call <SID>DEBUG('Entering ShowExplorer()',10)
 
   " Make sure we are in our window
   if bufname('%') != '-MiniBufExplorer-'
@@ -968,89 +1168,230 @@ function! <SID>ShowBuffers(delBufNum,curBufNum)
     return
   endif
 
-  let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 1, a:curBufNum)
+  let l:save_rep = &report
+  let l:save_sc = &showcmd
+  let &report = 10000
+  set noshowcmd
 
-  if (l:ListChanged == 1 || g:miniBufExplForceDisplay)
-    let l:save_rep = &report
-    let l:save_sc = &showcmd
-    let &report = 10000
-    set noshowcmd
+  " We need to be able to modify the buffer
+  setlocal modifiable
 
-    " We need to be able to modify the buffer
-    setlocal modifiable
+  " Delete all lines in buffer.
+  silent 1,$d _
 
-    " Delete all lines in buffer.
-    silent 1,$d _
+  " Goto the end of the buffer put the buffer list
+  " and then delete the extra trailing blank line
+  $
+  put! =s:miniBufExplBufList
+  silent $ d _
 
-    " Goto the end of the buffer put the buffer list
-    " and then delete the extra trailing blank line
-    $
-    put! =g:miniBufExplBufList
-    silent $ d _
+  " Prevent the buffer from being modified.
+  setlocal nomodifiable
 
-    " Prevent the buffer from being modified.
-    setlocal nomodifiable
-
-    let g:miniBufExplForceDisplay = 0
-
-    let &report  = l:save_rep
-    let &showcmd = l:save_sc
-  else
-    call <SID>DEBUG('Buffer list not update since there was no change',9)
-  endif
+  let &report  = l:save_rep
+  let &showcmd = l:save_sc
 
   call <SID>DEBUG('Leaving ShowBuffers()',10)
 endfunction
 
 " }}}
-" FocusCurrentBuffer {{{
-function! <SID>FocusCurrentBuffer(bufnr)
-  " Make sure we are in our window
-  if bufname('%') != '-MiniBufExplorer-'
-    call <SID>DEBUG('FocuCurrentBuffer called in invalid window',1)
+" CycleBuffer - Cycle Through Buffers {{{
+"
+" Move to next or previous buffer in the current window. If there
+" are no more modifiable buffers then stay on the current buffer.
+" can be called with no parameters in which case the buffers are
+" cycled forward. Otherwise a single argument is accepted, if
+" it's 0 then the buffers are cycled backwards, otherwise they
+" are cycled forward.
+"
+function! <SID>CycleBuffer(forward,...)
+  if <SID>IsBufferIgnored(bufnr('%')) == 1
     return
   endif
 
-  if (a:bufnr != -1)
-    let l:bufname = expand('#'.a:bufnr.':t')
-    call search('\V['.a:bufnr.':'.l:bufname.']', 'w')
+  let curBufNum = bufnr('%')
+
+  if exists('a:1') && a:1 == 1
+    call <SID>DEBUG('MRUList is '.string(s:MRUList),1)
+    let curBufIndex = index(s:MRUList, l:curBufNum)
+    call <SID>DEBUG('curBufIndex is '.l:curBufIndex,1)
+    let forBufIndex = l:curBufIndex - 1 < 0 ? len(s:MRUList) - 1 : l:curBufIndex - 1
+    call <SID>DEBUG('forBufIndex is '.l:forBufIndex,1)
+    let bacBufIndex = l:curBufIndex + 1 >= len(s:MRUList) ? 0 : l:curBufIndex + 1
+    call <SID>DEBUG('bacBufIndex is '.l:bacBufIndex,1)
+
+    if a:forward
+      let l:moveCmd = 'b! '.s:MRUList[l:forBufIndex]
+    else
+      let l:moveCmd = 'b! '.s:MRUList[l:bacBufIndex]
+    endif
+
+    let s:MRUEnable = 0
   else
-    call <SID>DEBUG('No current buffer to search for',9)
+    call <SID>DEBUG('BufList is '.string(s:BufList),1)
+    let curBufIndex = index(s:BufList, l:curBufNum)
+    call <SID>DEBUG('curBufIndex is '.l:curBufIndex,1)
+    let forBufIndex = l:curBufIndex + 1 >= len(s:BufList) ? 0 : l:curBufIndex + 1
+    call <SID>DEBUG('forBufIndex is '.l:forBufIndex,1)
+    let bacBufIndex = l:curBufIndex - 1 < 0 ? len(s:BufList) - 1 : l:curBufIndex - 1
+    call <SID>DEBUG('bacBufIndex is '.l:bacBufIndex,1)
+
+    if a:forward
+      let l:moveCmd = 'b! '.s:BufList[l:forBufIndex]
+    else
+      let l:moveCmd = 'b! '.s:BufList[l:bacBufIndex]
+    endif
+
+    let s:MRUEnable = 1
   endif
+
+  call <SID>DEBUG('===============move cmd is '.l:moveCmd,1)
+
+  " Change buffer (keeping track of before and after buffers)
+  exec l:moveCmd
+
+  let s:MRUEnable = 1
 endfunction
 
 " }}}
-" Max - Returns the max of two numbers {{{
+" DeleteBuffer {{{
 "
-function! <SID>Max(argOne, argTwo)
-  if a:argOne > a:argTwo
-    return a:argOne
+" Delete/Unload/Wipeout a buffer but preserve the window it was in
+"
+" a:action 0 bd, 1 bw, 2 bun
+"   delete/wipeout/unload a buffer
+" a:bufNum
+"   number of the buffer to be deleted
+"
+function! <SID>DeleteBuffer(action,bang,...)
+  call <SID>DEBUG('Entering DeleteBuffer('.a:action.','.a:bang.')',10)
+
+  if a:0 == 0
+    call <SID>DEBUG('No buffer is given, use current buffer',5)
+    let l:bufNums = [ bufnr('%') ]
   else
-    return a:argTwo
+    call <SID>DEBUG('Given buffers are '.string(a:000),5)
+    let l:bufNums = map(copy(a:000),'v:val =~ ''\d\+'' ? bufnr(v:val + 0) : bufnr(v:val)')
   endif
+
+  call <SID>DEBUG('Buffers to be deleted are '.string(l:bufNums),5)
+
+  for l:bufNum in l:bufNums
+    if <SID>IsBufferIgnored(l:bufNum)
+      call <SID>DEBUG('Buffer '.l:bufNum.'is not a normal buffer, skip it',5)
+      continue
+    endif
+
+    let l:bufName = bufname(l:bufNum)
+    call <SID>DEBUG('Buffer to be deleted is <'.l:bufName.'>['.l:bufNum.']',5)
+
+    " Don't want auto updates while we are processing a delete
+    " request.
+    let l:saveAutoUpdate = t:miniBufExplAutoUpdate
+    let t:miniBufExplAutoUpdate = 0
+
+    " Get the currently active buffer, so we can update the MBE
+    " correctly. If that is the buffer to be deleted, then get
+    " the window for that buffer, so we can find which buffer
+    " is in that window after the detaching.
+    let l:actBuf = <SID>GetActiveBuffer()
+    if l:actBuf == l:bufNum
+      let l:actBufWin = bufwinnr(l:actBuf)
+    endif
+
+    " Detach the buffer from all the windows that holding it
+    " in every tab page.
+    tabdo call <SID>DetachBuffer(l:bufNum)
+
+    " Find which buffer is in the active window now
+    if l:actBuf == l:bufNum
+      let l:actBuf = winbufnr(l:actBufWin)
+    endif
+
+    " Delete the buffer selected.
+    call <SID>DEBUG('About to delete buffer: '.l:bufNum,5)
+
+    if a:action == 2
+      let l:cmd = 'bun'
+    elseif a:action == 1
+      let l:cmd = 'bw'
+    else
+      let l:cmd = 'bd'
+    endif
+
+    if a:bang
+      let l:cmd = l:cmd.'!'
+    endif
+
+    let l:cmd = 'silent! '.l:cmd.' '.l:bufNum
+    call <SID>DEBUG('About to execute the command "'.l:cmd.'"',5)
+
+    exec l:cmd
+
+    let t:miniBufExplAutoUpdate = l:saveAutoUpdate
+
+    call <SID>UpdateExplorer(l:actBuf)
+  endfor
+
+  call <SID>DEBUG('Leaving DeleteBuffer()',10)
 endfunction
 
 " }}}
-" IgnoreBuffer - check to see if buffer should be ignored {{{
+" DetachBuffer {{{
+"
+" Detach a buffer from all the windows in which it is displayed.
+"
+function! <SID>DetachBuffer(bufNum)
+  call <SID>DEBUG('Entering DetachBuffer('.a:bufNum.')',10)
+
+  call <SID>DEBUG('We are currently in tab page '.tabpagenr(),10)
+
+  let l:bufNum = a:bufNum + 0
+
+  let l:winNum = bufwinnr(l:bufNum)
+  " while we have windows that contain our buffer
+  while l:winNum != -1
+    call <SID>DEBUG('Buffer '.l:bufNum.' is being displayed in window: '.l:winNum,5)
+
+    " move to window that contains our selected buffer
+    call s:SwitchWindow('w',1,l:winNum)
+
+    call <SID>DEBUG('We are now in window: '.winnr(),5)
+
+    call <SID>DEBUG('Window contains buffer: '.bufnr('%').' which should be: '.l:bufNum,5)
+    let l:origBuf = bufnr('%')
+    call <SID>CycleBuffer(0,1)
+    let l:currBuf = bufnr('%')
+    call <SID>DEBUG('Window now contains buffer: '.bufnr('%').' which should not be: '.l:bufNum,5)
+
+    if l:origBuf == l:currBuf
+      " we wrapped so we are going to have to delete a buffer
+      " that is in an open window.
+      let l:winNum = -1
+    else
+      " see if we have anymore windows with our selected buffer
+      let l:winNum = bufwinnr(l:bufNum)
+    endif
+  endwhile
+
+  call <SID>DEBUG('Leaving DetachBuffer()',10)
+endfunction
+
+" }}}
+" IsBufferIgnored - check to see if buffer should be ignored {{{
 "
 " Returns 0 if this buffer should be displayed in the list, 1 otherwise.
 "
-function! <SID>IgnoreBuffer(buf)
-  " Skip temporary buffers with buftype set.
-  if empty(getbufvar(a:buf, "&buftype")) == 0
-    call <SID>DEBUG('Buffer '.a:buf.' is special, ignoring...',5)
-    return 1
-  endif
-
+function! <SID>IsBufferIgnored(buf)
   " Skip unlisted buffers.
   if buflisted(a:buf) == 0
     call <SID>DEBUG('Buffer '.a:buf.' is unlisted, ignoring...',5)
     return 1
   endif
 
-  " Only show modifiable buffers.
-  if getbufvar(a:buf, '&modifiable') != 1
-    call <SID>DEBUG('Buffer '.a:buf.' is unmodifiable, ignoring...',5)
+  " Skip non normal buffers.
+  if getbufvar(a:buf, "&buftype") != ''
+    call <SID>DEBUG('Buffer '.a:buf.' is not normal, ignoring...',5)
     return 1
   endif
 
@@ -1063,8 +1404,8 @@ endfunction
 " Creates the buffer list string and returns 1 if it is different than
 " last time this was called and 0 otherwise.
 "
-function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
-    call <SID>DEBUG('Entering BuildBufferList('.a:delBufNum.','.a:updateBufList.','.a:curBufNum.')',10)
+function! <SID>BuildBufferList(curBufNum)
+    call <SID>DEBUG('Entering BuildBufferList('.a:curBufNum.')',10)
 
     let l:CurBufNum = a:curBufNum
 
@@ -1075,28 +1416,7 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
     let l:maxTabWidth = 0
 
     " Loop through every buffer less than the total number of buffers.
-    let l:i = 0
-    while(l:i <= l:NBuffers)
-        let l:i = l:i + 1
-
-        " If we have a delBufNum and it is the current
-        " buffer then ignore the current buffer.
-        " Otherwise, continue.
-        if (a:delBufNum == l:i)
-            continue
-        endif
-
-        if (<SID>IgnoreBuffer(l:i))
-            continue
-        endif
-
-        if g:miniBufExplSortBy == "mru"
-            let l:mruIdx = index(s:MRUList, l:i)
-            if l:mruIdx == -1
-                call add(s:MRUList, l:i)
-            endif
-        endif
-
+    for l:i in s:BufList
         let l:BufName = expand( "#" . l:i . ":p:t")
 
         " Identify buffers with no name
@@ -1136,10 +1456,10 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
             let l:tab .= '!'
         endif
 
-        let l:maxTabWidth = <SID>Max(strlen(l:tab), l:maxTabWidth)
+        let l:maxTabWidth = strlen(l:tab) > l:maxTabWidth ? strlen(l:tab) : l:maxTabWidth
 
         call add(l:tabList, l:tab)
-    endwhile
+    endfor
 
     if g:miniBufExplSortBy == "name"
         call sort(l:tabList, "<SID>NameCmp")
@@ -1147,26 +1467,24 @@ function! <SID>BuildBufferList(delBufNum, updateBufList, curBufNum)
         call sort(l:tabList, "<SID>MRUCmp")
     endif
 
-    let l:fileNames = ''
+    let l:miniBufExplBufList = ''
     for l:tab in l:tabList
-        let l:fileNames = l:fileNames.l:tab
+        let l:miniBufExplBufList = l:miniBufExplBufList.l:tab
 
         " If horizontal and tab wrap is turned on we need to add spaces
         if g:miniBufExplVSplit == 0
             if g:miniBufExplTabWrap != 0
-                let l:fileNames = l:fileNames.' '
+                let l:miniBufExplBufList = l:miniBufExplBufList.' '
             endif
         " If not horizontal we need a newline
         else
-            let l:fileNames = l:fileNames . "\n"
+            let l:miniBufExplBufList = l:miniBufExplBufList . "\n"
         endif
     endfor
 
-    if (g:miniBufExplBufList != l:fileNames)
-        if (a:updateBufList)
-            let g:miniBufExplBufList = l:fileNames
-            let s:maxTabWidth = l:maxTabWidth
-        endif
+    if (s:miniBufExplBufList != l:miniBufExplBufList)
+        let s:maxTabWidth = l:maxTabWidth
+        let s:miniBufExplBufList = l:miniBufExplBufList
         call <SID>DEBUG('Leaving BuildBufferList()',10)
         return 1
     else
@@ -1185,18 +1503,18 @@ function! <SID>CreateBufferUniqName(bufNum)
     call <SID>DEBUG('Entering CreateBufferUniqName()',5)
 
     let l:bufNum = 0 + a:bufNum
-    let l:bufPath = expand( "#" . l:bufNum . ":p")
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
     let l:bufPathPrefix = ""
 
     if(!has_key(s:bufPathSignDict, l:bufNum))
-        call <SID>DEBUG(l:bufNum . 'is not in s:bufPathSignDict, which should not happen.',5)
+        call <SID>DEBUG(l:bufNum . ' is not in s:bufPathSignDict, aborting...',5)
         call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
         return l:bufName
     endif
 
     let l:signs = s:bufPathSignDict[l:bufNum]
     if(empty(l:signs))
+        call <SID>DEBUG('Signs for ' . l:bufNum . ' is empty, aborting...',5)
         call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
         return l:bufName
     endif
@@ -1231,16 +1549,30 @@ endfunction
 " }}}
 " UpdateBufferNameDict {{{
 "
-function! <SID>UpdateBufferNameDict(bufNum)
-    call <SID>DEBUG('Entering UpdateBufferNameDict('.a:bufNum.')',5)
+function! <SID>UpdateBufferNameDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferNameDict('.a:bufNum.','.a:deleted.')',5)
 
     let l:bufNum = 0 + a:bufNum
+
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
     " Skip buffers with no name, because we will use buffer name as key
     " for 's:bufNameDict' in which empty string is invalid. Also, it does
     " not make sense to check duplicate names for buffers with no name.
     if l:bufName == ''
+        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        return
+    endif
+
+    " Remove a deleted buffer from the buffer name dictionary
+    if a:deleted
+        if has_key(s:bufNameDict, l:bufName)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            let l:bufnrs = s:bufNameDict[l:bufName]
+            call filter(l:bufnrs, 'v:val != '.l:bufNum)
+            let s:bufNameDict[l:bufName] = l:bufnrs
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
         call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
         return
     endif
@@ -1258,8 +1590,8 @@ endfunction
 " }}}
 " UpdateBufferPathDict {{{
 "
-function! <SID>UpdateBufferPathDict(bufNum)
-    call <SID>DEBUG('Entering UpdateBufferPathDict('.a:bufNum.')',5)
+function! <SID>UpdateBufferPathDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferPathDict('.a:bufNum.','.a:deleted.')',5)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufPath = expand( "#" . l:bufNum . ":p:h")
@@ -1269,7 +1601,19 @@ function! <SID>UpdateBufferPathDict(bufNum)
     " we just want make sure entries in 's:bufPathDict' are synced
     " with 's:bufNameDict'.
     if l:bufName == ''
-        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        call <SID>DEBUG('Leaving UpdateBufferPathDict()',5)
+        return
+    endif
+
+    " Remove a deleted buffer from the buffer path dictionary
+    if a:deleted
+        if has_key(s:bufNameDict, l:bufName)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            let l:bufnrs = s:bufNameDict[l:bufName]
+            call filter(s:bufPathDict, 'v:key != '.l:bufNum)
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
+        call <SID>DEBUG('Leaving UpdateBufferPathDict()',5)
         return
     endif
 
@@ -1289,10 +1633,15 @@ endfunction
 " the path. We could then construct a string with these locaitons using as
 " less characters as possible.
 "
-function! <SID>BuildBufferPathSignDict(index,bufnrs)
-    call <SID>DEBUG('Entering BuildBufferPathSignDict() '.a:index,5)
+function! <SID>BuildBufferPathSignDict(bufnrs, ...)
+    if a:0 == 0
+        let index = 0
+    else
+        let index = a:1
+    endif
 
-    let index = a:index
+    call <SID>DEBUG('Entering BuildBufferPathSignDict() '.index,5)
+
     let bufnrs = a:bufnrs
 
     " Temporary dictionary to see if there is any different part
@@ -1310,7 +1659,7 @@ function! <SID>BuildBufferPathSignDict(index,bufnrs)
         endif
 
         " If some buffers' path does not have this index, we skip it
-        if empty(get(s:bufPathDict[bufnr],index))
+        if len(s:bufPathDict[bufnr]) < index
             continue
         endif
 
@@ -1319,6 +1668,10 @@ function! <SID>BuildBufferPathSignDict(index,bufnrs)
 
         " Get requested part of the path
         let part = get(s:bufPathDict[bufnr],index)
+
+        if empty(part)
+            let part = '--EMPTY--'
+        endif
 
         " Group the buffers using dictionary by this part
         if(!has_key(partDict, part))
@@ -1329,7 +1682,7 @@ function! <SID>BuildBufferPathSignDict(index,bufnrs)
 
     " All the paths have been walked to the end
     if !moreParts
-        call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.a:index,5)
+        call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.index,5)
         return
     endif
 
@@ -1345,30 +1698,50 @@ function! <SID>BuildBufferPathSignDict(index,bufnrs)
             call add(s:bufPathSignDict[bufnr],index)
         endfor
         " For all buffer subsets, increase the index by one, run again.
-        let index = index + 1
         for subset in subsets
-          " If we only have one buffer left in the subset, it means there are
-          " already enough signature index sufficient to identify the buffer
-          if len(subset) <= 1
-              continue
-          endif
-          call <SID>BuildBufferPathSignDict(index, subset)
+            " If we only have one buffer left in the subset, it means there are
+            " already enough signature index sufficient to identify the buffer
+            if len(subset) <= 1
+                continue
+            endif
+            call <SID>BuildBufferPathSignDict(subset, index + 1)
         endfor
     " If all the buffers are in the same subset, then this index is not a
     " signature index, increase the index by one, run again.
     else
-        let index = index + 1
-        call <SID>BuildBufferPathSignDict(index, bufnrs)
+        call <SID>BuildBufferPathSignDict(bufnrs, index + 1)
     endif
 
-    call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.a:index,5)
+    call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.index,5)
 endfunction
 
 " }}}
-" BuildBufferUniqNameDict {{{
+" UpdateBufferPathSignDict {{{
 "
-function! <SID>BuildBufferUniqNameDict(arg)
-    call <SID>DEBUG('Entering BuildBufferUniqNameDict()',5)
+function! <SID>UpdateBufferPathSignDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferPathSignDict()',5)
+
+    let l:bufNum = 0 + a:bufNum
+
+    " Remove a deleted buffer from the buffer path signature dictionary
+    if a:deleted
+        if has_key(s:bufPathSignDict, l:bufNum)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            call filter(s:bufPathSignDict, 'v:key != '.l:bufNum)
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
+        call <SID>DEBUG('Leaving UpdateBufferPathSignDict()',5)
+        return
+    endif
+
+    call <SID>DEBUG('Leaving UpdateBufferPathSignDict()',5)
+endfunction
+
+" }}}
+" BuildBufferFinalDict {{{
+"
+function! <SID>BuildBufferFinalDict(arg,deleted)
+    call <SID>DEBUG('Entering BuildBufferFinalDict()',5)
 
     if type(a:arg) == 3
         let l:bufnrs = a:arg
@@ -1377,18 +1750,37 @@ function! <SID>BuildBufferUniqNameDict(arg)
         let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
         if(!has_key(s:bufNameDict, l:bufName))
-            call <SID>DEBUG(l:bufName . 'is not in s:bufNameDict, which should not happen.',5)
-            call <SID>DEBUG('Leaving BuildBufferUniqNameDict()',5)
+            call <SID>DEBUG(l:bufName . ' is not in s:bufNameDict, aborting...',5)
+            call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
             return
         endif
 
         let l:bufnrs = s:bufNameDict[l:bufName]
+
+        " Remove a deleted buffer from the buffer unique name dictionary
+        if a:deleted
+            call <SID>UpdateBufferPathSignDict(l:bufNum, a:deleted)
+            call <SID>UpdateBufferUniqNameDict(l:bufNum, a:deleted)
+        endif
     endif
 
-    call <SID>BuildBufferPathSignDict(0,l:bufnrs)
+    call <SID>BuildBufferPathSignDict(l:bufnrs)
+
+    call <SID>BuildBufferUniqNameDict(l:bufnrs)
+
+    call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
+endfunction
+
+" }}}
+" BuildBufferUniqNameDict {{{
+"
+function! <SID>BuildBufferUniqNameDict(bufnrs)
+    call <SID>DEBUG('Entering BuildBufferUniqNameDict()',5)
+
+    let l:bufnrs = a:bufnrs
 
     for bufnr in l:bufnrs
-        call <SID>UpdateBufferUniqNameDict(bufnr)
+        call <SID>UpdateBufferUniqNameDict(bufnr,0)
     endfor
 
     call <SID>DEBUG('Leaving BuildBufferUniqNameDict()',5)
@@ -1397,10 +1789,21 @@ endfunction
 " }}}
 " UpdateBufferUniqNameDict {{{
 "
-function! <SID>UpdateBufferUniqNameDict(bufNum)
-    call <SID>DEBUG('Entering UpdateBufferUniqNameDict('.a:bufNum.')',5)
+function! <SID>UpdateBufferUniqNameDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferUniqNameDict('.a:bufNum.','.a:deleted.')',5)
 
     let l:bufNum = 0 + a:bufNum
+
+    " Remove a deleted buffer from the buffer path dictionary
+    if a:deleted
+        if has_key(s:bufUniqNameDict, l:bufNum)
+            call <SID>DEBUG('Found entry for deleted buffer '.l:bufNum,5)
+            call filter(s:bufUniqNameDict, 'v:key != '.l:bufNum)
+            call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
+        endif
+        call <SID>DEBUG('Leaving UpdateBufferUniqNameDict()',5)
+        return
+    endif
 
     call <SID>DEBUG('Creating buffer name for ' . l:bufNum,5)
     let l:bufUniqName = <SID>CreateBufferUniqName(l:bufNum)
@@ -1428,19 +1831,15 @@ function! <SID>BuildAllBufferDicts()
             continue
         endif
 
-        if (<SID>IgnoreBuffer(l:i))
-             let l:i = l:i + 1
-            continue
-        endif
-
-        call <SID>UpdateBufferNameDict(l:i)
-        call <SID>UpdateBufferPathDict(l:i)
+        call <SID>UpdateBufferNameDict(l:i,0)
+        call <SID>UpdateBufferPathDict(l:i,0)
+        call <SID>UpdateBufferStateDict(l:i,0)
 
         let l:i = l:i + 1
     endwhile
 
     for bufnrs in values(s:bufNameDict)
-        call <SID>BuildBufferUniqNameDict(bufnrs)
+        call <SID>BuildBufferFinalDict(bufnrs,0)
     endfor
 
     call <SID>DEBUG('Leaving BuildAllBuffersDicts()',5)
@@ -1449,19 +1848,41 @@ endfunction
 " }}}
 " UpdateAllBufferDicts {{{
 "
-function! <SID>UpdateAllBufferDicts(newBufNum)
-    call <SID>DEBUG('Entering UpdateAllBuffersDicts('.a:newBufNum.')',5)
+function! <SID>UpdateAllBufferDicts(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateAllBuffersDicts('.a:bufNum.','.a:deleted.')',5)
 
-    if (<SID>IgnoreBuffer(a:newBufNum))
-       call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
-       return
-    endif
+    call <SID>UpdateBufferNameDict(a:bufNum,a:deleted)
+    call <SID>UpdateBufferPathDict(a:bufNum,a:deleted)
+    call <SID>UpdateBufferStateDict(a:bufNum,a:deleted)
 
-    call <SID>UpdateBufferNameDict(a:newBufNum)
-    call <SID>UpdateBufferPathDict(a:newBufNum)
-    call <SID>BuildBufferUniqNameDict(a:newBufNum)
+    call <SID>BuildBufferFinalDict(a:bufNum,a:deleted)
 
     call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
+endfunction
+
+" }}}
+" UpdateBufferStateDict {{{
+function! <SID>UpdateBufferStateDict(bufNum,deleted)
+    call <SID>DEBUG('Entering UpdateBufferStateDict()',5)
+
+    let l:bufNum = 0 + a:bufNum
+
+    if a:deleted && has_key(s:bufStateDict, l:bufNum)
+        call filter(s:bufStateDict, 'v:key != '.l:bufNum)
+        call <SID>DEBUG('Leaving UpdateBufferStateDict()',5)
+        return
+    endif
+
+    if has_key(s:bufStateDict, l:bufNum)
+        if s:bufStateDict[l:bufNum] != getbufvar(a:bufNum, '&modified')
+            let s:bufStateDict[l:bufNum] = getbufvar(a:bufNum, '&modified')
+            call <SID>AutoUpdate(bufnr(a:bufNum),0)
+        endif
+    else
+        let s:bufStateDict[l:bufNum] = getbufvar(a:bufNum, '&modified')
+    endif
+
+    call <SID>DEBUG('Leaving UpdateBufferStateDict()',5)
 endfunction
 
 " }}}
@@ -1492,115 +1913,19 @@ endfunction
 " HasEligibleBuffers - Are there enough MBE eligible buffers to open the MBE window? {{{
 "
 " Returns 1 if there are any buffers that can be displayed in a
-" mini buffer explorer. Otherwise returns 0. If delBufNum is
-" any non -1 value then don't include that buffer in the list
-" of eligible buffers.
+" mini buffer explorer. Otherwise returns 0.
 "
-function! <SID>HasEligibleBuffers(delBufNum)
-  call <SID>DEBUG('Entering HasEligibleBuffers('.a:delBufNum.')',10)
+function! <SID>HasEligibleBuffers()
+  call <SID>DEBUG('Entering HasEligibleBuffers()',10)
 
-  if s:skipEligibleBuffersCheck == 1
-    call <SID>DEBUG('Leaving HasEligibleBuffers()',10)
-    return 1
-  endif
+  let l:found = len(s:BufList)
+  let l:needed = g:miniBufExplBuffersNeeded
 
-  let l:save_rep = &report
-  let l:save_sc = &showcmd
-  let &report = 10000
-  set noshowcmd
-
-  " Get the number of the last buffer.
-  let l:NBuffers = bufnr('$')
-
-   " No buffer found
-  let l:found = 0
-
-  if (g:miniBufExplorerMoreThanOne > 1)
-    call <SID>DEBUG('More Than One mode turned on',6)
-  endif
-  let l:needed = g:miniBufExplorerMoreThanOne
-
-  " Loop through every buffer less than the total number of buffers.
-  let l:i = 0
-  while(l:i <= l:NBuffers && l:found < l:needed)
-    let l:i = l:i + 1
-
-    " If we have a delBufNum and it is the current
-    " buffer then ignore the current buffer.
-    " Otherwise, continue.
-    if (a:delBufNum == -1 || l:i != a:delBufNum)
-      " Make sure the buffer in question is listed.
-      if (getbufvar(l:i, '&buflisted') == 1)
-        " Get the name of the buffer.
-        let l:BufName = bufname(l:i)
-        " Check to see if the buffer is a blank or not. If the buffer does have
-        " a name, process it.
-        if (strlen(l:BufName))
-          " Only show modifiable buffers (The idea is that we don't
-          " want to show Explorers)
-          if ((getbufvar(l:i, '&modifiable') == 1) && (BufName != '-MiniBufExplorer-'))
-
-              let l:found = l:found + 1
-
-          endif
-        endif
-      endif
-    endif
-  endwhile
-
-  let &report  = l:save_rep
-  let &showcmd = l:save_sc
-
-  call <SID>DEBUG('HasEligibleBuffers found '.l:found.' eligible buffers of '.l:needed.' needed',6)
+  call <SID>DEBUG('Eligible buffers are '.string(s:BufList),6)
+  call <SID>DEBUG('Found '.l:found.' eligible buffers of '.l:needed.' needed',6)
 
   call <SID>DEBUG('Leaving HasEligibleBuffers()',10)
   return (l:found >= l:needed)
-endfunction
-
-" }}}
-" Auto Update Check - Function called by auto commands to see if MBE needs to {{{
-" be updated
-" If current buffer's modified flag has changed THEN
-" call the auto update function. ELSE
-" Don't do anything
-" This is implemented to save resources so that MBE does not have to update
-" on every keypress to check if the buffer has been modified
-let g:modTrackingList = []
-function! <SID>AutoUpdateCheck(currBuf)
-    let l:bufAlreadyExists = 0
-    for item in g:modTrackingList
-        if (item[0] == a:currBuf)
-            let l:bufAlreadyExists = 1
-            if(getbufvar(a:currBuf, '&modified') != item[1])
-                call <SID>AutoUpdate(-1,bufnr(a:currBuf))
-                "update g:modTrackingList with new &mod flag state
-                "call <SID>DEBUG(getbufvar(a:currBuf, '&modified'),1)
-                let item[1] = getbufvar(a:currBuf, '&modified')
-            elseif(getbufvar(a:currBuf, '&modified') == item[1])
-                "do nothing
-            endif
-        endif
-    endfor
-    if (l:bufAlreadyExists == 0)
-        call add(g:modTrackingList, [a:currBuf,0])
-    endif
-    call <SID>DEBUG('Buffer List is '.join(g:modTrackingList),10)
-endfunction
-
-" }}}
-" Clean Mod Tracking List - Function called when a buffer is deleted to keep the {{{
-" list used to track modified buffers nice and small
-" On buffer delete, loop through g:modTrackingList and delete the item that
-" matches this buffer's number
-function! <SID>CleanModTrackingList(currBuf)
-    let l:trackingListPos = 0
-    for item in g:modTrackingList
-        if (item[0] == a:currBuf)
-            call <SID>DEBUG('Buffer index to be deleted is '.l:trackingListPos,10)
-            call remove(g:modTrackingList, l:trackingListPos)
-        endif
-        let l:trackingListPos = l:trackingListPos + 1
-    endfor
 endfunction
 
 " }}}
@@ -1618,100 +1943,114 @@ endfunction
 " buffer, in which case we will want to close
 " the MBE window.
 "
-function! <SID>AutoUpdate(delBufNum,curBufNum)
-  call <SID>DEBUG('Entering AutoUpdate('.a:delBufNum.','.a:curBufNum.')',10)
+function! <SID>AutoUpdate(curBufNum,force)
+  call <SID>DEBUG('Entering AutoUpdate('.a:curBufNum.')',10)
 
   call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
 
-  if (g:miniBufExplInAutoUpdate == 1)
+  if (s:miniBufExplInAutoUpdate == 1)
     call <SID>DEBUG('AutoUpdate recursion stopped',9)
     call <SID>DEBUG('Leaving AutoUpdate()',10)
     return
   else
-    let g:miniBufExplInAutoUpdate = 1
-  endif
-
-  " Quit MBE if no more mormal window left
-  if (bufname('%') == '-MiniBufExplorer-') && (<SID>NextNormalWindow() == -1)
-    call <SID>DEBUG('MBE is the last open window, quit it', 9)
-    quit
+    let s:miniBufExplInAutoUpdate = 1
   endif
 
   " Skip windows holding ignored buffer
-  if <SID>IgnoreBuffer(bufnr('%')) == 1
+  if !a:force && <SID>IsBufferIgnored(a:curBufNum) == 1
     call <SID>DEBUG('Leaving AutoUpdate()',10)
 
-    let g:miniBufExplInAutoUpdate = 0
+    let s:miniBufExplInAutoUpdate = 0
     return
   endif
 
-  call <SID>MRUPush(bufnr("%"))
-
-  if (a:delBufNum != -1)
-    call <SID>DEBUG('AutoUpdate will make sure that buffer '.a:delBufNum.' is not included in the buffer list.', 5)
-    call <SID>MRUPop(a:delBufNum)
+  if s:MRUEnable == 1
+    call <SID>ListPush(s:MRUList,a:curBufNum)
   endif
 
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
-  if s:miniBufExplAutoUpdate == 1
-    " Only show MiniBufExplorer if we have a real buffer
-    if ((g:miniBufExplorerMoreThanOne == 0) || (bufnr('%') != -1))
-      " if we don't have a window then create one
-      let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 0)
+  if t:miniBufExplAutoUpdate == 1
+    " if we don't have a window then create one
+    let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-      if <SID>HasEligibleBuffers(a:delBufNum) == 1
-        if (l:winnr == -1)
-          if g:miniBufExplorerAutoStart == 1
-            call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
-            call <SID>StartExplorer(a:delBufNum, bufname("%"))
-          else
-            call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
-            call <SID>DEBUG('Leaving AutoUpdate()',10)
-            let g:miniBufExplInAutoUpdate = 0
-            return
-          endif
+    if t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1
+      if (l:winnr == -1)
+        if g:miniBufExplAutoStart == 1
+          call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
+          call <SID>StartExplorer(a:curBufNum)
         else
-          " otherwise only update the window if the contents have
-          " changed
-          let l:ListChanged = <SID>BuildBufferList(a:delBufNum, 0, a:curBufNum)
-          if (l:ListChanged)
-            call <SID>DEBUG('Updating MiniBufExplorer...', 9)
-            call <SID>UpdateExplorer(a:delBufNum, a:curBufNum)
-          endif
-        endif
-      else
-        if (l:winnr == -1)
           call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
           call <SID>DEBUG('Leaving AutoUpdate()',10)
-          let g:miniBufExplInAutoUpdate = 0
+          let s:miniBufExplInAutoUpdate = 0
           return
-        else
-          call <SID>DEBUG('Failed in eligible check', 9)
-          call <SID>StopExplorer()
-          " we do not want to turn auto-updating off
-          let s:miniBufExplAutoUpdate = 1
         endif
+      else
+        call <SID>DEBUG('Updating MiniBufExplorer...', 9)
+        call <SID>UpdateExplorer(a:curBufNum)
       endif
-
-	    " VIM sometimes turns syntax highlighting off,
-	    " we can force it on, but this may cause weird
-	    " behavior so this is an optional hack to force
-	    " syntax back on when we enter a buffer
-	    if g:miniBufExplForceSyntaxEnable
-		    call <SID>DEBUG('Enable Syntax', 9)
-		    exec 'syntax enable'
-	    endif
     else
-      call <SID>DEBUG('No buffers loaded...',9)
+      if (l:winnr == -1)
+        call <SID>DEBUG('MiniBufExplorer was not running, aborting...', 9)
+        call <SID>DEBUG('Leaving AutoUpdate()',10)
+        let s:miniBufExplInAutoUpdate = 0
+        return
+      else
+        call <SID>DEBUG('Failed in eligible check', 9)
+        call <SID>StopExplorer(0)
+        " we do not want to turn auto-updating off
+        let t:miniBufExplAutoUpdate = 1
+      endif
     endif
+
+	  " VIM sometimes turns syntax highlighting off,
+	  " we can force it on, but this may cause weird
+	  " behavior so this is an optional hack to force
+	  " syntax back on when we enter a buffer
+	  if g:miniBufExplForceSyntaxEnable
+		  call <SID>DEBUG('Enable Syntax', 9)
+		  exec 'syntax enable'
+	  endif
   else
     call <SID>DEBUG('AutoUpdates are turned off, terminating',9)
   endif
 
   call <SID>DEBUG('Leaving AutoUpdate()',10)
 
-  let g:miniBufExplInAutoUpdate = 0
+  let s:miniBufExplInAutoUpdate = 0
+endfunction
+
+" }}}
+" QuitIfLastOpen {{{
+"
+function! <SID>QuitIfLastOpen() abort
+  " Quit MBE if no more mormal window left
+  if (bufname('%') == '-MiniBufExplorer-') && (<SID>NextNormalWindow() == -1)
+    call <SID>DEBUG('MBE is the last open window, quit it', 9)
+    if tabpagenr('$') == 1
+      " Before quitting Vim, delete the MBE buffer so that
+      " the '0 mark is correctly set to the previous buffer.
+      " Also disable autocmd on this command to avoid unnecessary
+      " autocmd nesting.
+      if winnr('$') == 1
+        noautocmd bdelete
+      endif
+      quit
+    else
+      close
+    endif
+  endif
+endfunction
+
+" }}}
+" GetActiveBuffer {{{
+"
+function! <SID>GetActiveBuffer()
+  call <SID>DEBUG('Entering GetActiveBuffer()',10)
+  let l:bufNum = substitute(s:miniBufExplBufList,'\[\([0-9]*\):[^\]]*\][^\!]*!', '\1', '') + 0
+  call <SID>DEBUG('Currently active buffer is '.l:bufNum,10)
+  call <SID>DEBUG('Leaving GetActiveBuffer()',10)
+  return l:bufNum
 endfunction
 
 " }}}
@@ -1730,6 +2069,11 @@ function! <SID>GetSelectedBuffer()
     return -1
   endif
 
+  let l:save_rep = &report
+  let l:save_sc  = &showcmd
+  let &report    = 10000
+  set noshowcmd
+
   let l:save_reg = @"
   let @" = ""
   normal ""yi[
@@ -1743,6 +2087,9 @@ function! <SID>GetSelectedBuffer()
     call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
     return -1
   endif
+
+  let &report  = l:save_rep
+  let &showcmd = l:save_sc
 endfunction
 
 " }}}
@@ -1763,25 +2110,23 @@ function! <SID>MBESelectBuffer(split)
     return
   endif
 
-  let l:save_rep = &report
-  let l:save_sc  = &showcmd
-  let &report    = 10000
-  set noshowcmd
-
   let l:bufnr  = <SID>GetSelectedBuffer()
-  let l:resize = 0
 
   if(l:bufnr != -1)             " If the buffer exists.
-    let l:saveAutoUpdate = s:miniBufExplAutoUpdate
-    let s:miniBufExplAutoUpdate = 0
+    let l:saveAutoUpdate = t:miniBufExplAutoUpdate
+    let t:miniBufExplAutoUpdate = 0
 
-    let l:winNum = <SID>NextNormalWindow()
-    if l:winNum != -1
-      exec l:winNum.'wincmd w'
-    else
-      call <SID>DEBUG('No elegible window avaliable',1)
-      call <SID>DEBUG('Leaving MBESelectBuffer()',10)
-      return
+    call s:SwitchWindow('p',1)
+
+    if <SID>IsBufferIgnored(bufnr('%'))
+      let l:winNum = <SID>NextNormalWindow()
+      if l:winNum != -1
+        call s:SwitchWindow('w',1,l:winNum)
+      else
+        call <SID>DEBUG('No elegible window avaliable',1)
+        call <SID>DEBUG('Leaving MBESelectBuffer()',10)
+        return
+      endif
     endif
 
     if a:split == 0
@@ -1792,20 +2137,13 @@ function! <SID>MBESelectBuffer(split)
 	    exec 'vertical sb! '.l:bufnr
     endif
 
-    if (l:resize)
-      resize
-    endif
+    let t:miniBufExplAutoUpdate = l:saveAutoUpdate
 
-    let s:miniBufExplAutoUpdate = l:saveAutoUpdate
-
-    call <SID>AutoUpdate(-1,bufnr("%"))
+    call <SID>AutoUpdate(bufnr("%"),0)
   endif
 
-  let &report  = l:save_rep
-  let &showcmd = l:save_sc
-
   if g:miniBufExplCloseOnSelect == 1
-    call <SID>StopExplorer()
+    call <SID>StopExplorer(0)
   endif
 
   call <SID>DEBUG('Leaving MBESelectBuffer()',10)
@@ -1819,7 +2157,7 @@ endfunction
 " window, this routine will attempt to get different buffers into the
 " windows that will be affected so that windows don't get removed.
 "
-function! <SID>MBEDeleteBuffer(prevBufName)
+function! <SID>MBEDeleteBuffer()
   call <SID>DEBUG('Entering MBEDeleteBuffer()',10)
 
   " Make sure we are in our window
@@ -1829,111 +2167,13 @@ function! <SID>MBEDeleteBuffer(prevBufName)
     return
   endif
 
-  let l:curLine    = line('.')
-  let l:curCol     = virtcol('.')
-  let l:selBuf     = <SID>GetSelectedBuffer()
-  let l:selBufName = bufname(l:selBuf)
-
-  if l:selBufName == 'MiniBufExplorer.DBG' && g:miniBufExplorerDebugLevel > 0
-    call <SID>DEBUG('MBEDeleteBuffer will not delete the debug window, when debugging is turned on.',1)
-    call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
-    return
-  endif
-
-  let l:save_rep = &report
-  let l:save_sc  = &showcmd
-  let &report    = 10000
-  set noshowcmd
-
+  let l:selBuf = <SID>GetSelectedBuffer()
 
   if l:selBuf != -1
-
-    " Don't want auto updates while we are processing a delete
-    " request.
-    let l:saveAutoUpdate = s:miniBufExplAutoUpdate
-    let s:miniBufExplAutoUpdate = 0
-
-    " Save previous window so that if we show a buffer after
-    " deleting. The show will come up in the correct window.
-    wincmd p
-    let l:prevWin    = winnr()
-    let l:prevWinBuf = winbufnr(winnr())
-
-    call <SID>DEBUG('Previous window: '.l:prevWin.' buffer in window: '.l:prevWinBuf,5)
-    call <SID>DEBUG('Selected buffer is <'.l:selBufName.'>['.l:selBuf.']',5)
-
-    " If buffer is being displayed in a window then
-    " move window to a different buffer before
-    " deleting this one.
-    let l:winNum = (bufwinnr(l:selBufName) + 0)
-    " while we have windows that contain our buffer
-    while l:winNum != -1
-        call <SID>DEBUG('Buffer '.l:selBuf.' is being displayed in window: '.l:winNum,5)
-
-        " move to window that contains our selected buffer
-        exec l:winNum.' wincmd w'
-
-        call <SID>DEBUG('We are now in window: '.winnr().' which contains buffer: '.bufnr('%').' and should contain buffer: '.l:selBuf,5)
-
-        let l:origBuf = bufnr('%')
-        call <SID>CycleBuffer(1)
-        let l:curBuf  = bufnr('%')
-
-        call <SID>DEBUG('Window now contains buffer: '.bufnr('%').' which should not be: '.l:selBuf,5)
-
-        if l:origBuf == l:curBuf
-            " we wrapped so we are going to have to delete a buffer
-            " that is in an open window.
-            let l:winNum = -1
-        else
-            " see if we have anymore windows with our selected buffer
-            let l:winNum = (bufwinnr(l:selBufName) + 0)
-        endif
-    endwhile
-
-    " Attempt to restore previous window
-    call <SID>DEBUG('Restoring previous window to: '.l:prevWin,5)
-    exec l:prevWin.' wincmd w'
-
-    " Try to get back to the -MiniBufExplorer- window
-    let l:winNum = bufwinnr(bufnr('-MiniBufExplorer-'))
-    if l:winNum != -1
-        exec l:winNum.' wincmd w'
-        call <SID>DEBUG('Got to -MiniBufExplorer- window: '.winnr(),5)
-    else
-        call <SID>DEBUG('Unable to get to -MiniBufExplorer- window',1)
-    endif
-
-    " Delete the buffer selected.
-    call <SID>DEBUG('About to delete buffer: '.l:selBuf,5)
-    exec 'silent! bd '.l:selBuf
-
-    let s:miniBufExplAutoUpdate = l:saveAutoUpdate
-    call <SID>DisplayBuffers(-1,a:prevBufName)
-    call cursor(l:curLine, l:curCol)
-
+    call <SID>DeleteBuffer(0,0,l:selBuf)
   endif
 
-  let &report  = l:save_rep
-  let &showcmd = l:save_sc
-
   call <SID>DEBUG('Leaving MBEDeleteBuffer()',10)
-endfunction
-
-" }}}
-" MBEClick - Handle mouse double click {{{
-"
-function! s:MBEClick()
-  call <SID>DEBUG('Entering MBEClick()',10)
-  call <SID>MBESelectBuffer(0)
-endfunction
-
-"
-" MBEDoubleClick - Double click with the mouse.
-"
-function! s:MBEDoubleClick()
-  call <SID>DEBUG('Entering MBEDoubleClick()',10)
-  call <SID>MBESelectBuffer(0)
 endfunction
 
 " }}}
@@ -1943,12 +2183,12 @@ function! <SID>NextNormalWindow()
   call <SID>DEBUG('Entering NextNormalWindow()',10)
 
   let l:winSum = winnr('$')
-  call <SID>DEBUG('Total number of open windows are'.l:winSum,9)
+  call <SID>DEBUG('Total number of open windows are '.l:winSum,9)
 
   let l:i = 1
   while(l:i <= l:winSum)
     call <SID>DEBUG('window: '.l:i.', buffer: ('.winbufnr(l:i).':'.bufname(winbufnr(l:i)).')',9)
-    if (!<SID>IgnoreBuffer(winbufnr(l:i)))
+    if !<SID>IsBufferIgnored(winbufnr(l:i)) && l:i != winnr()
         call <SID>DEBUG('Found window '.l:i,8)
         call <SID>DEBUG('Leaving NextNormalWindow()',10)
         return l:i
@@ -1962,74 +2202,34 @@ function! <SID>NextNormalWindow()
 endfunction
 
 " }}}
-" CycleBuffer - Cycle Through Buffers {{{
+" ListAdd {{{
 "
-" Move to next or previous buffer in the current window. If there
-" are no more modifiable buffers then stay on the current buffer.
-" can be called with no parameters in which case the buffers are
-" cycled forward. Otherwise a single argument is accepted, if
-" it's 0 then the buffers are cycled backwards, otherwise they
-" are cycled forward.
-"
-function! <SID>CycleBuffer(forward)
-  " If we are in the MBE window, switch to the next one, otherwise a new
-  " window will be created
-  if (bufname("%") == "-MiniBufExplorer-")
-    call <SID>DEBUG('Can not cycle buffer inside MBE window', 1)
-    return
-  endif
-
-  let l:saveAutoUpdate = s:miniBufExplAutoUpdate
-
-  let s:miniBufExplAutoUpdate = 0
-
-  " Change buffer (keeping track of before and after buffers)
-  let l:origBuf = bufnr('%')
-  if (a:forward == 1)
-    bn!
-  else
-    bp!
-  endif
-  let l:curBuf  = bufnr('%')
-
-  " Skip any non-modifiable buffers, but don't cycle forever
-  " This should stop us from stopping in any of the [Explorers]
-  while getbufvar(l:curBuf, '&modifiable') == 0 && l:origBuf != l:curBuf
-    if (a:forward == 1)
-      bn!
-    else
-      bp!
-    endif
-    let l:curBuf = bufnr('%')
-  endwhile
-
-  if g:miniBufExplForceSyntaxEnable
-    call <SID>DEBUG('Enable Syntax', 9)
-    exec 'syntax enable'
-  endif
-
-  if (l:saveAutoUpdate == 1)
-    call <SID>AutoUpdate(-1,bufnr("%"))
-  endif
-  let s:miniBufExplAutoUpdate = l:saveAutoUpdate
+function! <SID>ListAdd(list,val)
+  call <SID>DEBUG('Entering ListAdd('.string(a:list).','.a:val.')',10)
+  call add(a:list, a:val)
+  call <SID>DEBUG('Leaving ListAdd()',10)
 endfunction
 
 " }}}
-" MRUPop - remove buffer from MRU list {{{
+" ListPop {{{
 "
-function! <SID>MRUPop(buf)
-  call filter(s:MRUList, 'v:val != '.a:buf)
+function! <SID>ListPop(list,val)
+  call <SID>DEBUG('Entering ListPop('.string(a:list).','.a:val.')',10)
+  call filter(a:list, 'v:val != '.a:val)
+  call <SID>DEBUG('Leaving ListPop()',10)
 endfunction
 
 " }}}
-" MRUPush - add buffer to MRU list {{{
+" ListPush {{{
 "
-function! <SID>MRUPush(buf)
+function! <SID>ListPush(list,val)
+  call <SID>DEBUG('Entering ListPush('.string(a:list).','.a:val.')',10)
   " Remove the buffer number from the list if it already exists.
-  call <SID>MRUPop(a:buf)
+  call <SID>ListPop(a:list,a:val)
 
   " Add the buffer number to the head of the list.
-  call insert(s:MRUList,a:buf)
+  call insert(a:list,a:val)
+  call <SID>DEBUG('Leaving ListPush()',10)
 endfunction
 
 " }}}
@@ -2039,8 +2239,15 @@ endfunction
 " for Decho.vim which was the inspiration for this enhanced debugging
 " capability.
 "
+let g:miniBufExplFuncCallDepth = 0
 function! <SID>DEBUG(msg, level)
-  if g:miniBufExplorerDebugLevel >= a:level
+  if g:miniBufExplDebugLevel >= a:level
+
+    if a:level == 10 && a:msg =~ '^Entering'
+      let g:miniBufExplFuncCallDepth += 1
+    endif
+
+    let l:msg = repeat('| ',g:miniBufExplFuncCallDepth).a:msg
 
     " Prevent a report of our actions from showing up.
     let l:save_rep    = &report
@@ -2049,7 +2256,7 @@ function! <SID>DEBUG(msg, level)
     set noshowcmd
 
     " Debug output to a buffer
-    if g:miniBufExplorerDebugMode == 0
+    if g:miniBufExplDebugMode == 0
         if bufname('%') == 'MiniBufExplorer.DBG'
             return
         endif
@@ -2058,7 +2265,7 @@ function! <SID>DEBUG(msg, level)
         let l:winNum = <SID>FindCreateWindow('MiniBufExplorer.DBG', 0, 1, 1, 1, 0)
 
         if l:winNum == -1
-          let g:miniBufExplorerDebugMode == 3
+          let g:miniBufExplDebugMode == 3
           call <SID>DEBUG('Failed to get the MBE debugging window, reset debugging mode to 3.',1)
           call <SID>DEBUG('Forwarding message...',1)
           call <SID>DEBUG(a:msg,1)
@@ -2068,18 +2275,17 @@ function! <SID>DEBUG(msg, level)
 
         " Save the current window number so we can come back here
         let l:currWin = winnr()
-        wincmd p
-        let l:prevWin = winnr()
+        call s:SwitchWindow('p',1)
 
         " Change to debug window
-        exec l:winNum wincmd w'
+        call s:SwitchWindow('w',1,l:winNum)
 
         " Make sure we really got to our window, if not we
         " will display a confirm dialog and turn debugging
         " off so that we won't break things even more.
         if bufname('%') != 'MiniBufExplorer.DBG'
             call confirm('Error in window debugging code. Dissabling MiniBufExplorer debugging.', 'OK')
-            let g:miniBufExplorerDebugLevel = 0
+            let g:miniBufExplDebugLevel = 0
             return
         endif
 
@@ -2093,14 +2299,14 @@ function! <SID>DEBUG(msg, level)
         norm G
 
         " Return to original window
-        exec l:prevWin.' wincmd w'
-        exec l:currWin.' wincmd w'
+        call s:SwitchWindow('p',1)
+        call s:SwitchWindow('w',1,l:currWin)
     " Debug output using VIM's echo facility
-    elseif g:miniBufExplorerDebugMode == 1
+    elseif g:miniBufExplDebugMode == 1
       echo s:debugIndex.':'.a:level.':'.a:msg
     " Debug output to a file -- VERY SLOW!!!
     " should be OK on UNIX and Win32 (not the 95/98 variants)
-    elseif g:miniBufExplorerDebugMode == 2
+    elseif g:miniBufExplDebugMode == 2
         if has('system') || has('fork')
             if has('win32') && !has('win95')
                 let l:result = system("cmd /c 'echo ".s:debugIndex.':'.a:level.':'.a:msg." >> MiniBufExplorer.DBG'")
@@ -2110,18 +2316,55 @@ function! <SID>DEBUG(msg, level)
             endif
         else
             call confirm('Error in file writing version of the debugging code, vim not compiled with system or fork. Dissabling MiniBufExplorer debugging.', 'OK')
-            let g:miniBufExplorerDebugLevel = 0
+            let g:miniBufExplDebugLevel = 0
         endif
-    elseif g:miniBufExplorerDebugMode == 3
-        let g:miniBufExplorerDebugOutput = g:miniBufExplorerDebugOutput."\n".s:debugIndex.':'.a:level.':'.a:msg
+    elseif g:miniBufExplDebugMode == 3
+        let g:miniBufExplDebugOutput = g:miniBufExplDebugOutput."\n".s:debugIndex."\t".':'.a:level."\t".':'.l:msg
     endif
 
     let s:debugIndex = s:debugIndex + 1
+
+    if a:level == 10 && a:msg =~ '^Leaving'
+      let g:miniBufExplFuncCallDepth -= 1
+    endif
 
     let &report  = l:save_rep
     let &showcmd = l:save_sc
   endif
 endfunc
+
+" }}}
+" SwitchWindow {{{
+"
+function! s:SwitchWindow(action, ...)
+  call <SID>DEBUG('Entering SwitchWindow('.a:action.','.string(a:000).')',10)
+
+  if a:action !~ '[hjkltbwWpP]'
+    call <SID>DEBUG('invalid window action : '.a:action,10)
+    call <SID>DEBUG('Leaving SwitchWindow()',10)
+    return
+  endif
+
+  if exists('a:1') && a:1 == 1
+    let l:aucmd = 'noautocmd '
+  else
+    let l:aucmd = ''
+  endif
+
+  if exists('a:2')
+    let l:winnr = a:2
+  else
+    let l:winnr = ''
+  endif
+
+  call <SID>DEBUG('previous window is: '.winnr(),10)
+  let l:wincmd = l:aucmd.l:winnr.'wincmd '.a:action
+  call <SID>DEBUG('window switching command is: '.l:wincmd,10)
+  exec l:wincmd
+  call <SID>DEBUG('current window is: '.winnr(),10)
+
+  call <SID>DEBUG('Leaving SwitchWindow()',10)
+endfunction
 
 " }}}
 
