@@ -52,7 +52,7 @@ if !exists(':MBEOpen')
   command! -bang MBEOpen      let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
 endif
 if !exists(':MBEOpenAll')
-  command! -bang MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
+  command! -bang MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%")) | let s:TabsMBEState = 1
 endif
 if !exists(':MBEFocus')
   command! MBEFocus           call <SID>FocusExplorer()
@@ -64,7 +64,7 @@ if !exists(':MBEClose')
   command! -bang MBEClose     let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
 endif
 if !exists(':MBECloseAll')
-  command! -bang MBECloseAll  tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
+  command! -bang MBECloseAll  tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!') | let s:TabsMBEState = 0
 endif
 if !exists(':MBEToggle')
   command! -bang MBEToggle    call <SID>ToggleExplorer(0,'<bang>'=='!')
@@ -424,6 +424,8 @@ function! <SID>VimEnterHandler()
   if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
         \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
     call <SID>StartExplorer(bufnr("%"))
+
+    " Let the MBE open in the new tab
     let s:TabsMBEState = 1
   endif
 
