@@ -1514,6 +1514,7 @@ function! <SID>CreateBufferUniqName(bufNum)
 
     let l:signs = s:bufPathSignDict[l:bufNum]
     if(empty(l:signs))
+        call <SID>DEBUG('Signs for ' . l:bufNum . ' is empty, aborting...',5)
         call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
         return l:bufName
     endif
