@@ -283,17 +283,6 @@ if !exists('g:miniBufExplCloseOnSelect')
 endif
 
 " }}}
-" Check for duplicate buffer names? {{{
-" Flag that can be set to 0 in a users .vimrc to turn off
-" the explorer's feature that differentiates similar buffer names by
-" displaying the parent directory names. This feature should be turned off
-" if you work with a large number of buffers (>15) simultaneously.
-"
-if !exists('g:miniBufExplCheckDupeBufs')
-  let g:miniBufExplCheckDupeBufs = 1
-endif
-
-" }}}
 " Status Line Text for MBE window {{{
 "
 if !exists('g:miniBufExplStatusLineText')
@@ -382,10 +371,10 @@ let s:bufPathSignDict = {}
 
 " Set a lower value to 'updatetime' for the CursorHold/CursorHoldI event, so
 " that the MBE could be updated in time. It can not be set too low, otherwise
-" might breaks many things, 1000ms should be a reasonable value.
+" might breaks many things, 1500ms should be a reasonable value.
 " We only change it if we are allowed to and it has not been changed yet.
 if g:miniBufExplSetUT && &ut == 4000
-  set updatetime=1000
+  set updatetime=1500
 endif
 
 augroup MiniBufExpl
@@ -399,6 +388,10 @@ augroup MiniBufExpl
     \ call <SID>DEBUG('==> Entering UpdateBufferStateDict AutoCmd', 10) |
     \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
     \ call <SID>DEBUG('<== Leaving UpdateBufferStateDict AutoCmd', 10)
+if exists('##QuitPre')
+  autocmd QuitPre        *
+    \ if <SID>NextNormalWindow() == -1 | call <SID>StopExplorer(0) | endif
+endif
 augroup END
 
 function! <SID>VimEnterHandler()
@@ -433,6 +426,7 @@ function! <SID>VimEnterHandler()
   if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
         \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
     call <SID>StartExplorer(bufnr("%"))
+    let s:TabsMBEState = 1
   endif
 
   call <SID>DEBUG('<== Leaving VimEnter Handler', 10)
@@ -442,7 +436,7 @@ function! <SID>TabEnterHandler()
   call <SID>DEBUG('==> Entering TabEnter Handler', 10)
 
   if !exists('t:miniBufExplAutoUpdate')
-    let t:miniBufExplAutoUpdate = 1
+    let t:miniBufExplAutoUpdate = s:TabsMBEState
   endif
 
   let t:skipEligibleBuffersCheck = 0
@@ -646,10 +640,17 @@ function! <SID>StartExplorer(curBufNum)
   " The following allows for quicker moving between buffer
   " names in the [MBE] window it also saves the last-pattern
   " and restores it.
-  nnoremap <buffer> l       :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
-  nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
-  nnoremap <buffer> <right> :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
-  nnoremap <buffer> <left>  :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  if !g:miniBufExplShowBufNumbers
+    nnoremap <buffer> l       :call search('\[[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> h       :call search('\[[^\]]*\]','b')<CR>:<BS>
+    nnoremap <buffer> <right> :call search('\[[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> <left>  :call search('\[[^\]]*\]','b')<CR>:<BS>
+  else
+    nnoremap <buffer> l       :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+    nnoremap <buffer> <right> :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> <left>  :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  endif
 
   " Attempt to perform single click mapping
   " It would be much nicer if we could 'nnoremap <buffer> ...', however
@@ -1027,7 +1028,13 @@ function! <SID>DisplayBuffers(curBufNum)
   call <SID>ResizeWindow()
 
   " Place cursor at current buffer in MBE
-  call search('\V['.a:curBufNum.':'.expand('#'.a:curBufNum.':t').']', 'w')
+  if !<SID>IsBufferIgnored(a:curBufNum)
+    if !g:miniBufExplShowBufNumbers
+      call search('\V['.s:bufUniqNameDict[a:curBufNum].']', 'w')
+    else
+      call search('\V['.a:curBufNum.':'.s:bufUniqNameDict[a:curBufNum].']', 'w')
+    endif
+  endif
 
   call <SID>DEBUG('Leaving DisplayExplorer()',10)
 endfunction
@@ -1425,15 +1432,8 @@ function! <SID>BuildBufferList(curBufNum)
         if g:miniBufExplShowBufNumbers == 1
             let l:tab .= l:i.':'
         endif
-
-        if (empty(s:bufUniqNameDict) || !has_key(s:bufUniqNameDict, l:i) || g:miniBufExplCheckDupeBufs == 0)
-            " Get filename & Remove []'s & ()'s
-            let l:shortBufName = fnamemodify(l:BufName, ":t")
-            let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g')
-            let l:tab .= l:shortBufName.']'
-        else
-            let l:tab .= s:bufUniqNameDict[l:i].']'
-        endif
+        let l:tab .= s:bufUniqNameDict[l:i]
+        let l:tab .= ']'
 
         " If the buffer is open in a window mark it
         if bufwinnr(l:i) != -1
@@ -1499,6 +1499,8 @@ function! <SID>CreateBufferUniqName(bufNum)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
+    " Remove []'s & ()'s, these chars are preserved for buffer name locating
+    let l:bufName = substitute(l:bufName, '[][()]', '', 'g')
 
     " Create a unique name for unamed buffer
     if empty(l:bufName)
@@ -1970,11 +1972,11 @@ function! <SID>AutoUpdate(curBufNum,force)
 
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
-  if t:miniBufExplAutoUpdate == 1
+  if exists('t:miniBufExplAutoUpdate') && t:miniBufExplAutoUpdate == 1
     " if we don't have a window then create one
     let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-    if t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1
+    if (exists('t:skipEligibleBuffersCheck') && t:skipEligibleBuffersCheck == 1) || <SID>HasEligibleBuffers() == 1
       if (l:winnr == -1)
         if g:miniBufExplAutoStart == 1
           call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
@@ -2078,7 +2080,15 @@ function! <SID>GetSelectedBuffer()
   let @" = ""
   normal ""yi[
   if @" != ""
-    let l:retv = substitute(@",'\([0-9]*\):.*', '\1', '') + 0
+    if !g:miniBufExplShowBufNumbers
+      " This is a bit ugly, but it works, unless we come up with a
+      " better way to get the key for a dictionary by its value.
+      let l:bufUniqNameDictKeys = keys(s:bufUniqNameDict)
+      let l:bufUniqNameDictValues = values(s:bufUniqNameDict)
+      let l:retv = l:bufUniqNameDictKeys[match(l:bufUniqNameDictValues,substitute(@",'[0-9]*:\(.*\)', '\1', ''))]
+    else
+      let l:retv = substitute(@",'\([0-9]*\):.*', '\1', '') + 0
+    endif
     let @" = l:save_reg
     call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
     return l:retv
