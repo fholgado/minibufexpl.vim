@@ -463,6 +463,9 @@ the following syntax:
 
   hi MBEChanged guibg=darkblue ctermbg=darkblue termbg=white
 
+If you have customized the above highlight groups, remember to set
+'g:did_minibufexplorer_syntax_inits = 1' so that MBE would not override
+your settings.
 
 NOTE: If you set a colorscheme in your .vimrc you should do it
       BEFORE updating the MBE highlighting groups.
