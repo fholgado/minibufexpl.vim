@@ -371,10 +371,10 @@ let s:bufPathSignDict = {}
 
 " Set a lower value to 'updatetime' for the CursorHold/CursorHoldI event, so
 " that the MBE could be updated in time. It can not be set too low, otherwise
-" might breaks many things, 1000ms should be a reasonable value.
+" might breaks many things, 1500ms should be a reasonable value.
 " We only change it if we are allowed to and it has not been changed yet.
 if g:miniBufExplSetUT && &ut == 4000
-  set updatetime=1000
+  set updatetime=1500
 endif
 
 augroup MiniBufExpl
