@@ -426,6 +426,7 @@ function! <SID>VimEnterHandler()
   if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
         \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
     call <SID>StartExplorer(bufnr("%"))
+    let s:TabsMBEState = 1
   endif
 
   call <SID>DEBUG('<== Leaving VimEnter Handler', 10)
@@ -435,7 +436,7 @@ function! <SID>TabEnterHandler()
   call <SID>DEBUG('==> Entering TabEnter Handler', 10)
 
   if !exists('t:miniBufExplAutoUpdate')
-    let t:miniBufExplAutoUpdate = 1
+    let t:miniBufExplAutoUpdate = s:TabsMBEState
   endif
 
   let t:skipEligibleBuffersCheck = 0
@@ -1971,11 +1972,11 @@ function! <SID>AutoUpdate(curBufNum,force)
 
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
-  if t:miniBufExplAutoUpdate == 1
+  if exists('t:miniBufExplAutoUpdate') && t:miniBufExplAutoUpdate == 1
     " if we don't have a window then create one
     let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-    if t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1
+    if (exists('t:skipEligibleBuffersCheck') && t:skipEligibleBuffersCheck == 1) || <SID>HasEligibleBuffers() == 1
       if (l:winnr == -1)
         if g:miniBufExplAutoStart == 1
           call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
