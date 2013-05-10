@@ -410,6 +410,18 @@ function! <SID>VimEnterHandler()
   let s:BufList = range(1, bufnr('$'))
   let s:MRUList = range(1, bufnr('$'))
 
+  for l:i in s:BufList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>ListPop(s:BufList,l:i)
+    endif
+  endfor
+
+  for l:i in s:MRUList
+    if <SID>IsBufferIgnored(l:i)
+        call <SID>ListPop(s:MRUList,l:i)
+    endif
+  endfor
+
   call <SID>BuildAllBufferDicts()
 
   if g:miniBufExplHideWhenDiff!=1 || !&diff
@@ -1097,6 +1109,12 @@ function! <SID>ResizeWindow()
         exec 'resize '.l:height
     endif
 
+    let saved_ead = &ead
+    let &ead = 'ver'
+    set equalalways
+    let &ead = saved_ead
+    set noequalalways
+
   " Vertical Resize
   else
 
@@ -1116,6 +1134,12 @@ function! <SID>ResizeWindow()
       call <SID>DEBUG('ResizeWindow to '.l:newWidth.' columns',9)
       exec 'vertical resize '.l:newWidth
     endif
+
+    let saved_ead = &ead
+    let &ead = 'hor'
+    set equalalways
+    let &ead = saved_ead
+    set noequalalways
 
   endif
 
@@ -1368,12 +1392,6 @@ function! <SID>IsBufferIgnored(buf)
   " Skip non normal buffers.
   if getbufvar(a:buf, "&buftype") != ''
     call <SID>DEBUG('Buffer '.a:buf.' is not normal, ignoring...',5)
-    return 1
-  endif
-
-  " Only show modifiable buffers.
-  if getbufvar(a:buf, '&modifiable') != 1
-    call <SID>DEBUG('Buffer '.a:buf.' is unmodifiable, ignoring...',5)
     return 1
   endif
 
@@ -1640,7 +1658,7 @@ function! <SID>BuildBufferPathSignDict(bufnrs, ...)
         endif
 
         " If some buffers' path does not have this index, we skip it
-        if empty(get(s:bufPathDict[bufnr],index))
+        if len(s:bufPathDict[bufnr]) < index
             continue
         endif
 
@@ -1649,6 +1667,10 @@ function! <SID>BuildBufferPathSignDict(bufnrs, ...)
 
         " Get requested part of the path
         let part = get(s:bufPathDict[bufnr],index)
+
+        if empty(part)
+            let part = '--EMPTY--'
+        endif
 
         " Group the buffers using dictionary by this part
         if(!has_key(partDict, part))
