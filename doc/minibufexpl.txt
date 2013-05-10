@@ -853,3 +853,6 @@ might not take you to the expected window.
 
 6.0.0
     - Initial Release on November 20, 2001
+
+==============================================================================
+vim: ft=help tw=78 cc=79 et ts=8 sw=4 sts=4
