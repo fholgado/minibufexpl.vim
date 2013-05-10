@@ -1016,7 +1016,13 @@ function! <SID>DisplayBuffers(curBufNum)
   call <SID>ResizeWindow()
 
   " Place cursor at current buffer in MBE
-  call search('\V['.a:curBufNum.':'.expand('#'.a:curBufNum.':t').']', 'w')
+  if !<SID>IsBufferIgnored(a:curBufNum)
+    if !g:miniBufExplShowBufNumbers
+      call search('\V['.s:bufUniqNameDict[a:curBufNum].']', 'w')
+    else
+      call search('\V['.a:curBufNum.':'.s:bufUniqNameDict[a:curBufNum].']', 'w')
+    endif
+  endif
 
   call <SID>DEBUG('Leaving DisplayExplorer()',10)
 endfunction
