@@ -635,10 +635,17 @@ function! <SID>StartExplorer(curBufNum)
   " The following allows for quicker moving between buffer
   " names in the [MBE] window it also saves the last-pattern
   " and restores it.
-  nnoremap <buffer> l       :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
-  nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
-  nnoremap <buffer> <right> :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
-  nnoremap <buffer> <left>  :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  if !g:miniBufExplShowBufNumbers
+    nnoremap <buffer> l       :call search('\[[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> h       :call search('\[[^\]]*\]','b')<CR>:<BS>
+    nnoremap <buffer> <right> :call search('\[[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> <left>  :call search('\[[^\]]*\]','b')<CR>:<BS>
+  else
+    nnoremap <buffer> l       :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> h       :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+    nnoremap <buffer> <right> :call search('\[[0-9]*:[^\]]*\]')<CR>:<BS>
+    nnoremap <buffer> <left>  :call search('\[[0-9]*:[^\]]*\]','b')<CR>:<BS>
+  endif
 
   " Attempt to perform single click mapping
   " It would be much nicer if we could 'nnoremap <buffer> ...', however
@@ -1016,7 +1023,13 @@ function! <SID>DisplayBuffers(curBufNum)
   call <SID>ResizeWindow()
 
   " Place cursor at current buffer in MBE
-  call search('\V['.a:curBufNum.':'.expand('#'.a:curBufNum.':t').']', 'w')
+  if !<SID>IsBufferIgnored(a:curBufNum)
+    if !g:miniBufExplShowBufNumbers
+      call search('\V['.s:bufUniqNameDict[a:curBufNum].']', 'w')
+    else
+      call search('\V['.a:curBufNum.':'.s:bufUniqNameDict[a:curBufNum].']', 'w')
+    endif
+  endif
 
   call <SID>DEBUG('Leaving DisplayExplorer()',10)
 endfunction
@@ -1481,6 +1494,8 @@ function! <SID>CreateBufferUniqName(bufNum)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
+    " Remove []'s & ()'s, these chars are preserved for buffer name locating
+    let l:bufName = substitute(l:bufName, '[][()]', '', 'g')
 
     " Create a unique name for unamed buffer
     if empty(l:bufName)
