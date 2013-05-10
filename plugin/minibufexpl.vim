@@ -415,8 +415,6 @@ function! <SID>VimEnterHandler()
     endif
   endfor
 
-  call <SID>BuildAllBufferDicts()
-
   if g:miniBufExplHideWhenDiff!=1 || !&diff
     let t:miniBufExplAutoUpdate = 1
   endif
@@ -513,6 +511,8 @@ function! <SID>StartExplorer(curBufNum)
   call <SID>DEBUG('Entering StartExplorer('.a:curBufNum.')',10)
 
   call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
+
+  call <SID>BuildAllBufferDicts()
 
   let t:miniBufExplAutoUpdate = 1
 
