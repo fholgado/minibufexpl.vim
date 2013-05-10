@@ -283,17 +283,6 @@ if !exists('g:miniBufExplCloseOnSelect')
 endif
 
 " }}}
-" Check for duplicate buffer names? {{{
-" Flag that can be set to 0 in a users .vimrc to turn off
-" the explorer's feature that differentiates similar buffer names by
-" displaying the parent directory names. This feature should be turned off
-" if you work with a large number of buffers (>15) simultaneously.
-"
-if !exists('g:miniBufExplCheckDupeBufs')
-  let g:miniBufExplCheckDupeBufs = 1
-endif
-
-" }}}
 " Status Line Text for MBE window {{{
 "
 if !exists('g:miniBufExplStatusLineText')
@@ -1426,7 +1415,7 @@ function! <SID>BuildBufferList(curBufNum)
             let l:tab .= l:i.':'
         endif
 
-        if (empty(s:bufUniqNameDict) || !has_key(s:bufUniqNameDict, l:i) || g:miniBufExplCheckDupeBufs == 0)
+        if empty(s:bufUniqNameDict) || !has_key(s:bufUniqNameDict, l:i
             " Get filename & Remove []'s & ()'s
             let l:shortBufName = fnamemodify(l:BufName, ":t")
             let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g')
