@@ -1419,11 +1419,6 @@ function! <SID>BuildBufferList(curBufNum)
     for l:i in s:BufList
         let l:BufName = expand( "#" . l:i . ":p:t")
 
-        " Identify buffers with no name
-        if empty(l:BufName)
-            let l:BufName = 'No Name'
-        endif
-
         " Establish the tab's content, including the differentiating root
         " dir if neccessary
         let l:tab = '['
@@ -1504,6 +1499,12 @@ function! <SID>CreateBufferUniqName(bufNum)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
+
+    " Create a unique name for unamed buffer
+    if empty(l:bufName)
+        return '--NO NAME--'.localtime()
+    endif
+
     let l:bufPathPrefix = ""
 
     if(!has_key(s:bufPathSignDict, l:bufNum))
@@ -1556,12 +1557,9 @@ function! <SID>UpdateBufferNameDict(bufNum,deleted)
 
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
-    " Skip buffers with no name, because we will use buffer name as key
-    " for 's:bufNameDict' in which empty string is invalid. Also, it does
-    " not make sense to check duplicate names for buffers with no name.
-    if l:bufName == ''
-        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
-        return
+    " Identify buffers with no name
+    if empty(l:bufName)
+        let l:bufName = '--NO NAME--'
     endif
 
     " Remove a deleted buffer from the buffer name dictionary
@@ -1597,12 +1595,9 @@ function! <SID>UpdateBufferPathDict(bufNum,deleted)
     let l:bufPath = expand( "#" . l:bufNum . ":p:h")
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
 
-    " Skip buffers with no name, it is not really necessary here,
-    " we just want make sure entries in 's:bufPathDict' are synced
-    " with 's:bufNameDict'.
-    if l:bufName == ''
-        call <SID>DEBUG('Leaving UpdateBufferPathDict()',5)
-        return
+    " Identify buffers with no name
+    if empty(l:bufName)
+        let l:bufName = '--NO NAME--'
     endif
 
     " Remove a deleted buffer from the buffer path dictionary
@@ -1748,6 +1743,11 @@ function! <SID>BuildBufferFinalDict(arg,deleted)
     else
         let l:bufNum = 0 + a:arg
         let l:bufName = expand( "#" . l:bufNum . ":p:t")
+
+        " Identify buffers with no name
+        if empty(l:bufName)
+            let l:bufName = '--NO NAME--'
+        endif
 
         if(!has_key(s:bufNameDict, l:bufName))
             call <SID>DEBUG(l:bufName . ' is not in s:bufNameDict, aborting...',5)
