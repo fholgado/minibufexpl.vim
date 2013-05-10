@@ -1414,15 +1414,8 @@ function! <SID>BuildBufferList(curBufNum)
         if g:miniBufExplShowBufNumbers == 1
             let l:tab .= l:i.':'
         endif
-
-        if empty(s:bufUniqNameDict) || !has_key(s:bufUniqNameDict, l:i
-            " Get filename & Remove []'s & ()'s
-            let l:shortBufName = fnamemodify(l:BufName, ":t")
-            let l:shortBufName = substitute(l:shortBufName, '[][()]', '', 'g')
-            let l:tab .= l:shortBufName.']'
-        else
-            let l:tab .= s:bufUniqNameDict[l:i].']'
-        endif
+        let l:tab .= s:bufUniqNameDict[l:i]
+        let l:tab .= ']'
 
         " If the buffer is open in a window mark it
         if bufwinnr(l:i) != -1
