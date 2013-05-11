@@ -392,6 +392,7 @@ if exists('##QuitPre')
   autocmd QuitPre        *
     \ if <SID>NextNormalWindow() == -1 | call <SID>StopExplorer(0) | endif
 endif
+  autocmd FileType minibufexpl    call <SID>RenderSyntax()
 augroup END
 
 function! <SID>VimEnterHandler()
@@ -507,6 +508,41 @@ endfunction
 "
 " Functions
 "
+" RenderSyntax {{{
+"
+function! <SID>RenderSyntax()
+  if has("syntax")
+    syn clear
+    syn match MBENormal                   '\[[^\]]*\]'
+    syn match MBEChanged                  '\[[^\]]*\]+'
+    syn match MBEVisibleNormal            '\[[^\]]*\]\*'
+    syn match MBEVisibleChanged           '\[[^\]]*\]\*+'
+    syn match MBEVisibleActiveNormal      '\[[^\]]*\]\*!'
+    syn match MBEVisibleActiveChanged     '\[[^\]]*\]\*+!'
+
+    "MiniBufExpl Color Examples
+    " hi MBENormal               guifg=#808080 guibg=fg
+    " hi MBEChanged              guifg=#CD5907 guibg=fg
+    " hi MBEVisibleNormal        guifg=#5DC2D6 guibg=fg
+    " hi MBEVisibleChanged       guifg=#F1266F guibg=fg
+    " hi MBEVisibleActiveNormal  guifg=#A6DB29 guibg=fg
+    " hi MBEVisibleActiveChanged guifg=#F1266F guibg=fg
+
+    if !exists("g:did_minibufexplorer_syntax_inits")
+      let g:did_minibufexplorer_syntax_inits = 1
+      hi def link MBENormal                Comment
+      hi def link MBEChanged               String
+      hi def link MBEVisibleNormal         Special
+      hi def link MBEVisibleChanged        Special
+      hi def link MBEVisibleActiveNormal   Underlined
+      hi def link MBEVisibleActiveChanged  Error
+    endif
+
+    let b:current_syntax = "minibufexpl"
+  endif
+endfunction
+
+" }}}
 " StartExplorer - Sets up our explorer and causes it to be displayed {{{
 "
 function! <SID>StartExplorer(curBufNum)
@@ -599,34 +635,6 @@ function! <SID>StartExplorer(curBufNum)
   if exists("+colorcolumn")
       setlocal colorcolumn&
   end
-
-  if has("syntax")
-    syn clear
-    syn match MBENormal                   '\[[^\]]*\]'
-    syn match MBEChanged                  '\[[^\]]*\]+'
-    syn match MBEVisibleNormal            '\[[^\]]*\]\*'
-    syn match MBEVisibleChanged           '\[[^\]]*\]\*+'
-    syn match MBEVisibleActiveNormal      '\[[^\]]*\]\*!'
-    syn match MBEVisibleActiveChanged     '\[[^\]]*\]\*+!'
-
-    "MiniBufExpl Color Examples
-    " hi MBENormal               guifg=#808080 guibg=fg
-    " hi MBEChanged              guifg=#CD5907 guibg=fg
-    " hi MBEVisibleNormal        guifg=#5DC2D6 guibg=fg
-    " hi MBEVisibleChanged       guifg=#F1266F guibg=fg
-    " hi MBEVisibleActiveNormal  guifg=#A6DB29 guibg=fg
-    " hi MBEVisibleActiveChanged guifg=#F1266F guibg=fg
-
-    if !exists("g:did_minibufexplorer_syntax_inits")
-      let g:did_minibufexplorer_syntax_inits = 1
-      hi def link MBENormal                Comment
-      hi def link MBEChanged               String
-      hi def link MBEVisibleNormal         Special
-      hi def link MBEVisibleChanged        Special
-      hi def link MBEVisibleActiveNormal   Underlined
-      hi def link MBEVisibleActiveChanged  Error
-    endif
-  endif
 
   " If you press return, o or e in the -MiniBufExplorer- then try
   " to open the selected buffer in the previous window.
