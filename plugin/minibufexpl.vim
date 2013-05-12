@@ -1409,18 +1409,23 @@ endfunction
 " Returns 0 if this buffer should be displayed in the list, 1 otherwise.
 "
 function! <SID>IsBufferIgnored(buf)
+  call <SID>DEBUG('Entering IsBufferIgnored('.a:buf.')',10)
+
   " Skip unlisted buffers.
   if buflisted(a:buf) == 0
     call <SID>DEBUG('Buffer '.a:buf.' is unlisted, ignoring...',5)
+    call <SID>DEBUG('Leaving IsBufferIgnored()',10)
     return 1
   endif
 
   " Skip non normal buffers.
   if getbufvar(a:buf, "&buftype") != ''
     call <SID>DEBUG('Buffer '.a:buf.' is not normal, ignoring...',5)
+    call <SID>DEBUG('Leaving IsBufferIgnored()',10)
     return 1
   endif
 
+  call <SID>DEBUG('Leaving IsBufferIgnored()',10)
   return 0
 endfunction
 
@@ -1514,7 +1519,7 @@ endfunction
 " the path.
 "
 function! <SID>CreateBufferUniqName(bufNum)
-    call <SID>DEBUG('Entering CreateBufferUniqName()',10)
+    call <SID>DEBUG('Entering CreateBufferUniqName('.a:bufNum.')',10)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
@@ -1657,7 +1662,7 @@ function! <SID>BuildBufferPathSignDict(bufnrs, ...)
         let index = a:1
     endif
 
-    call <SID>DEBUG('Entering BuildBufferPathSignDict() '.index,10)
+    call <SID>DEBUG('Entering BuildBufferPathSignDict('.string(a:bufnrs).','.index.')',10)
 
     let bufnrs = a:bufnrs
 
@@ -1736,7 +1741,7 @@ endfunction
 " UpdateBufferPathSignDict {{{
 "
 function! <SID>UpdateBufferPathSignDict(bufNum,deleted)
-    call <SID>DEBUG('Entering UpdateBufferPathSignDict()',10)
+    call <SID>DEBUG('Entering UpdateBufferPathSignDict('.a:bufNum.','.a:deleted.')',10)
 
     let l:bufNum = 0 + a:bufNum
 
@@ -1758,7 +1763,7 @@ endfunction
 " BuildBufferFinalDict {{{
 "
 function! <SID>BuildBufferFinalDict(arg,deleted)
-    call <SID>DEBUG('Entering BuildBufferFinalDict()',10)
+    call <SID>DEBUG('Entering BuildBufferFinalDict('.string(a:arg).','.a:deleted.')',10)
 
     if type(a:arg) == 3
         let l:bufnrs = a:arg
@@ -1797,7 +1802,7 @@ endfunction
 " BuildBufferUniqNameDict {{{
 "
 function! <SID>BuildBufferUniqNameDict(bufnrs)
-    call <SID>DEBUG('Entering BuildBufferUniqNameDict()',10)
+    call <SID>DEBUG('Entering BuildBufferUniqNameDict('.string(a:bufnrs).')',10)
 
     let l:bufnrs = a:bufnrs
 
@@ -1885,7 +1890,7 @@ endfunction
 " }}}
 " UpdateBufferStateDict {{{
 function! <SID>UpdateBufferStateDict(bufNum,deleted)
-    call <SID>DEBUG('Entering UpdateBufferStateDict()',10)
+    call <SID>DEBUG('Entering UpdateBufferStateDict('.a:bufNum.','.a:deleted.')',10)
 
     let l:bufNum = 0 + a:bufNum
 
