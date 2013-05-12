@@ -383,13 +383,6 @@ following in your .vimrc:
 
     let g:miniBufExplShowBufNumbers = 0
 
-                                            *'g:miniBufExplForceSyntaxEnable'*
-There is a Vim bug that can cause buffers to show up without their
-highlighting. The following setting will cause MBE to try and turn
-highlighting back on (introduced in 6.3.1):
-
-  let g:miniBufExplForceSyntaxEnable = 1
-
 ------------------------------------------------------------------------------
 4.6 Debugging                                           *MiniBufExplDebugging*
 
