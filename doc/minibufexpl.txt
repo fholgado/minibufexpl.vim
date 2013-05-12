@@ -377,16 +377,6 @@ window that does not have a nonmodifiable buffer. The upshot of this should be
 that if you go into MBE and select a buffer, the buffer should not show up in
 a window that is hosting an explorer.
 
-                                                *'g:miniBufExplCheckDupeBufs'*
-If you use Vim with many open buffers simultaneously (>15) and you notice that
-switching buffers takes longer than usual, it is because of MBE's duplicate
-buffer name checking feature. To turn it off, you can add the following to
-your .vimrc:
-
-    let g:miniBufExplCheckDupeBufs = 0
-
-We are working on a fix so that we can all enjoy the feature if you want!
-
                                                *'g:miniBufExplShowBufNumbers'*
 If you would like to omit the buffer number from MBE's buffer display, put the
 following in your .vimrc:
@@ -463,6 +453,9 @@ the following syntax:
 
   hi MBEChanged guibg=darkblue ctermbg=darkblue termbg=white
 
+If you have customized the above highlight groups, remember to set
+'g:did_minibufexplorer_syntax_inits = 1' so that MBE would not override
+your settings.
 
 NOTE: If you set a colorscheme in your .vimrc you should do it
       BEFORE updating the MBE highlighting groups.
@@ -850,3 +843,6 @@ might not take you to the expected window.
 
 6.0.0
     - Initial Release on November 20, 2001
+
+==============================================================================
+vim: ft=help tw=78 cc=79 et ts=8 sw=4 sts=4
