@@ -493,14 +493,7 @@ function! <SID>BufDeleteHandler()
 
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 
-  " If the deleted buffer is an ignored buffer, that means this buffer is very
-  " likely a plugin buffer, we need to force update the MBE window in order to
-  " remove it from the buffers list. We do not want to trigger the update on a
-  " renamed buffer at this point, because the renamed buffer might not be
-  " ready until the BufAdd event.
-  if <SID>IsBufferIgnored(bufnr("%"))
-      call <SID>AutoUpdate(bufnr("%"),1)
-  endif
+  call <SID>AutoUpdate(bufnr("%"),1)
 
   call <SID>DEBUG('Leaving BufDelete Handler', 10)
 endfunction
@@ -1412,7 +1405,7 @@ function! <SID>IsBufferIgnored(buf)
   call <SID>DEBUG('Entering IsBufferIgnored('.a:buf.')',10)
 
   " Skip unlisted buffers.
-  if buflisted(a:buf) == 0
+  if buflisted(a:buf) == 0 || index(s:BufList,a:buf) == -1
     call <SID>DEBUG('Buffer '.a:buf.' is unlisted, ignoring...',5)
     call <SID>DEBUG('Leaving IsBufferIgnored()',10)
     return 1
