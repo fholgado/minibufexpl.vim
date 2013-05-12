@@ -256,13 +256,6 @@ if !exists('g:miniBufExplShowBufNumbers')
   let g:miniBufExplShowBufNumbers = 1
 endif
 
-"}}}
-" Force Syntax Enable {{{
-"
-if !exists('g:miniBufExplForceSyntaxEnable')
-  let g:miniBufExplForceSyntaxEnable = 0
-endif
-
 " }}}
 " Single/Double Click? {{{
 " flag that can be set to 1 in a users .vimrc to allow
@@ -2024,15 +2017,6 @@ function! <SID>AutoUpdate(curBufNum,force)
         let t:miniBufExplAutoUpdate = 1
       endif
     endif
-
-	  " VIM sometimes turns syntax highlighting off,
-	  " we can force it on, but this may cause weird
-	  " behavior so this is an optional hack to force
-	  " syntax back on when we enter a buffer
-	  if g:miniBufExplForceSyntaxEnable
-		  call <SID>DEBUG('Enable Syntax', 9)
-		  exec 'syntax enable'
-	  endif
   else
     call <SID>DEBUG('AutoUpdates are turned off, terminating',9)
   endif
