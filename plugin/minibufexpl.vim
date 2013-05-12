@@ -1607,7 +1607,9 @@ function! <SID>UpdateBufferNameDict(bufNum,deleted)
         let s:bufNameDict[l:bufName] = []
     endif
 
-    call add(s:bufNameDict[l:bufName], l:bufNum)
+    if index(s:bufNameDict[l:bufName],l:bufNum) == -1
+        call add(s:bufNameDict[l:bufName], l:bufNum)
+    endif
 
     call <SID>DEBUG('Leaving UpdateBufferNameDict()',10)
 endfunction
