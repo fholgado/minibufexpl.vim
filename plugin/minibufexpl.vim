@@ -290,6 +290,14 @@ if !exists('g:miniBufExplSortBy')
 endif
 
 " }}}
+" Should buffer be cycled arround if hits the begining or the end while {{{
+" using MBE's buffer movement commands.
+"
+if !exists('g:miniBufExplCycleArround')
+  let g:miniBufExplCycleArround = 0
+endif
+
+" }}}
 "
 " Variables used internally
 "
@@ -1233,8 +1241,16 @@ function! <SID>CycleBuffer(forward,...)
     call <SID>DEBUG('bacBufIndex is '.l:bacBufIndex,1)
 
     if a:forward
+      if !g:miniBufExplCycleArround && l:curBufIndex < l:forBufIndex
+        echo "You have reached the most recent buffer!"
+        return
+      endif
       let l:moveCmd = 'b! '.s:MRUList[l:forBufIndex]
     else
+      if !g:miniBufExplCycleArround && l:curBufIndex > l:bacBufIndex
+        echo "You have reached the least recent buffer!"
+        return
+      endif
       let l:moveCmd = 'b! '.s:MRUList[l:bacBufIndex]
     endif
 
@@ -1249,8 +1265,16 @@ function! <SID>CycleBuffer(forward,...)
     call <SID>DEBUG('bacBufIndex is '.l:bacBufIndex,1)
 
     if a:forward
+      if !g:miniBufExplCycleArround && l:curBufIndex > l:forBufIndex
+        echo "You have reached the last buffer!"
+        return
+      endif
       let l:moveCmd = 'b! '.s:BufList[l:forBufIndex]
     else
+      if !g:miniBufExplCycleArround && l:curBufIndex < l:bacBufIndex
+        echo "You have reached the first buffer!"
+        return
+      endif
       let l:moveCmd = 'b! '.s:BufList[l:bacBufIndex]
     endif
 
