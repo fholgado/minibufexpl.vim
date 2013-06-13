@@ -99,6 +99,12 @@ configuration of Vim.
 :UMiniBufExplorer (Obsolete)                               *:UMiniBufExplorer*
     Command has been removed
 
+:MBEFocus                                                          *:MBEFocus*
+    Focus into the MBE window.
+
+:MBEFocusAll                                                    *:MBEFocusAll*
+    Focus into the MBE window in every tab page.
+
 :MBEOpen[!]                                                         *:MBEOpen*
     Open the Explorer.
     With '!' appended, MBE will be reopened if it is already open.
@@ -106,12 +112,6 @@ configuration of Vim.
 :MBEOpenAll[!]                                                   *:MBEOpenAll*
     Open the Explorer in every tab page.
     With '!' appended, MBE will be reopened if it is already open.
-
-:MBEFocus                                                          *:MBEFocus*
-    Focus into the MBE window.
-
-:MBEFocusAll                                                    *:MBEFocusAll*
-    Focus into the MBE window in every tab page.
 
 :MBEClose[!]                                                       *:MBEClose*
     Close the Explorer if it's open.
