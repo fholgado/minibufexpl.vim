@@ -337,17 +337,8 @@ let s:bufStateDict = {}
 " unless the list has changed.
 let s:miniBufExplBufList = ''
 
-" We start out with this off for startup, but once vim is running we
-" turn this on. This prevent any BufEnter event from being triggered
-" before VimEnter event.
-let t:miniBufExplAutoUpdate = 0
-
 " Variable used as a mutex so that AutoUpdates would not get nested.
 let s:miniBufExplInAutoUpdate = 0
-
-" If MBE was opened manually, then we should skip eligible buffers checking,
-" open MBE window no matter what value 'g:miniBufExplBuffersNeeded' is set.
-let t:skipEligibleBuffersCheck = 0
 
 " Dictionary used to keep track of the names we have seen.
 let s:bufNameDict = {}
@@ -361,6 +352,15 @@ let s:bufPathDict = {}
 
 " Dictionary used to hold the path signature index for each buffer
 let s:bufPathSignDict = {}
+
+" We start out with this off for startup, but once vim is running we
+" turn this on. This prevent any BufEnter event from being triggered
+" before VimEnter event.
+let t:miniBufExplAutoUpdate = 0
+
+" If MBE was opened manually, then we should skip eligible buffers checking,
+" open MBE window no matter what value 'g:miniBufExplBuffersNeeded' is set.
+let t:skipEligibleBuffersCheck = 0
 
 " }}}
 "
