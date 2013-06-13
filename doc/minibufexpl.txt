@@ -72,32 +72,76 @@ configuration of Vim.
     <up>                                            *MiniBufExpl-Mapping-<up>*
                                             Move one line up in the MBE window
 
-    h                                                  *MiniBufExpl-Mapping-h*
+    j                                                  *MiniBufExpl-Mapping-j*
     <down>                                        *MiniBufExpl-Mapping-<down>*
                                           Move one line down in the MBE window
 
     l                                                  *MiniBufExpl-Mapping-l*
-    <TAB>                                          *MiniBufExpl-Mapping-<TAB>*
+    <right>                                      *MiniBufExpl-Mapping-<right>*
                                      Move one buffer forward in the MBE window
 
-    j                                                  *MiniBufExpl-Mapping-j*
-    <S-TAB>                                      *MiniBufExpl-Mapping-<S-TAB>*
+    h                                                  *MiniBufExpl-Mapping-h*
+    <left>                                        *MiniBufExpl-Mapping-<left>*
                                     Move one buffer backward in the MBE window
 
 ==============================================================================
 3. Commands                                              *MiniBufExplCommands*
 
 :MiniBufExplorer (depreciated)                              *:MiniBufExplorer*
-:MBEOpen                                                            *:MBEOpen*
-    Open and/or goto Explorer
+    Use :MBEOpen instead
 
 :CMiniBufExplorer (depreciated)                            *:CMiniBufExplorer*
-:MBEClose                                                          *:MBEClose*
-    Close the Explorer if it's open
+    Use :MBEClose instead
 
 :TMiniBufExplorer (depreciated)                            *:TMiniBufExplorer*
-:MBEToggle                                                        *:MBEToggle*
-    Toggle the Explorer window open and closed.
+    Use :MBEToggle instead
+
+:UMiniBufExplorer (Obsolete)                               *:UMiniBufExplorer*
+    Command has been removed
+
+:MBEOpen[!]                                                         *:MBEOpen*
+    Open the Explorer.
+    With '!' appended, MBE will be reopened if it is already open.
+
+:MBEOpenAll[!]                                                   *:MBEOpenAll*
+    Open the Explorer in every tab page.
+    With '!' appended, MBE will be reopened if it is already open.
+
+:MBEFocus                                                          *:MBEFocus*
+    Focus into the MBE window.
+
+:MBEFocusAll                                                    *:MBEFocusAll*
+    Focus into the MBE window in every tab page.
+
+:MBEClose[!]                                                       *:MBEClose*
+    Close the Explorer if it's open.
+    With '!' appended, auto-updating will be disabled even if it does not
+    meet the required numbers of eligible buffers. Otherwise, auto-updating
+    will only be disabled if the required numbers of eligible buffers has
+    been meet.
+
+:MBECloseAll[!]                                                 *:MBECloseAll*
+    Close the Explorer in every tab page if it's open.
+    With '!' appended, auto-updating will be disabled even if it does not
+    meet the required numbers of eligible buffers. Otherwise, auto-updating
+    will only be disabled if the required numbers of eligible buffers has
+    been meet.
+
+:MBEToggle[!]                                                     *:MBEToggle*
+    Toggle the Explorer open and closed.
+    With '!' appended: On the open action, it does not have any effect; On
+    the close action, auto-updating will be disabled even if it does not
+    meet the required numbers of eligible buffers, otherwise, auto-updating
+    will only be disabled if the required numbers of eligible buffers has
+    been meet.
+
+:MBEToggleAll[!]                                               *:MBEToggleAll*
+    Toggle the Explorer open and closed in every tab page.
+    With '!' appended: On the open action, MBE will be reopened if it is
+    already open; On the close action, auto-updating will be disabled even
+    if it does not meet the required numbers of eligible buffers, otherwise,
+    auto-updating will only be disabled if the required numbers of eligible
+    buffers has been meet.
 
 :MBEbn                                                                *:MBEbn*
     Switch to next normal buffer in current window.
@@ -110,6 +154,24 @@ configuration of Vim.
 
 :MBEbb                                                                *:MBEbb*
     Move one buffer backward in the most recent used buffer list.
+
+:MBEbd[!] [N1] [N2] ...                                               *:MBEbd*
+    Delete buffers but preserve the window that holding them.
+    [N*] is the buffer's number or name to be deleted. If no [N*] is given,
+    then current buffer will be deleted. Multiple buffers could be deleted
+    at the same time.
+
+:MBEbw[!] [N1] [N2] ...                                               *:MBEbw*
+    Wipe out buffers but preserve the window that holding them.
+    [N*] is the buffer's number or name to be wiped out. If no [N*] is given,
+    then current buffer will be deleted. Multiple buffers could be unloaded
+    at the same time.
+
+:MBEbun[!] [N1] [N2] ...                                             *:MBEbun*
+    Unload buffers but preserve the window that holding them.
+    [N*] is the buffer's number or name to be unloaded. If no [N*] is given,
+    then current buffer will be deleted. Multiple buffers could be wiped out
+    at the same time.
 
 ==============================================================================
 4. Options                                                *MiniBufExplOptions*
@@ -291,6 +353,9 @@ following mappings to your .vimrc file.
 ------------------------------------------------------------------------------
 4.5 Misc                                                     *MiniBufExplMisc*
 
+                                                        *'g:miniBufExplSetUT'*
+Set the 'updatetime' to a proper value.
+
                                                *'g:miniBufExplStatusLineText'*
 MBE window status line text.
 
@@ -312,28 +377,11 @@ window that does not have a nonmodifiable buffer. The upshot of this should be
 that if you go into MBE and select a buffer, the buffer should not show up in
 a window that is hosting an explorer.
 
-                                                *'g:miniBufExplCheckDupeBufs'*
-If you use Vim with many open buffers simultaneously (>15) and you notice that
-switching buffers takes longer than usual, it is because of MBE's duplicate
-buffer name checking feature. To turn it off, you can add the following to
-your .vimrc:
-
-    let g:miniBufExplCheckDupeBufs = 0
-
-We are working on a fix so that we can all enjoy the feature if you want!
-
                                                *'g:miniBufExplShowBufNumbers'*
 If you would like to omit the buffer number from MBE's buffer display, put the
 following in your .vimrc:
 
     let g:miniBufExplShowBufNumbers = 0
-
-                                            *'g:miniBufExplForceSyntaxEnable'*
-There is a Vim bug that can cause buffers to show up without their
-highlighting. The following setting will cause MBE to try and turn
-highlighting back on (introduced in 6.3.1):
-
-  let g:miniBufExplForceSyntaxEnable = 1
 
 ------------------------------------------------------------------------------
 4.6 Debugging                                           *MiniBufExplDebugging*
@@ -375,18 +423,18 @@ prompt right before you do the operation that is failing.
 It is possible to customize the highlighting for the tabs in the MBE by
 configuring the following highlighting groups:
 
-  MBENormal               - for buffers that have NOT CHANGED and
-                            are NOT VISIBLE.
-  MBEChanged              - for buffers that HAVE CHANGED and are
+  MBENormal               - for buffers that have NOT CHANGED and are
                             NOT VISIBLE
-  MBEVisibleNormal        - buffers that have NOT CHANGED and are
+  MBEChanged              - for buffers that have CHANGED and are
+                            NOT VISIBLE
+  MBEVisibleNormal        - for buffers that have NOT CHANGED and are
                             VISIBLE
-  MBEVisibleActive        - buffers that have NOT CHANGED and are
-                            VISIBLE and is the active buffer
   MBEVisibleChanged       - for buffers that have CHANGED and are
                             VISIBLE
-  MBEVisibleChangedActive - buffers that have CHANGED and are VISIBLE
-                            and is the active buffer
+  MBEVisibleActiveNormal  - for buffers that have NOT CHANGED and are
+                            VISIBLE and is the active buffer
+  MBEVisibleActiveChanged - for buffers that have CHANGED and are
+                            VISIBLE and is the active buffer
 
 You can either link to an existing highlighting group by adding a command
 like:
@@ -398,6 +446,9 @@ the following syntax:
 
   hi MBEChanged guibg=darkblue ctermbg=darkblue termbg=white
 
+If you have customized the above highlight groups, remember to set
+'g:did_minibufexplorer_syntax_inits = 1' so that MBE would not override
+your settings.
 
 NOTE: If you set a colorscheme in your .vimrc you should do it
       BEFORE updating the MBE highlighting groups.
@@ -785,3 +836,6 @@ might not take you to the expected window.
 
 6.0.0
     - Initial Release on November 20, 2001
+
+==============================================================================
+vim: ft=help tw=78 cc=79 et ts=8 sw=4 sts=4
