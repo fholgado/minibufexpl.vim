@@ -143,9 +143,9 @@ Here are all the color additions to customize MBE's new features. You can add
 the following to your Color file and customize the color accordingly:
 
     " MiniBufExpl Colors
-    hi MBEVisibleActive guifg=#A6DB29 guibg=fg
-    hi MBEVisibleChangedActive guifg=#F1266F guibg=fg
-    hi MBEVisibleChanged guifg=#F1266F guibg=fg
-    hi MBEVisibleNormal guifg=#5DC2D6 guibg=fg
-    hi MBEChanged guifg=#CD5907 guibg=fg
-    hi MBENormal guifg=#808080 guibg=fg
+    hi MBENormal               guifg=#808080 guibg=fg
+    hi MBEChanged              guifg=#CD5907 guibg=fg
+    hi MBEVisibleNormal        guifg=#5DC2D6 guibg=fg
+    hi MBEVisibleChanged       guifg=#F1266F guibg=fg
+    hi MBEVisibleActiveNormal  guifg=#A6DB29 guibg=fg
+    hi MBEVisibleActiveChanged guifg=#F1266F guibg=fg

@@ -423,18 +423,18 @@ prompt right before you do the operation that is failing.
 It is possible to customize the highlighting for the tabs in the MBE by
 configuring the following highlighting groups:
 
-  MBENormal               - for buffers that have NOT CHANGED and
-                            are NOT VISIBLE.
-  MBEChanged              - for buffers that HAVE CHANGED and are
+  MBENormal               - for buffers that have NOT CHANGED and are
                             NOT VISIBLE
-  MBEVisibleNormal        - buffers that have NOT CHANGED and are
+  MBEChanged              - for buffers that have CHANGED and are
+                            NOT VISIBLE
+  MBEVisibleNormal        - for buffers that have NOT CHANGED and are
                             VISIBLE
-  MBEVisibleActive        - buffers that have NOT CHANGED and are
-                            VISIBLE and is the active buffer
   MBEVisibleChanged       - for buffers that have CHANGED and are
                             VISIBLE
-  MBEVisibleChangedActive - buffers that have CHANGED and are VISIBLE
-                            and is the active buffer
+  MBEVisibleActiveNormal  - for buffers that have NOT CHANGED and are
+                            VISIBLE and is the active buffer
+  MBEVisibleActiveChanged - for buffers that have CHANGED and are
+                            VISIBLE and is the active buffer
 
 You can either link to an existing highlighting group by adding a command
 like:
