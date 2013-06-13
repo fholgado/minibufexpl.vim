@@ -443,7 +443,9 @@ function! <SID>TabEnterHandler()
     let t:miniBufExplAutoUpdate = s:TabsMBEState
   endif
 
-  let t:skipEligibleBuffersCheck = 0
+  if !exists('t:skipEligibleBuffersCheck')
+    let t:skipEligibleBuffersCheck = 0
+  endif
 
   if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
         \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
