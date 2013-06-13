@@ -256,13 +256,6 @@ if !exists('g:miniBufExplShowBufNumbers')
   let g:miniBufExplShowBufNumbers = 1
 endif
 
-"}}}
-" Force Syntax Enable {{{
-"
-if !exists('g:miniBufExplForceSyntaxEnable')
-  let g:miniBufExplForceSyntaxEnable = 0
-endif
-
 " }}}
 " Single/Double Click? {{{
 " flag that can be set to 1 in a users .vimrc to allow
@@ -493,14 +486,7 @@ function! <SID>BufDeleteHandler()
 
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
 
-  " If the deleted buffer is an ignored buffer, that means this buffer is very
-  " likely a plugin buffer, we need to force update the MBE window in order to
-  " remove it from the buffers list. We do not want to trigger the update on a
-  " renamed buffer at this point, because the renamed buffer might not be
-  " ready until the BufAdd event.
-  if <SID>IsBufferIgnored(bufnr("%"))
-      call <SID>AutoUpdate(bufnr("%"),1)
-  endif
+  call <SID>AutoUpdate(bufnr("%"),1)
 
   call <SID>DEBUG('Leaving BufDelete Handler', 10)
 endfunction
@@ -1412,7 +1398,7 @@ function! <SID>IsBufferIgnored(buf)
   call <SID>DEBUG('Entering IsBufferIgnored('.a:buf.')',10)
 
   " Skip unlisted buffers.
-  if buflisted(a:buf) == 0
+  if buflisted(a:buf) == 0 || index(s:BufList,a:buf) == -1
     call <SID>DEBUG('Buffer '.a:buf.' is unlisted, ignoring...',5)
     call <SID>DEBUG('Leaving IsBufferIgnored()',10)
     return 1
@@ -2031,15 +2017,6 @@ function! <SID>AutoUpdate(curBufNum,force)
         let t:miniBufExplAutoUpdate = 1
       endif
     endif
-
-	  " VIM sometimes turns syntax highlighting off,
-	  " we can force it on, but this may cause weird
-	  " behavior so this is an optional hack to force
-	  " syntax back on when we enter a buffer
-	  if g:miniBufExplForceSyntaxEnable
-		  call <SID>DEBUG('Enable Syntax', 9)
-		  exec 'syntax enable'
-	  endif
   else
     call <SID>DEBUG('AutoUpdates are turned off, terminating',9)
   endif
