@@ -356,6 +356,11 @@ following mappings to your .vimrc file.
                                                         *'g:miniBufExplSetUT'*
 Set the 'updatetime' to a proper value.
 
+                                                 *'g:miniBufExplCycleArround'*
+
+Should buffer be cycled arround if hits the begining or the end while
+using MBE's buffer movement commands.
+
                                                *'g:miniBufExplStatusLineText'*
 MBE window status line text.
 
