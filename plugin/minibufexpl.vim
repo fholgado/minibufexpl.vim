@@ -1841,7 +1841,7 @@ function! <SID>BuildAllBufferDicts()
     " Loop through every buffer less than the total number of buffers.
     let l:i = 0
     while(l:i <= l:NBuffers)
-        if !bufexists(l:i)
+        if <SID>IsBufferIgnored(l:i)
             let l:i = l:i + 1
             continue
         endif
