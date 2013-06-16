@@ -356,6 +356,11 @@ following mappings to your .vimrc file.
                                                         *'g:miniBufExplSetUT'*
 Set the 'updatetime' to a proper value.
 
+                                                 *'g:miniBufExplCycleArround'*
+
+Should buffer be cycled arround if hits the begining or the end while
+using MBE's buffer movement commands.
+
                                                *'g:miniBufExplStatusLineText'*
 MBE window status line text.
 
@@ -377,28 +382,11 @@ window that does not have a nonmodifiable buffer. The upshot of this should be
 that if you go into MBE and select a buffer, the buffer should not show up in
 a window that is hosting an explorer.
 
-                                                *'g:miniBufExplCheckDupeBufs'*
-If you use Vim with many open buffers simultaneously (>15) and you notice that
-switching buffers takes longer than usual, it is because of MBE's duplicate
-buffer name checking feature. To turn it off, you can add the following to
-your .vimrc:
-
-    let g:miniBufExplCheckDupeBufs = 0
-
-We are working on a fix so that we can all enjoy the feature if you want!
-
                                                *'g:miniBufExplShowBufNumbers'*
 If you would like to omit the buffer number from MBE's buffer display, put the
 following in your .vimrc:
 
     let g:miniBufExplShowBufNumbers = 0
-
-                                            *'g:miniBufExplForceSyntaxEnable'*
-There is a Vim bug that can cause buffers to show up without their
-highlighting. The following setting will cause MBE to try and turn
-highlighting back on (introduced in 6.3.1):
-
-  let g:miniBufExplForceSyntaxEnable = 1
 
 ------------------------------------------------------------------------------
 4.6 Debugging                                           *MiniBufExplDebugging*
@@ -440,18 +428,18 @@ prompt right before you do the operation that is failing.
 It is possible to customize the highlighting for the tabs in the MBE by
 configuring the following highlighting groups:
 
-  MBENormal               - for buffers that have NOT CHANGED and
-                            are NOT VISIBLE.
-  MBEChanged              - for buffers that HAVE CHANGED and are
+  MBENormal               - for buffers that have NOT CHANGED and are
                             NOT VISIBLE
-  MBEVisibleNormal        - buffers that have NOT CHANGED and are
+  MBEChanged              - for buffers that have CHANGED and are
+                            NOT VISIBLE
+  MBEVisibleNormal        - for buffers that have NOT CHANGED and are
                             VISIBLE
-  MBEVisibleActive        - buffers that have NOT CHANGED and are
-                            VISIBLE and is the active buffer
   MBEVisibleChanged       - for buffers that have CHANGED and are
                             VISIBLE
-  MBEVisibleChangedActive - buffers that have CHANGED and are VISIBLE
-                            and is the active buffer
+  MBEVisibleActiveNormal  - for buffers that have NOT CHANGED and are
+                            VISIBLE and is the active buffer
+  MBEVisibleActiveChanged - for buffers that have CHANGED and are
+                            VISIBLE and is the active buffer
 
 You can either link to an existing highlighting group by adding a command
 like:
@@ -463,6 +451,9 @@ the following syntax:
 
   hi MBEChanged guibg=darkblue ctermbg=darkblue termbg=white
 
+If you have customized the above highlight groups, remember to set
+'g:did_minibufexplorer_syntax_inits = 1' so that MBE would not override
+your settings.
 
 NOTE: If you set a colorscheme in your .vimrc you should do it
       BEFORE updating the MBE highlighting groups.
@@ -850,3 +841,6 @@ might not take you to the expected window.
 
 6.0.0
     - Initial Release on November 20, 2001
+
+==============================================================================
+vim: ft=help tw=78 cc=79 et ts=8 sw=4 sts=4

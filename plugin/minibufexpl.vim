@@ -52,7 +52,7 @@ if !exists(':MBEOpen')
   command! -bang MBEOpen      let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
 endif
 if !exists(':MBEOpenAll')
-  command! -bang MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
+  command! -bang MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%")) | let s:TabsMBEState = 1
 endif
 if !exists(':MBEFocus')
   command! MBEFocus           call <SID>FocusExplorer()
@@ -64,7 +64,7 @@ if !exists(':MBEClose')
   command! -bang MBEClose     let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
 endif
 if !exists(':MBECloseAll')
-  command! -bang MBECloseAll  tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
+  command! -bang MBECloseAll  tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!') | let s:TabsMBEState = 0
 endif
 if !exists(':MBEToggle')
   command! -bang MBEToggle    call <SID>ToggleExplorer(0,'<bang>'=='!')
@@ -256,13 +256,6 @@ if !exists('g:miniBufExplShowBufNumbers')
   let g:miniBufExplShowBufNumbers = 1
 endif
 
-"}}}
-" Force Syntax Enable {{{
-"
-if !exists('g:miniBufExplForceSyntaxEnable')
-  let g:miniBufExplForceSyntaxEnable = 0
-endif
-
 " }}}
 " Single/Double Click? {{{
 " flag that can be set to 1 in a users .vimrc to allow
@@ -294,6 +287,14 @@ endif
 "
 if !exists('g:miniBufExplSortBy')
   let g:miniBufExplSortBy = "number"
+endif
+
+" }}}
+" Should buffer be cycled arround if hits the begining or the end while {{{
+" using MBE's buffer movement commands.
+"
+if !exists('g:miniBufExplCycleArround')
+  let g:miniBufExplCycleArround = 0
 endif
 
 " }}}
@@ -385,17 +386,18 @@ augroup MiniBufExpl
   autocmd BufEnter       * nested call <SID>BufEnterHandler()
   autocmd BufDelete      *        call <SID>BufDeleteHandler()
   autocmd CursorHold,CursorHoldI,BufWritePost    *
-    \ call <SID>DEBUG('==> Entering UpdateBufferStateDict AutoCmd', 10) |
+    \ call <SID>DEBUG('Entering UpdateBufferStateDict AutoCmd', 10) |
     \ call <SID>UpdateBufferStateDict(bufnr("%"),0) |
-    \ call <SID>DEBUG('<== Leaving UpdateBufferStateDict AutoCmd', 10)
+    \ call <SID>DEBUG('Leaving UpdateBufferStateDict AutoCmd', 10)
 if exists('##QuitPre')
   autocmd QuitPre        *
     \ if <SID>NextNormalWindow() == -1 | call <SID>StopExplorer(0) | endif
 endif
+  autocmd FileType minibufexpl    call <SID>RenderSyntax()
 augroup END
 
 function! <SID>VimEnterHandler()
-  call <SID>DEBUG('==> Entering VimEnter Handler', 10)
+  call <SID>DEBUG('Entering VimEnter Handler', 10)
 
   " Build initial MRUList.
   " This makes sure all the files specified on the command
@@ -415,8 +417,6 @@ function! <SID>VimEnterHandler()
     endif
   endfor
 
-  call <SID>BuildAllBufferDicts()
-
   if g:miniBufExplHideWhenDiff!=1 || !&diff
     let t:miniBufExplAutoUpdate = 1
   endif
@@ -426,16 +426,19 @@ function! <SID>VimEnterHandler()
   if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
         \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
     call <SID>StartExplorer(bufnr("%"))
+
+    " Let the MBE open in the new tab
+    let s:TabsMBEState = 1
   endif
 
-  call <SID>DEBUG('<== Leaving VimEnter Handler', 10)
+  call <SID>DEBUG('Leaving VimEnter Handler', 10)
 endfunction
 
 function! <SID>TabEnterHandler()
-  call <SID>DEBUG('==> Entering TabEnter Handler', 10)
+  call <SID>DEBUG('Entering TabEnter Handler', 10)
 
   if !exists('t:miniBufExplAutoUpdate')
-    let t:miniBufExplAutoUpdate = 1
+    let t:miniBufExplAutoUpdate = s:TabsMBEState
   endif
 
   let t:skipEligibleBuffersCheck = 0
@@ -445,22 +448,24 @@ function! <SID>TabEnterHandler()
     call <SID>StartExplorer(bufnr("%"))
   endif
 
-  call <SID>DEBUG('<== Leaving TabEnter Handler', 10)
+  call <SID>DEBUG('Leaving TabEnter Handler', 10)
 endfunction
 
 function! <SID>BufAddHandler()
-  call <SID>DEBUG('==> Entering BufAdd Handler', 10)
+  call <SID>DEBUG('Entering BufAdd Handler', 10)
 
   call <SID>ListAdd(s:BufList,str2nr(expand("<abuf>")))
   call <SID>ListAdd(s:MRUList,str2nr(expand("<abuf>")))
 
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),0)
 
-  call <SID>DEBUG('<== Leaving BufAdd Handler', 10)
+  call <SID>AutoUpdate(bufnr("%"),0)
+
+  call <SID>DEBUG('Leaving BufAdd Handler', 10)
 endfunction
 
 function! <SID>BufEnterHandler() abort
-  call <SID>DEBUG('==> Entering BufEnter Handler', 10)
+  call <SID>DEBUG('Entering BufEnter Handler', 10)
 
   call <SID>QuitIfLastOpen()
 
@@ -478,11 +483,11 @@ function! <SID>BufEnterHandler() abort
 
   call <SID>AutoUpdate(bufnr("%"),0)
 
-  call <SID>DEBUG('<== Leaving BufEnter Handler', 10)
+  call <SID>DEBUG('Leaving BufEnter Handler', 10)
 endfunction
 
 function! <SID>BufDeleteHandler()
-  call <SID>DEBUG('==> Entering BufDelete Handler', 10)
+  call <SID>DEBUG('Entering BufDelete Handler', 10)
 
   call <SID>ListPop(s:BufList,str2nr(expand("<abuf>")))
   call <SID>ListPop(s:MRUList,str2nr(expand("<abuf>")))
@@ -491,18 +496,55 @@ function! <SID>BufDeleteHandler()
 
   call <SID>AutoUpdate(bufnr("%"),1)
 
-  call <SID>DEBUG('<== Leaving BufDelete Handler', 10)
+  call <SID>DEBUG('Leaving BufDelete Handler', 10)
 endfunction
 " }}}
 "
 " Functions
 "
+" RenderSyntax {{{
+"
+function! <SID>RenderSyntax()
+  if has("syntax")
+    syn clear
+    syn match MBENormal                   '\[[^\]]*\]'
+    syn match MBEChanged                  '\[[^\]]*\]+'
+    syn match MBEVisibleNormal            '\[[^\]]*\]\*'
+    syn match MBEVisibleChanged           '\[[^\]]*\]\*+'
+    syn match MBEVisibleActiveNormal      '\[[^\]]*\]\*!'
+    syn match MBEVisibleActiveChanged     '\[[^\]]*\]\*+!'
+
+    "MiniBufExpl Color Examples
+    " hi MBENormal               guifg=#808080 guibg=fg
+    " hi MBEChanged              guifg=#CD5907 guibg=fg
+    " hi MBEVisibleNormal        guifg=#5DC2D6 guibg=fg
+    " hi MBEVisibleChanged       guifg=#F1266F guibg=fg
+    " hi MBEVisibleActiveNormal  guifg=#A6DB29 guibg=fg
+    " hi MBEVisibleActiveChanged guifg=#F1266F guibg=fg
+
+    if !exists("g:did_minibufexplorer_syntax_inits")
+      let g:did_minibufexplorer_syntax_inits = 1
+      hi def link MBENormal                Comment
+      hi def link MBEChanged               String
+      hi def link MBEVisibleNormal         Special
+      hi def link MBEVisibleChanged        Special
+      hi def link MBEVisibleActiveNormal   Underlined
+      hi def link MBEVisibleActiveChanged  Error
+    endif
+
+    let b:current_syntax = "minibufexpl"
+  endif
+endfunction
+
+" }}}
 " StartExplorer - Sets up our explorer and causes it to be displayed {{{
 "
 function! <SID>StartExplorer(curBufNum)
   call <SID>DEBUG('Entering StartExplorer('.a:curBufNum.')',10)
 
   call <SID>DEBUG('Current state: '.winnr().' : '.bufnr('%').' : '.bufname('%'),10)
+
+  call <SID>BuildAllBufferDicts()
 
   let t:miniBufExplAutoUpdate = 1
 
@@ -587,34 +629,6 @@ function! <SID>StartExplorer(curBufNum)
   if exists("+colorcolumn")
       setlocal colorcolumn&
   end
-
-  if has("syntax")
-    syn clear
-    syn match MBENormal                   '\[[^\]]*\]'
-    syn match MBEChanged                  '\[[^\]]*\]+'
-    syn match MBEVisibleNormal            '\[[^\]]*\]\*'
-    syn match MBEVisibleChanged           '\[[^\]]*\]\*+'
-    syn match MBEVisibleActiveNormal      '\[[^\]]*\]\*!'
-    syn match MBEVisibleActiveChanged     '\[[^\]]*\]\*+!'
-
-    "MiniBufExpl Color Examples
-    " hi MBENormal               guifg=#808080 guibg=fg
-    " hi MBEChanged              guifg=#CD5907 guibg=fg
-    " hi MBEVisibleNormal        guifg=#5DC2D6 guibg=fg
-    " hi MBEVisibleChanged       guifg=#F1266F guibg=fg
-    " hi MBEVisibleActiveNormal  guifg=#A6DB29 guibg=fg
-    " hi MBEVisibleActiveChanged guifg=#F1266F guibg=fg
-
-    if !exists("g:did_minibufexplorer_syntax_inits")
-      let g:did_minibufexplorer_syntax_inits = 1
-      hi def link MBENormal                Comment
-      hi def link MBEChanged               String
-      hi def link MBEVisibleNormal         Special
-      hi def link MBEVisibleChanged        Special
-      hi def link MBEVisibleActiveNormal   Underlined
-      hi def link MBEVisibleActiveChanged  Error
-    endif
-  endif
 
   " If you press return, o or e in the -MiniBufExplorer- then try
   " to open the selected buffer in the previous window.
@@ -1227,8 +1241,16 @@ function! <SID>CycleBuffer(forward,...)
     call <SID>DEBUG('bacBufIndex is '.l:bacBufIndex,1)
 
     if a:forward
+      if !g:miniBufExplCycleArround && l:curBufIndex < l:forBufIndex
+        echo "You have reached the most recent buffer!"
+        return
+      endif
       let l:moveCmd = 'b! '.s:MRUList[l:forBufIndex]
     else
+      if !g:miniBufExplCycleArround && l:curBufIndex > l:bacBufIndex
+        echo "You have reached the least recent buffer!"
+        return
+      endif
       let l:moveCmd = 'b! '.s:MRUList[l:bacBufIndex]
     endif
 
@@ -1243,8 +1265,16 @@ function! <SID>CycleBuffer(forward,...)
     call <SID>DEBUG('bacBufIndex is '.l:bacBufIndex,1)
 
     if a:forward
+      if !g:miniBufExplCycleArround && l:curBufIndex > l:forBufIndex
+        echo "You have reached the last buffer!"
+        return
+      endif
       let l:moveCmd = 'b! '.s:BufList[l:forBufIndex]
     else
+      if !g:miniBufExplCycleArround && l:curBufIndex < l:bacBufIndex
+        echo "You have reached the first buffer!"
+        return
+      endif
       let l:moveCmd = 'b! '.s:BufList[l:bacBufIndex]
     endif
 
@@ -1389,18 +1419,23 @@ endfunction
 " Returns 0 if this buffer should be displayed in the list, 1 otherwise.
 "
 function! <SID>IsBufferIgnored(buf)
+  call <SID>DEBUG('Entering IsBufferIgnored('.a:buf.')',10)
+
   " Skip unlisted buffers.
-  if buflisted(a:buf) == 0
+  if buflisted(a:buf) == 0 || index(s:BufList,a:buf) == -1
     call <SID>DEBUG('Buffer '.a:buf.' is unlisted, ignoring...',5)
+    call <SID>DEBUG('Leaving IsBufferIgnored()',10)
     return 1
   endif
 
   " Skip non normal buffers.
   if getbufvar(a:buf, "&buftype") != ''
     call <SID>DEBUG('Buffer '.a:buf.' is not normal, ignoring...',5)
+    call <SID>DEBUG('Leaving IsBufferIgnored()',10)
     return 1
   endif
 
+  call <SID>DEBUG('Leaving IsBufferIgnored()',10)
   return 0
 endfunction
 
@@ -1494,7 +1529,7 @@ endfunction
 " the path.
 "
 function! <SID>CreateBufferUniqName(bufNum)
-    call <SID>DEBUG('Entering CreateBufferUniqName()',5)
+    call <SID>DEBUG('Entering CreateBufferUniqName('.a:bufNum.')',10)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufName = expand( "#" . l:bufNum . ":p:t")
@@ -1503,6 +1538,7 @@ function! <SID>CreateBufferUniqName(bufNum)
 
     " Create a unique name for unamed buffer
     if empty(l:bufName)
+        call <SID>DEBUG('Leaving CreateBufferUniqName()',10)
         return '--NO NAME--'.localtime()
     endif
 
@@ -1510,14 +1546,14 @@ function! <SID>CreateBufferUniqName(bufNum)
 
     if(!has_key(s:bufPathSignDict, l:bufNum))
         call <SID>DEBUG(l:bufNum . ' is not in s:bufPathSignDict, aborting...',5)
-        call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
+        call <SID>DEBUG('Leaving CreateBufferUniqName()',10)
         return l:bufName
     endif
 
     let l:signs = s:bufPathSignDict[l:bufNum]
     if(empty(l:signs))
         call <SID>DEBUG('Signs for ' . l:bufNum . ' is empty, aborting...',5)
-        call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
+        call <SID>DEBUG('Leaving CreateBufferUniqName()',10)
         return l:bufName
     endif
 
@@ -1543,7 +1579,7 @@ function! <SID>CreateBufferUniqName(bufNum)
 
     call <SID>DEBUG('Uniq name for ' . l:bufNum . ' is ' .  l:bufPathPrefix.l:bufName,5)
 
-    call <SID>DEBUG('Leaving CreateBufferUniqName()',5)
+    call <SID>DEBUG('Leaving CreateBufferUniqName()',10)
 
     return l:bufPathPrefix.l:bufName
 endfunction
@@ -1552,7 +1588,7 @@ endfunction
 " UpdateBufferNameDict {{{
 "
 function! <SID>UpdateBufferNameDict(bufNum,deleted)
-    call <SID>DEBUG('Entering UpdateBufferNameDict('.a:bufNum.','.a:deleted.')',5)
+    call <SID>DEBUG('Entering UpdateBufferNameDict('.a:bufNum.','.a:deleted.')',10)
 
     let l:bufNum = 0 + a:bufNum
 
@@ -1572,7 +1608,7 @@ function! <SID>UpdateBufferNameDict(bufNum,deleted)
             let s:bufNameDict[l:bufName] = l:bufnrs
             call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
         endif
-        call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+        call <SID>DEBUG('Leaving UpdateBufferNameDict()',10)
         return
     endif
 
@@ -1581,16 +1617,18 @@ function! <SID>UpdateBufferNameDict(bufNum,deleted)
         let s:bufNameDict[l:bufName] = []
     endif
 
-    call add(s:bufNameDict[l:bufName], l:bufNum)
+    if index(s:bufNameDict[l:bufName],l:bufNum) == -1
+        call add(s:bufNameDict[l:bufName], l:bufNum)
+    endif
 
-    call <SID>DEBUG('Leaving UpdateBufferNameDict()',5)
+    call <SID>DEBUG('Leaving UpdateBufferNameDict()',10)
 endfunction
 
 " }}}
 " UpdateBufferPathDict {{{
 "
 function! <SID>UpdateBufferPathDict(bufNum,deleted)
-    call <SID>DEBUG('Entering UpdateBufferPathDict('.a:bufNum.','.a:deleted.')',5)
+    call <SID>DEBUG('Entering UpdateBufferPathDict('.a:bufNum.','.a:deleted.')',10)
 
     let l:bufNum = 0 + a:bufNum
     let l:bufPath = expand( "#" . l:bufNum . ":p:h")
@@ -1609,13 +1647,13 @@ function! <SID>UpdateBufferPathDict(bufNum,deleted)
             call filter(s:bufPathDict, 'v:key != '.l:bufNum)
             call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
         endif
-        call <SID>DEBUG('Leaving UpdateBufferPathDict()',5)
+        call <SID>DEBUG('Leaving UpdateBufferPathDict()',10)
         return
     endif
 
     let s:bufPathDict[l:bufNum] = split(l:bufPath,s:PathSeparator,0)
 
-    call <SID>DEBUG('Leaving UpdateBufferPathDict()',5)
+    call <SID>DEBUG('Leaving UpdateBufferPathDict()',10)
 endfunction
 
 " }}}
@@ -1636,7 +1674,7 @@ function! <SID>BuildBufferPathSignDict(bufnrs, ...)
         let index = a:1
     endif
 
-    call <SID>DEBUG('Entering BuildBufferPathSignDict() '.index,5)
+    call <SID>DEBUG('Entering BuildBufferPathSignDict('.string(a:bufnrs).','.index.')',10)
 
     let bufnrs = a:bufnrs
 
@@ -1678,7 +1716,7 @@ function! <SID>BuildBufferPathSignDict(bufnrs, ...)
 
     " All the paths have been walked to the end
     if !moreParts
-        call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.index,5)
+        call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.index,10)
         return
     endif
 
@@ -1708,14 +1746,14 @@ function! <SID>BuildBufferPathSignDict(bufnrs, ...)
         call <SID>BuildBufferPathSignDict(bufnrs, index + 1)
     endif
 
-    call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.index,5)
+    call <SID>DEBUG('Leaving BuildBufferPathSignDict() '.index,10)
 endfunction
 
 " }}}
 " UpdateBufferPathSignDict {{{
 "
 function! <SID>UpdateBufferPathSignDict(bufNum,deleted)
-    call <SID>DEBUG('Entering UpdateBufferPathSignDict()',5)
+    call <SID>DEBUG('Entering UpdateBufferPathSignDict('.a:bufNum.','.a:deleted.')',10)
 
     let l:bufNum = 0 + a:bufNum
 
@@ -1726,18 +1764,18 @@ function! <SID>UpdateBufferPathSignDict(bufNum,deleted)
             call filter(s:bufPathSignDict, 'v:key != '.l:bufNum)
             call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
         endif
-        call <SID>DEBUG('Leaving UpdateBufferPathSignDict()',5)
+        call <SID>DEBUG('Leaving UpdateBufferPathSignDict()',10)
         return
     endif
 
-    call <SID>DEBUG('Leaving UpdateBufferPathSignDict()',5)
+    call <SID>DEBUG('Leaving UpdateBufferPathSignDict()',10)
 endfunction
 
 " }}}
 " BuildBufferFinalDict {{{
 "
 function! <SID>BuildBufferFinalDict(arg,deleted)
-    call <SID>DEBUG('Entering BuildBufferFinalDict()',5)
+    call <SID>DEBUG('Entering BuildBufferFinalDict('.string(a:arg).','.a:deleted.')',10)
 
     if type(a:arg) == 3
         let l:bufnrs = a:arg
@@ -1752,7 +1790,7 @@ function! <SID>BuildBufferFinalDict(arg,deleted)
 
         if(!has_key(s:bufNameDict, l:bufName))
             call <SID>DEBUG(l:bufName . ' is not in s:bufNameDict, aborting...',5)
-            call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
+            call <SID>DEBUG('Leaving BuildBufferFinalDict()',10)
             return
         endif
 
@@ -1769,14 +1807,14 @@ function! <SID>BuildBufferFinalDict(arg,deleted)
 
     call <SID>BuildBufferUniqNameDict(l:bufnrs)
 
-    call <SID>DEBUG('Leaving BuildBufferFinalDict()',5)
+    call <SID>DEBUG('Leaving BuildBufferFinalDict()',10)
 endfunction
 
 " }}}
 " BuildBufferUniqNameDict {{{
 "
 function! <SID>BuildBufferUniqNameDict(bufnrs)
-    call <SID>DEBUG('Entering BuildBufferUniqNameDict()',5)
+    call <SID>DEBUG('Entering BuildBufferUniqNameDict('.string(a:bufnrs).')',10)
 
     let l:bufnrs = a:bufnrs
 
@@ -1784,14 +1822,14 @@ function! <SID>BuildBufferUniqNameDict(bufnrs)
         call <SID>UpdateBufferUniqNameDict(bufnr,0)
     endfor
 
-    call <SID>DEBUG('Leaving BuildBufferUniqNameDict()',5)
+    call <SID>DEBUG('Leaving BuildBufferUniqNameDict()',10)
 endfunction
 
 " }}}
 " UpdateBufferUniqNameDict {{{
 "
 function! <SID>UpdateBufferUniqNameDict(bufNum,deleted)
-    call <SID>DEBUG('Entering UpdateBufferUniqNameDict('.a:bufNum.','.a:deleted.')',5)
+    call <SID>DEBUG('Entering UpdateBufferUniqNameDict('.a:bufNum.','.a:deleted.')',10)
 
     let l:bufNum = 0 + a:bufNum
 
@@ -1802,7 +1840,7 @@ function! <SID>UpdateBufferUniqNameDict(bufNum,deleted)
             call filter(s:bufUniqNameDict, 'v:key != '.l:bufNum)
             call <SID>DEBUG('Delete entry for deleted buffer '.l:bufNum,5)
         endif
-        call <SID>DEBUG('Leaving UpdateBufferUniqNameDict()',5)
+        call <SID>DEBUG('Leaving UpdateBufferUniqNameDict()',10)
         return
     endif
 
@@ -1812,14 +1850,14 @@ function! <SID>UpdateBufferUniqNameDict(bufNum,deleted)
     call <SID>DEBUG('Setting ' . l:bufNum . ' to ' . l:bufUniqName,5)
     let s:bufUniqNameDict[l:bufNum] = l:bufUniqName
 
-    call <SID>DEBUG('Leaving UpdateBufferUniqNameDict()',5)
+    call <SID>DEBUG('Leaving UpdateBufferUniqNameDict()',10)
 endfunction
 
 " }}}
 " BuildAllBufferDicts {{{
 "
 function! <SID>BuildAllBufferDicts()
-    call <SID>DEBUG('Entering BuildAllBuffersDicts()',5)
+    call <SID>DEBUG('Entering BuildAllBuffersDicts()',10)
 
     " Get the number of the last buffer.
     let l:NBuffers = bufnr('$')
@@ -1827,7 +1865,7 @@ function! <SID>BuildAllBufferDicts()
     " Loop through every buffer less than the total number of buffers.
     let l:i = 0
     while(l:i <= l:NBuffers)
-        if !bufexists(l:i)
+        if <SID>IsBufferIgnored(l:i)
             let l:i = l:i + 1
             continue
         endif
@@ -1843,14 +1881,14 @@ function! <SID>BuildAllBufferDicts()
         call <SID>BuildBufferFinalDict(bufnrs,0)
     endfor
 
-    call <SID>DEBUG('Leaving BuildAllBuffersDicts()',5)
+    call <SID>DEBUG('Leaving BuildAllBuffersDicts()',10)
 endfunction
 
 " }}}
 " UpdateAllBufferDicts {{{
 "
 function! <SID>UpdateAllBufferDicts(bufNum,deleted)
-    call <SID>DEBUG('Entering UpdateAllBuffersDicts('.a:bufNum.','.a:deleted.')',5)
+    call <SID>DEBUG('Entering UpdateAllBuffersDicts('.a:bufNum.','.a:deleted.')',10)
 
     call <SID>UpdateBufferNameDict(a:bufNum,a:deleted)
     call <SID>UpdateBufferPathDict(a:bufNum,a:deleted)
@@ -1858,19 +1896,19 @@ function! <SID>UpdateAllBufferDicts(bufNum,deleted)
 
     call <SID>BuildBufferFinalDict(a:bufNum,a:deleted)
 
-    call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',5)
+    call <SID>DEBUG('Leaving UpdateAllBuffersDicts()',10)
 endfunction
 
 " }}}
 " UpdateBufferStateDict {{{
 function! <SID>UpdateBufferStateDict(bufNum,deleted)
-    call <SID>DEBUG('Entering UpdateBufferStateDict()',5)
+    call <SID>DEBUG('Entering UpdateBufferStateDict('.a:bufNum.','.a:deleted.')',10)
 
     let l:bufNum = 0 + a:bufNum
 
     if a:deleted && has_key(s:bufStateDict, l:bufNum)
         call filter(s:bufStateDict, 'v:key != '.l:bufNum)
-        call <SID>DEBUG('Leaving UpdateBufferStateDict()',5)
+        call <SID>DEBUG('Leaving UpdateBufferStateDict()',10)
         return
     endif
 
@@ -1883,7 +1921,7 @@ function! <SID>UpdateBufferStateDict(bufNum,deleted)
         let s:bufStateDict[l:bufNum] = getbufvar(a:bufNum, '&modified')
     endif
 
-    call <SID>DEBUG('Leaving UpdateBufferStateDict()',5)
+    call <SID>DEBUG('Leaving UpdateBufferStateDict()',10)
 endfunction
 
 " }}}
@@ -1971,11 +2009,11 @@ function! <SID>AutoUpdate(curBufNum,force)
 
   " Only allow updates when the AutoUpdate flag is set
   " this allows us to stop updates on startup.
-  if t:miniBufExplAutoUpdate == 1
+  if exists('t:miniBufExplAutoUpdate') && t:miniBufExplAutoUpdate == 1
     " if we don't have a window then create one
     let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 1)
 
-    if t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1
+    if (exists('t:skipEligibleBuffersCheck') && t:skipEligibleBuffersCheck == 1) || <SID>HasEligibleBuffers() == 1
       if (l:winnr == -1)
         if g:miniBufExplAutoStart == 1
           call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
@@ -2003,15 +2041,6 @@ function! <SID>AutoUpdate(curBufNum,force)
         let t:miniBufExplAutoUpdate = 1
       endif
     endif
-
-	  " VIM sometimes turns syntax highlighting off,
-	  " we can force it on, but this may cause weird
-	  " behavior so this is an optional hack to force
-	  " syntax back on when we enter a buffer
-	  if g:miniBufExplForceSyntaxEnable
-		  call <SID>DEBUG('Enable Syntax', 9)
-		  exec 'syntax enable'
-	  endif
   else
     call <SID>DEBUG('AutoUpdates are turned off, terminating',9)
   endif
@@ -2206,7 +2235,7 @@ function! <SID>NextNormalWindow()
   endwhile
 
   call <SID>DEBUG('Found no window',8)
-  call <SID>DEBUG('Leaving NextNormalWindow()',9)
+  call <SID>DEBUG('Leaving NextNormalWindow()',10)
   return -1
 endfunction
 
@@ -2256,7 +2285,13 @@ function! <SID>DEBUG(msg, level)
       let g:miniBufExplFuncCallDepth += 1
     endif
 
-    let l:msg = repeat('| ',g:miniBufExplFuncCallDepth).a:msg
+    if a:msg =~ '^Entering'
+      let l:msg = repeat('│ ',g:miniBufExplFuncCallDepth - 1).'┌ '.a:msg
+    elseif a:msg =~ '^Leaving'
+      let l:msg = repeat('│ ',g:miniBufExplFuncCallDepth - 1).'└ '.a:msg
+    else
+      let l:msg = repeat('│ ',g:miniBufExplFuncCallDepth).a:msg
+    endif
 
     " Prevent a report of our actions from showing up.
     let l:save_rep    = &report
