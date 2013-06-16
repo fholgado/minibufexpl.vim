@@ -72,6 +72,12 @@ endif
 if !exists(':MBEToggleAll')
   command! -bang MBEToggleAll call <SID>ToggleExplorer(1,'<bang>'=='!')
 endif
+if !exists(':MBEToggleMRU')
+  command! -bang MBEToggleMRU       call <SID>ToggleMRU()
+endif
+if !exists(':MBEToggleMRUAll')
+  command! -bang MBEToggleMRUAll    tabdo call <SID>ToggleMRU()
+endif
 if !exists(':MBEbn')
   command! MBEbn call <SID>CycleBuffer(1)
 endif
@@ -362,6 +368,9 @@ let t:miniBufExplAutoUpdate = 0
 " open MBE window no matter what value 'g:miniBufExplBuffersNeeded' is set.
 let t:skipEligibleBuffersCheck = 0
 
+" The order of buffer listing in MBE window is tab dependently.
+let t:miniBufExplSortBy = g:miniBufExplSortBy
+
 " }}}
 "
 " Auto Commands
@@ -436,6 +445,10 @@ endfunction
 
 function! <SID>TabEnterHandler()
   call <SID>DEBUG('Entering TabEnter Handler', 10)
+
+  if !exists('t:miniBufExplSortBy')
+     let t:miniBufExplSortBy = g:miniBufExplSortBy
+  endif
 
   if !exists('t:miniBufExplAutoUpdate')
     let t:miniBufExplAutoUpdate = s:TabsMBEState
@@ -765,6 +778,32 @@ function! <SID>FocusExplorer()
   call s:SwitchWindow('w',0,l:winNum)
 
   call <SID>DEBUG('Leaving FocusExplorer()',10)
+endfunction
+
+" }}}
+" ToggleMRU - Switch the order of buffer listing in MBE window {{{
+" between its default and most recently used.
+"
+function! <SID>ToggleMRU()
+  call <SID>DEBUG('Entering ToggleMRU()',10)
+
+  if t:miniBufExplSortBy == 'number'
+    let t:miniBufExplSortBy = 'mru'
+  else
+    let t:miniBufExplSortBy = 'number'
+  endif
+
+  let l:winnr = <SID>FindWindow('-MiniBufExplorer-', 1)
+
+  if (l:winnr == -1)
+    call <SID>DEBUG('MiniBufExplorer was not running, starting...', 9)
+    call <SID>StartExplorer(bufnr('%'))
+  else
+    call <SID>DEBUG('Updating MiniBufExplorer...', 9)
+    call <SID>UpdateExplorer(bufnr('%'))
+  endif
+
+  call <SID>DEBUG('Leaving ToggleMRU()',10)
 endfunction
 
 " }}}
@@ -1503,9 +1542,9 @@ function! <SID>BuildBufferList(curBufNum)
         call add(l:tabList, l:tab)
     endfor
 
-    if g:miniBufExplSortBy == "name"
+    if t:miniBufExplSortBy == "name"
         call sort(l:tabList, "<SID>NameCmp")
-    elseif g:miniBufExplSortBy == "mru"
+    elseif t:miniBufExplSortBy == "mru"
         call sort(l:tabList, "<SID>MRUCmp")
     endif
 
