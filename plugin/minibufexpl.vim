@@ -392,6 +392,8 @@ augroup MiniBufExpl
 if exists('##QuitPre')
   autocmd QuitPre        *
     \ if <SID>NextNormalWindow() == -1 | call <SID>StopExplorer(0) | endif
+else
+  autocmd BufEnter       * nested call <SID>QuitIfLastOpen()
 endif
   autocmd FileType minibufexpl    call <SID>RenderSyntax()
 augroup END
@@ -467,8 +469,6 @@ endfunction
 function! <SID>BufEnterHandler() abort
   call <SID>DEBUG('Entering BufEnter Handler', 10)
 
-  call <SID>QuitIfLastOpen()
-
   for l:i in s:BufList
     if <SID>IsBufferIgnored(l:i)
         call <SID>ListPop(s:BufList,l:i)
@@ -493,6 +493,20 @@ function! <SID>BufDeleteHandler()
   call <SID>ListPop(s:MRUList,str2nr(expand("<abuf>")))
 
   call <SID>UpdateAllBufferDicts(expand("<abuf>"),1)
+
+  " Handle ':bd' command correctly
+  if (bufname('%') == '-MiniBufExplorer-' && <SID>NextNormalWindow() == -1 && len(s:BufList) > 0)
+    if(tabpagenr('$') == 1)
+      setlocal modifiable
+      resize
+      exec 'noautocmd rightbelow sb'.s:BufList[0]
+      call s:SwitchWindow('p',1)
+      call <SID>ResizeWindow()
+      call s:SwitchWindow('p',1)
+    else
+      close
+    endif
+  endif
 
   call <SID>AutoUpdate(bufnr("%"),1)
 
