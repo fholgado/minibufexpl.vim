@@ -9,7 +9,7 @@ repo][].
 
 [Vim]: http://vim.org
 [MiniBufExpl]: http://www.vim.org/scripts/script.php?script_id=159
-[Techlive Zheng]: https://techlivezheng.me
+[Techlive Zheng]: http://techlivezheng.me
 [Federico Holgado]: http://www.fholgado.com
 [@fholgado's repo]:https://github.com/fholgado/minibufexpl.vim
 [@techlivezheng's repo]: https://github.com/techlivezheng/vim-plugin-minibufexpl
