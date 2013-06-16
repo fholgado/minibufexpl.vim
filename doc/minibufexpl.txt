@@ -143,6 +143,14 @@ configuration of Vim.
     auto-updating will only be disabled if the required numbers of eligible
     buffers has been meet.
 
+:MBEToggleMRU                                                  *:MBEToggleMRU*
+    Toggle the buffer listing order of the MBE window between its default and
+    most recently used.
+
+:MBEToggleMRUAll                                            *:MBEToggleMRUAll*
+    Toggle the buffer listing order of the MBE window between its default and
+    most recently used in every tab page.
+
 :MBEbn                                                                *:MBEbn*
     Switch to next normal buffer in current window.
 
