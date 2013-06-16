@@ -423,8 +423,6 @@ function! <SID>VimEnterHandler()
     let t:miniBufExplAutoUpdate = 1
   endif
 
-  let t:skipEligibleBuffersCheck = 0
-
   if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
         \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
     call <SID>StartExplorer(bufnr("%"))
