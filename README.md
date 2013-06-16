@@ -4,7 +4,7 @@ This is a fork of [Bindu Wavell][]'s [MiniBufExpl][] plugin for [Vim][].
 
 [Federico Holgado][] started this fork and made lots of improvements. It is
 currently maintained by [Techlive Zheng][], the development has been moved to
-[@techlivezheng's repo][], only new version will be relased to [@fholgado's
+[@techlivezheng's repo][], only new version will be released to [@fholgado's
 repo][].
 
 [Vim]: http://vim.org
