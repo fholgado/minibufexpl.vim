@@ -499,10 +499,9 @@ function! <SID>BufDeleteHandler()
     if(tabpagenr('$') == 1)
       setlocal modifiable
       resize
-      exec 'noautocmd rightbelow sb'.s:BufList[0]
-      call s:SwitchWindow('p',1)
-      call <SID>ResizeWindow()
-      call s:SwitchWindow('p',1)
+      exec 'noautocmd sb'.s:BufList[0]
+      call <SID>StopExplorer(0)
+      call <SID>StartExplorer(bufnr("%"))
     else
       close
     endif
