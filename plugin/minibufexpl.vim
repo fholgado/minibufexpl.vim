@@ -1983,8 +1983,8 @@ endfunction
 " MRUCmp - compares tabs based on MRU order {{{
 "
 function! <SID>MRUCmp(tab1, tab2)
-  let l:buf1 = str2nr(matchstr(a:tab1, '[0-9]\+'))
-  let l:buf2 = str2nr(matchstr(a:tab2, '[0-9]\+'))
+  let l:buf1 = <SID>GetBufferNumber(a:tab1)
+  let l:buf2 = <SID>GetBufferNumber(a:tab2)
   return index(s:MRUList, l:buf1) - index(s:MRUList, l:buf2)
 endfunction
 
@@ -2007,8 +2007,8 @@ endfunction
 " NumberCmp - compares tabs based on buffer number {{{
 "
 function! <SID>NumberCmp(tab1, tab2)
-  let l:buf1 = str2nr(matchstr(a:tab1, '[0-9]\+'))
-  let l:buf2 = str2nr(matchstr(a:tab2, '[0-9]\+'))
+  let l:buf1 = <SID>GetBufferNumber(a:tab1)
+  let l:buf2 = <SID>GetBufferNumber(a:tab2)
   return l:buf1 - l:buf2
 endfunction
 
@@ -2137,11 +2137,33 @@ function! <SID>QuitIfLastOpen() abort
 endfunction
 
 " }}}
+" GetBufferNumber - Get the buffer number from a formated string {{{
+"
+function! <SID>GetBufferNumber(bufname)
+  call <SID>DEBUG('Entering GetBufferNumber()',10)
+  call <SID>DEBUG('The buffer name is '.a:bufname,9)
+  if !g:miniBufExplShowBufNumbers
+    " This is a bit ugly, but it works, unless we come up with a
+    " better way to get the key for a dictionary by its value.
+    let l:bufUniqNameDictKeys = keys(s:bufUniqNameDict)
+    let l:bufUniqNameDictValues = values(s:bufUniqNameDict)
+    let l:retv = l:bufUniqNameDictKeys[match(l:bufUniqNameDictValues,substitute(a:bufname,'\[*\([^\]]*\)\]*.*', '\1', ''))]
+  else
+    let l:retv = substitute(a:bufname,'\[*\([0-9]*\):[^\]]*\]*.*', '\1', '') + 0
+  endif
+  call <SID>DEBUG('The buffer number is '.l:retv,9)
+  call <SID>DEBUG('Leaving GetBufferNumber()',10)
+  return str2nr(l:retv)
+endfunction
+
+" }}}
 " GetActiveBuffer {{{
 "
 function! <SID>GetActiveBuffer()
   call <SID>DEBUG('Entering GetActiveBuffer()',10)
-  let l:bufNum = substitute(s:miniBufExplBufList,'\[\([0-9]*\):[^\]]*\][^\!]*!', '\1', '') + 0
+  let l:bufStr = substitute(s:miniBufExplBufList,'.*\(\[[0-9]*:*[^\]]*\][^\!]*!\).*', '\1', '')
+  call <SID>DEBUG('Currently active buffer is '.l:bufStr,10)
+  let l:bufNum = <SID>GetBufferNumber(l:bufStr)
   call <SID>DEBUG('Currently active buffer is '.l:bufNum,10)
   call <SID>DEBUG('Leaving GetActiveBuffer()',10)
   return l:bufNum
@@ -2172,26 +2194,17 @@ function! <SID>GetSelectedBuffer()
   let @" = ""
   normal ""yi[
   if @" != ""
-    if !g:miniBufExplShowBufNumbers
-      " This is a bit ugly, but it works, unless we come up with a
-      " better way to get the key for a dictionary by its value.
-      let l:bufUniqNameDictKeys = keys(s:bufUniqNameDict)
-      let l:bufUniqNameDictValues = values(s:bufUniqNameDict)
-      let l:retv = l:bufUniqNameDictKeys[match(l:bufUniqNameDictValues,substitute(@",'[0-9]*:\(.*\)', '\1', ''))]
-    else
-      let l:retv = substitute(@",'\([0-9]*\):.*', '\1', '') + 0
-    endif
-    let @" = l:save_reg
-    call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
-    return l:retv
+    let l:retv = <SID>GetBufferNumber(@")
   else
-    let @" = l:save_reg
-    call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
-    return -1
+    let l:retv = -1
   endif
+  let @" = l:save_reg
 
   let &report  = l:save_rep
   let &showcmd = l:save_sc
+
+  call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
+  return l:retv
 endfunction
 
 " }}}
