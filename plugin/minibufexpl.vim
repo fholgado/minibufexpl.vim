@@ -1542,10 +1542,13 @@ function! <SID>BuildBufferList(curBufNum)
         call add(l:tabList, l:tab)
     endfor
 
-    if t:miniBufExplSortBy == "name"
-        call sort(l:tabList, "<SID>NameCmp")
-    elseif t:miniBufExplSortBy == "mru"
+    if t:miniBufExplSortBy == "mru"
         call sort(l:tabList, "<SID>MRUCmp")
+    elseif t:miniBufExplSortBy == "name"
+        call sort(l:tabList, "<SID>NameCmp")
+    else
+        " Sort by buffer number by default
+        call sort(l:tabList, "<SID>NumberCmp")
     endif
 
     let l:miniBufExplBufList = ''
@@ -1977,6 +1980,15 @@ function! <SID>UpdateBufferStateDict(bufNum,deleted)
 endfunction
 
 " }}}
+" MRUCmp - compares tabs based on MRU order {{{
+"
+function! <SID>MRUCmp(tab1, tab2)
+  let l:buf1 = str2nr(matchstr(a:tab1, '[0-9]\+'))
+  let l:buf2 = str2nr(matchstr(a:tab2, '[0-9]\+'))
+  return index(s:MRUList, l:buf1) - index(s:MRUList, l:buf2)
+endfunction
+
+" }}}
 " NameCmp - compares tabs based on filename {{{
 "
 function! <SID>NameCmp(tab1, tab2)
@@ -1992,12 +2004,12 @@ function! <SID>NameCmp(tab1, tab2)
 endfunction
 
 " }}}
-" MRUCmp - compares tabs based on MRU order {{{
+" NumberCmp - compares tabs based on buffer number {{{
 "
-function! <SID>MRUCmp(tab1, tab2)
+function! <SID>NumberCmp(tab1, tab2)
   let l:buf1 = str2nr(matchstr(a:tab1, '[0-9]\+'))
   let l:buf2 = str2nr(matchstr(a:tab2, '[0-9]\+'))
-  return index(s:MRUList, l:buf1) - index(s:MRUList, l:buf2)
+  return l:buf1 - l:buf2
 endfunction
 
 " }}}
