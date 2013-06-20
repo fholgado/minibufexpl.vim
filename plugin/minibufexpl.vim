@@ -2181,17 +2181,16 @@ function! <SID>GetSelectedBuffer()
     else
       let l:retv = substitute(@",'\([0-9]*\):.*', '\1', '') + 0
     endif
-    let @" = l:save_reg
-    call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
-    return l:retv
   else
-    let @" = l:save_reg
-    call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
-    return -1
+    let l:retv = -1
   endif
+  let @" = l:save_reg
 
   let &report  = l:save_rep
   let &showcmd = l:save_sc
+
+  call <SID>DEBUG('Leaving GetSelectedBuffer()',10)
+  return l:retv
 endfunction
 
 " }}}
