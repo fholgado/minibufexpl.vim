@@ -469,12 +469,6 @@ endfunction
 function! <SID>BufAddHandler()
   call <SID>DEBUG('Entering BufAdd Handler', 10)
 
-  " Check to make sure our buffer is still there, some autocmds
-  " might have deleted it already.
-  if !bufexists(expand("<abuf"))
-    return
-  endif
-
   call <SID>ListAdd(s:BufList,str2nr(expand("<abuf>")))
   call <SID>ListAdd(s:MRUList,str2nr(expand("<abuf>")))
 
