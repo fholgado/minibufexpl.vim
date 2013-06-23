@@ -434,7 +434,14 @@ function! <SID>VimEnterHandler()
 
   if g:miniBufExplAutoStart && t:miniBufExplAutoUpdate == 1
         \ && (t:skipEligibleBuffersCheck == 1 || <SID>HasEligibleBuffers() == 1)
-    call <SID>StartExplorer(bufnr("%"))
+
+    " VimEnter event will be triggered after a session is loaded, if there is
+    " already a MBE window, we need to update it at this point.
+    if <SID>FindWindow('-MiniBufExplorer-', 1) == -1
+      call <SID>StartExplorer(bufnr("%"))
+    else
+      call <SID>UpdateExplorer(bufnr("%"))
+    endif
 
     " Let the MBE open in the new tab
     let s:TabsMBEState = 1
