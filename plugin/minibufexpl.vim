@@ -646,7 +646,11 @@ function! <SID>StartExplorer(curBufNum)
 
   " Set the text of the statusline for the MBE buffer. See help:stl for
   " many options
-  exec 'setlocal statusline='.g:miniBufExplStatusLineText
+  if g:miniBufExplStatusLineText == ""
+    exec 'setlocal statusline=\ '
+  else
+    exec 'setlocal statusline='.g:miniBufExplStatusLineText
+  end
 
   " No spell check
   setlocal nospell
