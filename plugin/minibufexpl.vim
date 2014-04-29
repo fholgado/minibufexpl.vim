@@ -632,7 +632,7 @@ function! <SID>StartExplorer(curBufNum)
   " them off for the MBE window
   setlocal foldcolumn=0
   setlocal nonumber
-  if exists("&norelativenumber")
+  if exists("&relativenumber")
     " relativenumber was introduced in Vim 7.3 - this provides compatibility
     " for older versions of Vim
     setlocal norelativenumber
