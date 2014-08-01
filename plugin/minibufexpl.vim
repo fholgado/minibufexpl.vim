@@ -96,6 +96,9 @@ endif
 if !exists(':MBEbw')
   command! -bang -nargs=* MBEbw call <SID>DeleteBuffer(1,'<bang>'=='!',<f-args>)
 endif
+if !exists(':MBEbs')
+  command! -bang -nargs=* MBEbs call <SID>SwitchBuffer(<f-args>)
+endif
 if !exists(':MBEbun')
   command! -bang -nargs=* MBEbun call <SID>DeleteBuffer(2,'<bang>'=='!',<f-args>)
 endif
@@ -1341,6 +1344,48 @@ function! <SID>CycleBuffer(forward,...)
   let s:MRUEnable = 1
 endfunction
 
+" }}}
+" SwitchBuffer {{{
+"
+" Select a buffer by its number if it is not ignored
+"
+" Useful for mapping such as follows
+"   nmap <Leader>1  :MBEbs1<CR>
+"   nmap <Leader>2  :MBEbs2<CR>
+"   nmap <Leader>3  :MBEbs3<CR>
+"   nmap <Leader>4  :MBEbs4<CR>
+"   nmap <Leader>5  :MBEbs5<CR>
+"   nmap <Leader>6  :MBEbs6<CR>
+"   nmap <Leader>7  :MBEbs7<CR>
+"   nmap <Leader>8  :MBEbs8<CR>
+"   nmap <Leader>9  :MBEbs9<CR>
+"   nmap <Leader>0  :MBEbs0<CR>
+"
+" a:bufNum
+"   number of the buffer to select
+"
+function! <SID>SwitchBuffer(bufNum,...)
+  call <SID>DEBUG('Entering SwitchBuffer('.a:bufNum.')',10)
+  if <SID>IsBufferIgnored(bufnr('%')) == 1
+    echo 'Current buffer is ignored, not switching.'
+    return
+  endif
+
+  let l:bufNum = a:bufNum + 0
+
+  if <SID>IsBufferIgnored(l:bufNum) == 1
+    echo 'Buffer '.l:bufNum.' is not selectable!'
+    return
+  endif
+
+  call <SID>DEBUG('Selecting buffer '.a:bufNum,5)
+  let l:moveCmd = 'b! '.l:bufNum
+
+  " Change buffer (keeping track of before and after buffers)
+  exec l:moveCmd
+
+  call <SID>DEBUG('Leaving SwitchBuffer()',10)
+endfunction
 " }}}
 " DeleteBuffer {{{
 "
