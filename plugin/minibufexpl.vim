@@ -1542,7 +1542,9 @@ function! <SID>BuildBufferList(curBufNum)
         call add(l:tabList, l:tab)
     endfor
 
-    if t:miniBufExplSortBy == "name"
+    if t:miniBufExplSortBy == "number"
+        call sort(l:tabList, "<SID>NumCmp")
+    elseif t:miniBufExplSortBy == "name"
         call sort(l:tabList, "<SID>NameCmp")
     elseif t:miniBufExplSortBy == "mru"
         call sort(l:tabList, "<SID>MRUCmp")
@@ -2001,6 +2003,22 @@ function! <SID>MRUCmp(tab1, tab2)
 endfunction
 
 " }}}
+" NumCmp - compares tabs based on filename {{{
+"
+function! <SID>NumCmp(tab1, tab2)
+  let l:num1 = matchstr(a:tab1, ".*:")
+  let l:num2 = matchstr(a:tab2, ".*:")
+  if l:num1 < l:num2
+    return -1
+  elseif l:num1 > l:num2
+    return 1
+  else
+    return 0
+  endif
+endfunction
+
+" }}}
+"
 " HasEligibleBuffers - Are there enough MBE eligible buffers to open the MBE window? {{{
 "
 " Returns 1 if there are any buffers that can be displayed in a
