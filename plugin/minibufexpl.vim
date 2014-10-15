@@ -2006,8 +2006,8 @@ endfunction
 " NumCmp - compares tabs based on filename {{{
 "
 function! <SID>NumCmp(tab1, tab2)
-  let l:num1 = matchstr(a:tab1, ".*:")
-  let l:num2 = matchstr(a:tab2, ".*:")
+  let l:num1 = str2nr(matchstr(a:tab1, ".*:"))
+  let l:num2 = str2nr(matchstr(a:tab2, ".*:"))
   if l:num1 < l:num2
     return -1
   elseif l:num1 > l:num2
@@ -2018,7 +2018,6 @@ function! <SID>NumCmp(tab1, tab2)
 endfunction
 
 " }}}
-"
 " HasEligibleBuffers - Are there enough MBE eligible buffers to open the MBE window? {{{
 "
 " Returns 1 if there are any buffers that can be displayed in a
