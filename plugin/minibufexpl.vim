@@ -1542,7 +1542,9 @@ function! <SID>BuildBufferList(curBufNum)
         call add(l:tabList, l:tab)
     endfor
 
-    if t:miniBufExplSortBy == "name"
+    if t:miniBufExplSortBy == "number"
+        call sort(l:tabList, "<SID>NumCmp")
+    elseif t:miniBufExplSortBy == "name"
         call sort(l:tabList, "<SID>NameCmp")
     elseif t:miniBufExplSortBy == "mru"
         call sort(l:tabList, "<SID>MRUCmp")
@@ -1998,6 +2000,21 @@ function! <SID>MRUCmp(tab1, tab2)
   let l:buf1 = str2nr(matchstr(a:tab1, '[0-9]\+'))
   let l:buf2 = str2nr(matchstr(a:tab2, '[0-9]\+'))
   return index(s:MRUList, l:buf1) - index(s:MRUList, l:buf2)
+endfunction
+
+" }}}
+" NumCmp - compares tabs based on filename {{{
+"
+function! <SID>NumCmp(tab1, tab2)
+  let l:num1 = str2nr(matchstr(a:tab1, ".*:", 1))
+  let l:num2 = str2nr(matchstr(a:tab2, ".*:", 1))
+  if l:num1 < l:num2
+    return -1
+  elseif l:num1 > l:num2
+    return 1
+  else
+    return 0
+  endif
 endfunction
 
 " }}}
