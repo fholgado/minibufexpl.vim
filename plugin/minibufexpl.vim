@@ -2006,8 +2006,8 @@ endfunction
 " NumCmp - compares tabs based on filename {{{
 "
 function! <SID>NumCmp(tab1, tab2)
-  let l:num1 = str2nr(matchstr(a:tab1, ".*:"))
-  let l:num2 = str2nr(matchstr(a:tab2, ".*:"))
+  let l:num1 = str2nr(matchstr(a:tab1, ".*:", 1))
+  let l:num2 = str2nr(matchstr(a:tab2, ".*:", 1))
   if l:num1 < l:num2
     return -1
   elseif l:num1 > l:num2
