@@ -52,31 +52,31 @@ if !exists(':MBEFocus')
   command! MBEFocus           call <SID>FocusExplorer()
 endif
 if !exists(':MBEFocusAll')
-  command! MBEFocusAll        tabdo call <SID>FocusExplorer()
+  command! MBEFocusAll        let s:currTab=tabpagenr() | tabdo call <SID>FocusExplorer() | exec "tabnext " . s:currTab
 endif
 if !exists(':MBEOpen')
   command! -bang MBEOpen      let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%"))
 endif
 if !exists(':MBEOpenAll')
-  command! -bang MBEOpenAll   tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%")) | let s:TabsMBEState = 1
+  command! -bang MBEOpenAll   let s:currTab=tabpagenr() | tabdo let t:skipEligibleBuffersCheck = 1 | if '<bang>' == '!' | call <SID>StopExplorer(0) | endif | call <SID>StartExplorer(bufnr("%")) | let s:TabsMBEState = 1 | exec "tabnext " . s:currTab
 endif
 if !exists(':MBEClose')
   command! -bang MBEClose     let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!')
 endif
 if !exists(':MBECloseAll')
-  command! -bang MBECloseAll  tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!') | let s:TabsMBEState = 0
+  command! -bang MBECloseAll  let s:currTab=tabpagenr() | tabdo let t:skipEligibleBuffersCheck = 0 | call <SID>StopExplorer('<bang>' == '!') | let s:TabsMBEState = 0 | exec "tabnext " . s:currTab
 endif
 if !exists(':MBEToggle')
   command! -bang MBEToggle    call <SID>ToggleExplorer(0,'<bang>'=='!')
 endif
 if !exists(':MBEToggleAll')
-  command! -bang MBEToggleAll call <SID>ToggleExplorer(1,'<bang>'=='!')
+  command! -bang MBEToggleAll let s:currTab=tabpagenr() | call <SID>ToggleExplorer(1,'<bang>'=='!') | exec "tabnext " . s:currTab
 endif
 if !exists(':MBEToggleMRU')
   command! -bang MBEToggleMRU       call <SID>ToggleMRU()
 endif
 if !exists(':MBEToggleMRUAll')
-  command! -bang MBEToggleMRUAll    tabdo call <SID>ToggleMRU()
+  command! -bang MBEToggleMRUAll    let s:currTab=tabpagenr() | tabdo call <SID>ToggleMRU() | exec "tabnext " . s:currTab
 endif
 if !exists(':MBEbn')
   command! MBEbn call <SID>CycleBuffer(1)
