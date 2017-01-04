@@ -1521,6 +1521,8 @@ function! <SID>BuildBufferList(curBufNum)
         let l:tab .= s:bufUniqNameDict[l:i]
         let l:tab .= ']'
 
+        let l:tabWidth = strlen(l:tab)
+
         " If the buffer is open in a window mark it
         if bufwinnr(l:i) != -1
             let l:tab .= '*'
@@ -1537,7 +1539,16 @@ function! <SID>BuildBufferList(curBufNum)
             let l:tab .= '!'
         endif
 
-        let l:maxTabWidth = strlen(l:tab) > l:maxTabWidth ? strlen(l:tab) : l:maxTabWidth
+        if g:miniBufExplVSplit == 0
+          " in normal mode, take the actual width as the TabWidth
+          let l:tabWidth = strlen(l:tab)
+        else
+          " in VSplit mode, use the potentially maximal width of a tab
+          " i.e. the tab content plus space for all the possible flags
+          let l:tabWidth = l:tabWidth + 3
+        endif
+
+        let l:maxTabWidth = l:tabWidth > l:maxTabWidth ? l:tabWidth : l:maxTabWidth
 
         call add(l:tabList, l:tab)
     endfor
