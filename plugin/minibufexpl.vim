@@ -1094,10 +1094,14 @@ function! <SID>DisplayBuffers(curBufNum)
 
   " Place cursor at current buffer in MBE
   if !<SID>IsBufferIgnored(a:curBufNum)
-    if !g:miniBufExplShowBufNumbers
-      call search('\V['.s:bufUniqNameDict[a:curBufNum].']', 'w')
+    if !g:miniBufExplVSplit
+      if !g:miniBufExplShowBufNumbers
+        call search('\V['.s:bufUniqNameDict[a:curBufNum].']', 'w')
+      else
+        call search('\V['.a:curBufNum.':'.s:bufUniqNameDict[a:curBufNum].']', 'w')
+      endif
     else
-      call search('\V['.a:curBufNum.':'.s:bufUniqNameDict[a:curBufNum].']', 'w')
+      call cursor(a:curBufNum, 0)
     endif
   endif
 
@@ -1206,6 +1210,11 @@ function! <SID>ResizeWindow()
       call <SID>DEBUG('ResizeWindow to '.l:newWidth.' columns',9)
       exec 'vertical resize '.l:newWidth
     endif
+    " if there are more than enough entries in both directions
+    " then center the selected line
+    let l:lines = winheight('%') / 2
+    exec 'setlocal scrolloff='.l:lines
+
 
     let saved_ead = &ead
     let &ead = 'hor'
@@ -1256,6 +1265,11 @@ function! <SID>ShowBuffers()
   $
   put! =s:miniBufExplBufList
   silent $ d _
+
+  " in VSplit scroll the viewport as topmost as possible
+  if g:miniBufExplVSplit == 1
+    call cursor(1,0)
+  endif
 
   " Prevent the buffer from being modified.
   setlocal nomodifiable
