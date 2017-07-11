@@ -182,7 +182,7 @@ configured for Vim. This adds a lot of visual clutter to MBE and does not add
 any functionality, since the status line is showing information for a buffer
 that does not contain any real content.
 
-![][stauts_line_clutter_old]
+![][status_line_clutter_old]
 
 [status_line_clutter_old]: http://dl.dropbox.com/u/118650/mbe/screenshots/status_line/old.png
 
