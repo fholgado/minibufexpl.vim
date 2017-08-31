@@ -99,6 +99,9 @@ endif
 if !exists(':MBEbun')
   command! -bang -nargs=* MBEbun call <SID>DeleteBuffer(2,'<bang>'=='!',<f-args>)
 endif
+if !exists(':MBEup')
+  command! -nargs=* MBEup call <SID>UpdateExplorer(bufnr("%"))
+endif
 
 " }}}
 "
@@ -1389,7 +1392,9 @@ function! <SID>DeleteBuffer(action,bang,...)
 
     " Detach the buffer from all the windows that holding it
     " in every tab page.
+    let iCurTab=tabpagenr()
     tabdo call <SID>DetachBuffer(l:bufNum)
+    execute("tabn " . iCurTab)
 
     " Find which buffer is in the active window now
     if l:actBuf == l:bufNum
@@ -1509,7 +1514,12 @@ function! <SID>BuildBufferList(curBufNum)
     let l:maxTabWidth = 0
 
     " Loop through every buffer less than the total number of buffers.
+    "<NOTE:mf>only show bufs in tabpage
+    let l:lstTabBuf=GetTabBufs()
     for l:i in s:BufList
+        if g:minibuf_limit_tab==#1 && index(l:lstTabBuf,l:i)==-1
+            continue
+        endif
         let l:BufName = expand( "#" . l:i . ":p:t")
 
         " Establish the tab's content, including the differentiating root
@@ -1541,7 +1551,10 @@ function! <SID>BuildBufferList(curBufNum)
 
         call add(l:tabList, l:tab)
     endfor
-
+    
+    if !exists('t:miniBufExplSortBy')
+      let t:miniBufExplSortBy = g:miniBufExplSortBy
+    endif
     if t:miniBufExplSortBy == "name"
         call sort(l:tabList, "<SID>NameCmp")
     elseif t:miniBufExplSortBy == "mru"
