@@ -531,6 +531,8 @@ endfunction
 " RenderSyntax {{{
 "
 function! <SID>RenderSyntax()
+  "Avoid background color override by cursorline
+  setlocal nocursorline
   if has("syntax")
     syn clear
     syn match MBENormal                   '\[[^\]]*\]'
