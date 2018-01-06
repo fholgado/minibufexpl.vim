@@ -1564,6 +1564,8 @@ function! <SID>BuildBufferList(curBufNum)
             let l:miniBufExplBufList = l:miniBufExplBufList . "\n"
         endif
     endfor
+    " trim whitespaces
+    let l:miniBufExplBufList = substitute(l:miniBufExplBufList, '^\s*\(.\{-}\)\s*$', '\1', '')
 
     if (s:miniBufExplBufList != l:miniBufExplBufList)
         let s:maxTabWidth = l:maxTabWidth
