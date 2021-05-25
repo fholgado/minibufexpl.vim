@@ -582,7 +582,10 @@ function! <SID>StartExplorer(curBufNum)
     return
   endif
 
-  call <SID>CreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
+  try
+    call <SID>CreateWindow('-MiniBufExplorer-', g:miniBufExplVSplit, g:miniBufExplBRSplit, g:miniBufExplSplitToEdge, 1, 1)
+  catch /.*/
+  endtry
 
   let l:winNum = <SID>FindWindow('-MiniBufExplorer-', 1)
 
@@ -2456,7 +2459,10 @@ function! s:SwitchWindow(action, ...)
   call <SID>DEBUG('previous window is: '.winnr(),10)
   let l:wincmd = l:aucmd.l:winnr.'wincmd '.a:action
   call <SID>DEBUG('window switching command is: '.l:wincmd,10)
-  exec l:wincmd
+  try
+    exec l:wincmd
+  catch /.*/
+  endtry
   call <SID>DEBUG('current window is: '.winnr(),10)
 
   call <SID>DEBUG('Leaving SwitchWindow()',10)
