@@ -539,6 +539,7 @@ function! <SID>RenderSyntax()
     syn match MBEVisibleChanged           '\[[^\]]*\]\*+'
     syn match MBEVisibleActiveNormal      '\[[^\]]*\]\*!'
     syn match MBEVisibleActiveChanged     '\[[^\]]*\]\*+!'
+    syn match MBEBufferNumber             '\[\d\+:'hs=s+1,he=e-1
 
     "MiniBufExpl Color Examples
     " hi MBENormal               guifg=#808080 guibg=fg
@@ -556,6 +557,7 @@ function! <SID>RenderSyntax()
       hi def link MBEVisibleChanged        Special
       hi def link MBEVisibleActiveNormal   Underlined
       hi def link MBEVisibleActiveChanged  Error
+      hi def link MBEBufferNumber          Constant
     endif
 
     let b:current_syntax = "minibufexpl"
